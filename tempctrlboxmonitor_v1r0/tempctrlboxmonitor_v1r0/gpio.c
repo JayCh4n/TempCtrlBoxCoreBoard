@@ -12,6 +12,7 @@
  */ 
 void gpio_init()
 {
+	/* LED相关IO口初始化 */	
 	LED1_PIN_OUTPUT;
 	LED2_PIN_OUTPUT;
 	LED3_PIN_OUTPUT;
@@ -28,6 +29,7 @@ void gpio_init()
 	LED6_OFF;
 	LED7_ON;
 	
+	/*
 	IQR0_PIN_OUTPUT;
 	IQR1_PIN_OUTPUT;
 	IQR2_PIN_OUTPUT;
@@ -45,11 +47,19 @@ void gpio_init()
 	IQR5_CLOSE;
 	IQR6_CLOSE;
 	IQR7_CLOSE;
-
+	*/
+	
+	/* 继电器相关IO口初始化 */
 	ALARM_PIN_OUTPUT;
 	ACCON_PIN_OUTPUT;
 	
 	ALARM_OFF;
 	ACCON_ON;
 	
+	/*io口模拟uart相关IO初始化*/
+	USART2_TX_PIN_OUTPUT;
+	USART2_RX_PIN_INPUT;
+	USART2_RX_PIN_PULLUP;
+	
+	USART2_TX_PIN_SET;
 }

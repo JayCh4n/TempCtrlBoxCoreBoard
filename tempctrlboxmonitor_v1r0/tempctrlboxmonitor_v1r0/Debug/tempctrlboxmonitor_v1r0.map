@@ -278,7 +278,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000     0x2acc
+.text           0x00000000     0x2842
  *(.vectors)
  .vectors       0x00000000       0x8c D:/AtmelStudio7/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega64a/avr5/crtatmega64a.o
                 0x00000000                __vector_default
@@ -463,81 +463,81 @@ END GROUP
                 0x00001800      0x6b4 eeprom.o
                 0x00001800                read_eeprom_data
  .text.gpio_init
-                0x00001eb4       0x46 gpio.o
+                0x00001eb4       0x2e gpio.o
                 0x00001eb4                gpio_init
  .text.system_init
-                0x00001efa       0x22 main.o
-                0x00001efa                system_init
- .text.main     0x00001f1c       0xbe main.o
-                0x00001f1c                main
+                0x00001ee2       0x22 main.o
+                0x00001ee2                system_init
+ .text.main     0x00001f04       0xbe main.o
+                0x00001f04                main
  .text.__vector_16
-                0x00001fda      0x27a timer.o
-                0x00001fda                __vector_16
+                0x00001fc2      0x27a timer.o
+                0x00001fc2                __vector_16
  .text.__vector_12
-                0x00002254      0x286 timer.o
-                0x00002254                __vector_12
+                0x0000223c       0x14 timer.o
+                0x0000223c                __vector_12
  .text.__vector_10
-                0x000024da       0x8e timer.o
-                0x000024da                __vector_10
+                0x00002250       0x8e timer.o
+                0x00002250                __vector_10
  .text.timer0_init
-                0x00002568       0x1e timer.o
-                0x00002568                timer0_init
+                0x000022de       0x1e timer.o
+                0x000022de                timer0_init
  .text.timer1_init
-                0x00002586       0x22 timer.o
-                0x00002586                timer1_init
+                0x000022fc       0x22 timer.o
+                0x000022fc                timer1_init
  .text.timer2_init
-                0x000025a8       0x24 timer.o
-                0x000025a8                timer2_init
+                0x0000231e       0x24 timer.o
+                0x0000231e                timer2_init
  .text.__vector_18
-                0x000025cc       0x46 usart.o
-                0x000025cc                __vector_18
+                0x00002342       0x46 usart.o
+                0x00002342                __vector_18
  .text.__vector_30
-                0x00002612       0x48 usart.o
-                0x00002612                __vector_30
+                0x00002388       0x48 usart.o
+                0x00002388                __vector_30
  .text.usart0_send_char
-                0x0000265a        0x8 usart.o
-                0x0000265a                usart0_send_char
+                0x000023d0        0x8 usart.o
+                0x000023d0                usart0_send_char
  .text.usart0_send_str
-                0x00002662       0x32 usart.o
-                0x00002662                usart0_send_str
+                0x000023d8       0x32 usart.o
+                0x000023d8                usart0_send_str
  .text.usart1_send_char
-                0x00002694       0x10 usart.o
-                0x00002694                usart1_send_char
+                0x0000240a       0x10 usart.o
+                0x0000240a                usart1_send_char
  .text.usart1_send_str
-                0x000026a4       0x32 usart.o
-                0x000026a4                usart1_send_str
+                0x0000241a       0x32 usart.o
+                0x0000241a                usart1_send_str
  .text.crc_check
-                0x000026d6       0x4e usart.o
-                0x000026d6                crc_check
+                0x0000244c       0x4e usart.o
+                0x0000244c                crc_check
  .text.usart0_deal
-                0x00002724      0x27c usart.o
-                0x00002724                usart0_deal
+                0x0000249a      0x27c usart.o
+                0x0000249a                usart0_deal
  .text.usart1_deal
-                0x000029a0       0x78 usart.o
-                0x000029a0                usart1_deal
+                0x00002716       0x78 usart.o
+                0x00002716                usart1_deal
  .text.usart0_init
-                0x00002a18       0x1c usart.o
-                0x00002a18                usart0_init
+                0x0000278e       0x1c usart.o
+                0x0000278e                usart0_init
  .text.usart1_init
-                0x00002a34       0x1a usart.o
-                0x00002a34                usart1_init
+                0x000027aa       0x1a usart.o
+                0x000027aa                usart1_init
  .text.libgcc.div
-                0x00002a4e       0x28 d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_divmodhi4.o)
-                0x00002a4e                _div
-                0x00002a4e                __divmodhi4
- .text.libgcc   0x00002a76        0xc d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
-                0x00002a76                __tablejump2__
+                0x000027c4       0x28 d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_divmodhi4.o)
+                0x000027c4                _div
+                0x000027c4                __divmodhi4
+ .text.libgcc   0x000027ec        0xc d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+                0x000027ec                __tablejump2__
  .text.libgcc.mul
-                0x00002a82       0x1e d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_umulhisi3.o)
-                0x00002a82                __umulhisi3
+                0x000027f8       0x1e d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_umulhisi3.o)
+                0x000027f8                __umulhisi3
  .text.libgcc.div
-                0x00002aa0       0x28 d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodhi4.o)
-                0x00002aa0                __udivmodhi4
-                0x00002ac8                . = ALIGN (0x2)
+                0x00002816       0x28 d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodhi4.o)
+                0x00002816                __udivmodhi4
+                0x0000283e                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00002ac8        0x0 d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x00002ac8                _exit
-                0x00002ac8                exit
+ .fini9         0x0000283e        0x0 d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x0000283e                _exit
+                0x0000283e                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -556,11 +556,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00002ac8        0x4 d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x0000283e        0x4 d:/atmelstudio7/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00002acc                _etext = .
+                0x00002842                _etext = .
 
-.data           0x00800100      0x158 load address 0x00002acc
+.data           0x00800100      0x158 load address 0x00002842
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -641,7 +641,7 @@ END GROUP
                 0x00800258                _edata = .
                 0x00800258                PROVIDE (__data_end, .)
 
-.bss            0x00800258      0x418
+.bss            0x00800258      0x3f7
                 0x00800258                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
@@ -710,85 +710,78 @@ END GROUP
                 0x008002e7                run_temp_page
  .bss.pre_iqr   0x008002e8        0x2 dgus.o
                 0x008002e8                pre_iqr
- .bss.time_cnt.1812
+ .bss.time_cnt.1788
                 0x008002ea        0x1 timer.o
- .bss.curve_cnt.1787
-                0x008002eb        0x1 timer.o
- .bss.pre_sta.1786
-                0x008002ec        0x8 timer.o
- .bss.sta.1785  0x008002f4        0x8 timer.o
- .bss.time_cnt.1784
-                0x008002fc       0x10 timer.o
  .bss.usart0_cnt.1765
-                0x0080030c        0x1 timer.o
+                0x008002eb        0x1 timer.o
  .bss.pre_usart0_rx_cnt.1766
-                0x0080030d        0x1 timer.o
+                0x008002ec        0x1 timer.o
  .bss.usart1_cnt.1763
-                0x0080030e        0x1 timer.o
+                0x008002ed        0x1 timer.o
  .bss.pre_usart1_rx_cnt.1764
-                0x0080030f        0x1 timer.o
+                0x008002ee        0x1 timer.o
  .bss.update_run_temp_cnt.1769
-                0x00800310        0x2 timer.o
+                0x008002ef        0x2 timer.o
  .bss.time_cnt.1767
-                0x00800312        0x1 timer.o
+                0x008002f1        0x1 timer.o
  .bss.timer2_ovf
-                0x00800313        0x1 timer.o
-                0x00800313                timer2_ovf
+                0x008002f2        0x1 timer.o
+                0x008002f2                timer2_ovf
  .bss.sensor_type_buff
-                0x00800314       0x18 usart.o
-                0x00800314                sensor_type_buff
+                0x008002f3       0x18 usart.o
+                0x008002f3                sensor_type_buff
  .bss.switch_sensor_buff
-                0x0080032c       0x18 usart.o
-                0x0080032c                switch_sensor_buff
+                0x0080030b       0x18 usart.o
+                0x0080030b                switch_sensor_buff
  .bss.temp_unit_buff
-                0x00800344        0x2 usart.o
-                0x00800344                temp_unit_buff
+                0x00800323        0x2 usart.o
+                0x00800323                temp_unit_buff
  .bss.all_sensor_type_buff
-                0x00800346        0x2 usart.o
-                0x00800346                all_sensor_type_buff
+                0x00800325        0x2 usart.o
+                0x00800325                all_sensor_type_buff
  .bss.usart0_rx_cnt
-                0x00800348        0x1 usart.o
-                0x00800348                usart0_rx_cnt
+                0x00800327        0x1 usart.o
+                0x00800327                usart0_rx_cnt
  .bss.usart0_rx_lenth
-                0x00800349        0x1 usart.o
-                0x00800349                usart0_rx_lenth
+                0x00800328        0x1 usart.o
+                0x00800328                usart0_rx_lenth
  .bss.usart0_rx_end
-                0x0080034a        0x1 usart.o
-                0x0080034a                usart0_rx_end
+                0x00800329        0x1 usart.o
+                0x00800329                usart0_rx_end
  .bss.usart0_tx_buff
-                0x0080034b       0xc8 usart.o
-                0x0080034b                usart0_tx_buff
+                0x0080032a       0xc8 usart.o
+                0x0080032a                usart0_tx_buff
  .bss.usart0_rx_buff
-                0x00800413       0xc8 usart.o
-                0x00800413                usart0_rx_buff
+                0x008003f2       0xc8 usart.o
+                0x008003f2                usart0_rx_buff
  .bss.usart1_rx_cnt
-                0x008004db        0x1 usart.o
-                0x008004db                usart1_rx_cnt
+                0x008004ba        0x1 usart.o
+                0x008004ba                usart1_rx_cnt
  .bss.usart1_rx_lenth
-                0x008004dc        0x1 usart.o
-                0x008004dc                usart1_rx_lenth
+                0x008004bb        0x1 usart.o
+                0x008004bb                usart1_rx_lenth
  .bss.usart1_rx_end
-                0x008004dd        0x1 usart.o
-                0x008004dd                usart1_rx_end
+                0x008004bc        0x1 usart.o
+                0x008004bc                usart1_rx_end
  .bss.usart1_tx_buff
-                0x008004de       0xc8 usart.o
-                0x008004de                usart1_tx_buff
+                0x008004bd       0xc8 usart.o
+                0x008004bd                usart1_tx_buff
  .bss.usart1_rx_buff
-                0x008005a6       0xc8 usart.o
-                0x008005a6                usart1_rx_buff
+                0x00800585       0xc8 usart.o
+                0x00800585                usart1_rx_buff
  *(COMMON)
- COMMON         0x0080066e        0x2 timer.o
-                0x0080066e                all_senser_sta
-                0x0080066f                global
-                0x00800670                PROVIDE (__bss_end, .)
-                0x00002acc                __data_load_start = LOADADDR (.data)
-                0x00002c24                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x0080064d        0x2 timer.o
+                0x0080064d                all_senser_sta
+                0x0080064e                global
+                0x0080064f                PROVIDE (__bss_end, .)
+                0x00002842                __data_load_start = LOADADDR (.data)
+                0x0000299a                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800670        0x0
+.noinit         0x0080064f        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x00800670                _end = .
+                0x0080064f                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
@@ -876,68 +869,68 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x34f3
+.debug_info     0x00000000     0x33c6
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x780 D:/AtmelStudio7/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega64a/avr5/crtatmega64a.o
  .debug_info    0x00000780     0x159d dgus.o
  .debug_info    0x00001d1d      0x8eb eeprom.o
  .debug_info    0x00002608       0x82 gpio.o
  .debug_info    0x0000268a      0x349 main.o
- .debug_info    0x000029d3      0x53d timer.o
- .debug_info    0x00002f10      0x5e3 usart.o
+ .debug_info    0x000029d3      0x410 timer.o
+ .debug_info    0x00002de3      0x5e3 usart.o
 
-.debug_abbrev   0x00000000      0xe21
+.debug_abbrev   0x00000000      0xe0a
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x718 D:/AtmelStudio7/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega64a/avr5/crtatmega64a.o
  .debug_abbrev  0x00000718      0x1d3 dgus.o
  .debug_abbrev  0x000008eb      0x120 eeprom.o
  .debug_abbrev  0x00000a0b       0x4f gpio.o
  .debug_abbrev  0x00000a5a      0x121 main.o
- .debug_abbrev  0x00000b7b      0x12b timer.o
- .debug_abbrev  0x00000ca6      0x17b usart.o
+ .debug_abbrev  0x00000b7b      0x114 timer.o
+ .debug_abbrev  0x00000c8f      0x17b usart.o
 
-.debug_line     0x00000000     0x1cf3
+.debug_line     0x00000000     0x1b81
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x169 D:/AtmelStudio7/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega64a/avr5/crtatmega64a.o
  .debug_line    0x00000169      0xd00 dgus.o
  .debug_line    0x00000e69      0x396 eeprom.o
- .debug_line    0x000011ff      0x153 gpio.o
- .debug_line    0x00001352      0x1b5 main.o
- .debug_line    0x00001507      0x3df timer.o
- .debug_line    0x000018e6      0x40d usart.o
+ .debug_line    0x000011ff      0x10b gpio.o
+ .debug_line    0x0000130a      0x1b5 main.o
+ .debug_line    0x000014bf      0x2b5 timer.o
+ .debug_line    0x00001774      0x40d usart.o
 
-.debug_frame    0x00000000      0x6fc
+.debug_frame    0x00000000      0x6a4
  *(.debug_frame)
  .debug_frame   0x00000000      0x354 dgus.o
  .debug_frame   0x00000354       0xa4 eeprom.o
  .debug_frame   0x000003f8       0x24 gpio.o
  .debug_frame   0x0000041c       0x34 main.o
- .debug_frame   0x00000450      0x168 timer.o
- .debug_frame   0x000005b8      0x144 usart.o
+ .debug_frame   0x00000450      0x110 timer.o
+ .debug_frame   0x00000560      0x144 usart.o
 
-.debug_str      0x00000000      0xb2f
+.debug_str      0x00000000      0xac7
  *(.debug_str)
  .debug_str     0x00000000      0x27e D:/AtmelStudio7/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega64a/avr5/crtatmega64a.o
  .debug_str     0x0000027e      0x5f9 dgus.o
                                 0x6b9 (size before relaxing)
  .debug_str     0x00000877       0x2b eeprom.o
                                 0x2cc (size before relaxing)
- .debug_str     0x000008a2       0x6c gpio.o
-                                0x186 (size before relaxing)
- .debug_str     0x0000090e       0xcf main.o
+ .debug_str     0x000008a2       0x16 gpio.o
+                                0x194 (size before relaxing)
+ .debug_str     0x000008b8       0xcf main.o
                                 0x2f6 (size before relaxing)
- .debug_str     0x000009dd       0xd5 timer.o
-                                0x41a (size before relaxing)
- .debug_str     0x00000ab2       0x7d usart.o
+ .debug_str     0x00000987       0xc3 timer.o
+                                0x3c3 (size before relaxing)
+ .debug_str     0x00000a4a       0x7d usart.o
                                 0x44a (size before relaxing)
 
-.debug_loc      0x00000000     0x1b87
+.debug_loc      0x00000000     0x1a73
  *(.debug_loc)
  .debug_loc     0x00000000     0x110f dgus.o
  .debug_loc     0x0000110f      0x1ca eeprom.o
  .debug_loc     0x000012d9       0x48 main.o
- .debug_loc     0x00001321      0x31d timer.o
- .debug_loc     0x0000163e      0x549 usart.o
+ .debug_loc     0x00001321      0x209 timer.o
+ .debug_loc     0x0000152a      0x549 usart.o
 
 .debug_macinfo
  *(.debug_macinfo)

@@ -134,6 +134,7 @@ ISR (TIMER0_OVF_vect)
 
 ISR(TIMER1_COMPA_vect)
 {
+	/*
 	uint8_t i = 0;
 
 	static uint16_t time_cnt[8] = {0};
@@ -232,7 +233,7 @@ ISR(TIMER1_COMPA_vect)
 			}
 		}
 	}
-	
+	*/
 }
 
 ISR(TIMER2_OVF_vect)

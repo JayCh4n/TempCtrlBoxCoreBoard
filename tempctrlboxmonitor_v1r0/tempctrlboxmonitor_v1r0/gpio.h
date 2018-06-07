@@ -36,6 +36,7 @@
 #define LED6_ON					PORTA &= ~(1<<1)
 #define LED7_ON					PORTA &= ~(1<<0)
 
+/*
 //定义射胶阀控制端口方向
 #define IQR0_PIN_OUTPUT			DDRC |= (1<<0)
 #define IQR1_PIN_OUTPUT			DDRC |= (1<<1)
@@ -56,6 +57,7 @@
 #define IQR6_OPEN				PORTC &= ~(1<<6)
 #define IQR7_OPEN				PORTC &= ~(1<<7)
 
+
 //射胶阀通道关闭宏定义
 #define IQR0_CLOSE				PORTC |= (1<<0)
 #define IQR1_CLOSE				PORTC |= (1<<1)
@@ -65,6 +67,7 @@
 #define IQR5_CLOSE				PORTC |= (1<<3)
 #define IQR6_CLOSE				PORTC |= (1<<6)
 #define IQR7_CLOSE				PORTC |= (1<<7)
+*/
 
 //定义继电器控制端口方向
 #define ALARM_PIN_OUTPUT		DDRD |= (1<<4)
@@ -77,6 +80,15 @@
 //继电器关闭宏定义
 #define ALARM_OFF				PORTD &= ~(1<<4)
 #define ACCON_OFF				PORTD &= ~(1<<5)
+
+//IO口模拟uart相关引脚定义
+#define USART2_TX_PIN_OUTPUT	DDRC |= (1<<7)		//配置IO口模拟Usart	TX脚为输出
+#define USART2_RX_PIN_INPUT		DDRC &= ~(1<<6)		//RX脚为输入
+#define USART2_RX_PIN_PULLUP	PORTC |= (1<<6)		//RX脚上拉
+
+#define USART2_TX_PIN_SET		PORTC |= (1<<7)
+#define USART2_TX_PIN_RESET		PORTC &= ~(1<<7)
+#define USART2_RX_PIN_VALUE		(PINC>>6) & 0x01
 
 void gpio_init();
 
