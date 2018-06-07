@@ -69,12 +69,14 @@ ISR (TIMER0_OVF_vect)
 			
 			if(run_temp_page)
 			{
-				send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num]+temp_unit*((run_temp[set_num]*8/10)+32));
+				send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num]+temp_unit*((run_temp[set_num]*8/10)+32));		//单独设定界面更新运行温度
 			}
 			else
 			{
 				send_variables(CURVE_PAGE_RUNTEMP_ADDR, run_temp[curve_page_num] +
-														temp_unit*(run_temp[curve_page_num]*8/10 + 32));
+														temp_unit*(run_temp[curve_page_num]*8/10 + 32));	//曲线界面更新运行温度
+														
+				send_variables(CURVE_PAGE_OUTRATE_ADDR, output_rate[curve_page_num]);						//曲线界面更新输出比例
 			}
 		}
 	}

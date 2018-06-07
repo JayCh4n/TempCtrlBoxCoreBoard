@@ -200,6 +200,7 @@ extern uint16_t t4[8];
 extern uint8_t first_start_iqr[8];
 extern uint8_t start_iqr[8];
 
+extern uint8_t output_rate[12];
 extern int16_t run_temp[12];
 extern int16_t set_temp[12];
 extern uint16_t sensor_type[12];
