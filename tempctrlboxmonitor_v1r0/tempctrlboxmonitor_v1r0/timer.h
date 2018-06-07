@@ -26,5 +26,6 @@ extern uint8_t all_senser_sta;
 void timer0_init();
 void timer1_init();
 void timer2_init();
+//void timer3_init();
 
 #endif /* TIMER_H_ */

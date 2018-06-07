@@ -255,6 +255,12 @@ ISR(TIMER2_OVF_vect)
 	
 }
 
+ISR(TIMER3_COMPA_vect)
+{
+	
+	
+}
+
 void timer0_init()
 {
 		TCCR0 &= 0xF8;		//关闭定时器0
@@ -292,3 +298,13 @@ void timer2_init()
 	TCCR2 |= 0x05;			//开启定时器2 正常模式TOP:0xFF, OC0不输出信号, clk/1024
 	TCCR2 &= 0xF8;
 }
+
+/*
+void timer3_init()
+{
+	TCCR3B |= 0x80;			//WGM32位置1	
+	TCCR3B &= 0xF8;			//关闭定时器（清除时钟选择位 CS30 CS31 CS32）
+	
+	ETIMSK |= 0x10;			//定时器3 A输出比较中断使能
+}
+*/

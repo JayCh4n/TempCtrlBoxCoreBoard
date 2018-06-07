@@ -13,8 +13,9 @@
 #include <avr/interrupt.h>
 #include "dgus.h"
 #include "timer.h"
+#include "gpio.h"
 
-#define MYUBRR(baud) ((F_CPU)/(baud*16UL)-1)
+#define MYUBRR(baud)	 ((F_CPU)/(baud*16UL)-1)
 
 //定义USART端口方向	
 #define	USART1_TX_PIN_OUTPUT	DDRD |= (1<<3)
@@ -85,6 +86,7 @@ int usart0_deal(void);
 int usart1_deal(void);
 void usart0_init(uint16_t ubbr);
 void usart1_init(uint16_t ubrr1);
+void usart2_init(uint16_t baud);
 
 void usart0_send_char(uint8_t data);
 void usart0_send_str(uint8_t *p, uint8_t data_size);

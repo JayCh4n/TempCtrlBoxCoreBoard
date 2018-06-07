@@ -56,10 +56,4 @@ void gpio_init()
 	ALARM_OFF;
 	ACCON_ON;
 	
-	/*io口模拟uart相关IO初始化*/
-	USART2_TX_PIN_OUTPUT;
-	USART2_RX_PIN_INPUT;
-	USART2_RX_PIN_PULLUP;
-	
-	USART2_TX_PIN_SET;
 }

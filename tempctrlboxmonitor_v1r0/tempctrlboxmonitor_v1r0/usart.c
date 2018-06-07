@@ -201,6 +201,8 @@ void usart1_send_str(uint8_t *str, uint8_t data_size)
 	}
 }
 
+
+
 uint16_t crc_check(uint8_t *p, uint8_t data_size)
 {
 	uint16_t crc = 0xFFFF;
@@ -252,3 +254,20 @@ void usart1_init(uint16_t ubrr1)					//设备通讯使用
 	UCSR1B = (1<<RXEN1)|(1<<TXEN1)|(1<<RXCIE1);		//使能接收,发送
 }
 
+/*使用IO口+TIMER3模拟串口*/
+void usart2_init(uint16_t baud)
+{
+	/*io口模拟uart相关IO初始化*/
+	USART2_TX_PIN_OUTPUT;	//TX脚配置为输出
+	USART2_RX_PIN_INPUT;
+	USART2_RX_PIN_PULLUP;	//RX配置为输入上拉
+		
+	USART2_TX_PIN_SET;		//TX脚输出高
+	
+	TCCR3B |= 0x80;			//WGM32位置1
+	TCCR3B &= 0xF8;			//关闭定时器（清除时钟选择位 CS30 CS31 CS32）
+	
+	OCR3A = 16000000UL/baud/2;	//定时时间为波特率的1/2（这里不启动定时器，启动时需要定时器时钟不分频 TCCR3B |= 0x01）
+	
+	ETIMSK |= 0x10;			//定时器3 A输出比较中断使能
+}
