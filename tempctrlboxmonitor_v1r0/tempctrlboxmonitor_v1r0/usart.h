@@ -26,6 +26,12 @@
 #define RX1_COMMAND				usart1_rx_buff[3]			//usart1接收数据包中的命令
 #define RX0_COMMAND				usart0_rx_buff[3]			//usart0接收数据包中的命令
 
+/* usart2当前状态定义 */
+#define USART2_IN_TX			0							
+#define USART2_IN_RX			1
+#define USART2_TX_END			3
+#define USART2_RX_END			4
+
 #define ACCESS_VARIABLE			0x83						//USART0访问变量命令
 
 #define READ_DATA_ALL			0x01						//USART1读取全部数据命令
@@ -81,6 +87,9 @@ extern uint16_t t2_buff;
 extern uint16_t t3_buff;
 extern uint16_t t4_buff;
 
+extern uint8_t usart2_tx_buff;
+extern uint8_t usart2_rx_buff;
+extern uint8_t usart2_sta;
 
 int usart0_deal(void);
 int usart1_deal(void);

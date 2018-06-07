@@ -37,6 +37,10 @@ uint16_t t2_buff = 500;
 uint16_t t3_buff = 500;
 uint16_t t4_buff = 500;
 
+uint8_t usart2_tx_buff = 0x00;
+uint8_t usart2_rx_buff = 0x00;
+uint8_t usart2_sta;
+
 ISR(USART0_RX_vect)
 {
 	usart0_rx_buff[usart0_rx_cnt++] = UDR0;
@@ -201,7 +205,29 @@ void usart1_send_str(uint8_t *str, uint8_t data_size)
 	}
 }
 
+void usart2_send_char(uint8_t data)
+{	
+	usart2_tx_buff = data;						//把数据保存到发送数据缓冲区
+	
+	usart2_sta = USART2_IN_TX;					//状态更改为发送状态
+	
+	USART2_TX_PIN_RESET;						//给起始位
+	
+	TCNT3 = 0x0000;								//定时器3计数器清零
+	TCCR3B |= 0x01;								//启动定时器
+}
 
+void usart2_send_str(uint8_t *str, uint8_t data_size)
+{
+	uint8_t i = 0;
+	
+	for(i=0; i<data_size; i++)
+	{
+		usart2_send_char(*str++);
+		
+		while(usart2_sta != USART2_TX_END);
+	}
+}
 
 uint16_t crc_check(uint8_t *p, uint8_t data_size)
 {

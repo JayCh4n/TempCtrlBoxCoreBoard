@@ -257,8 +257,39 @@ ISR(TIMER2_OVF_vect)
 
 ISR(TIMER3_COMPA_vect)
 {
+	static uint8_t cnt = 0;
+	static uint8_t pos = 1;		//当前发送数据BIt 的位置 
 	
+	cnt++;
 	
+	if(usart2_sta == USART2_IN_TX)
+	{
+		if((cnt >= 3) && (cnt%2 != 0))
+		{
+			if(((usart2_tx_buff & (1<<pos))>>pos) == 1)
+			{
+				USART2_TX_PIN_SET;
+			}
+			else
+			{
+				USART2_TX_PIN_RESET;
+			}
+			pos++;
+		}
+		
+		if(cnt == 18)
+		{
+			pos = 1;				//数据发送完成，发送位置恢复1
+			USART2_TX_PIN_SET;		//停止位
+		}
+		
+		if(cnt == 19)
+		{
+			cnt = 0;
+			usart2_sta = USART2_TX_END;		//更改USART2状态为发送完成
+			TCCR3B |= 0x00;					//关闭关闭定时器
+		}
+	}
 }
 
 void timer0_init()
