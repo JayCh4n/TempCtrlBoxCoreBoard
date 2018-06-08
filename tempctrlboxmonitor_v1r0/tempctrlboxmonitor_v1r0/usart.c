@@ -224,8 +224,7 @@ void usart2_send_str(uint8_t *str, uint8_t data_size)
 	for(i=0; i<data_size; i++)
 	{
 		usart2_send_char(*str++);
-		
-		while(usart2_sta != USART2_TX_END);
+		_delay_us(1200);
 	}
 }
 
@@ -290,10 +289,10 @@ void usart2_init(uint16_t baud)
 		
 	USART2_TX_PIN_SET;		//TX脚输出高
 	
-	TCCR3B |= 0x80;			//WGM32位置1
+	TCCR3B |= 0x08;			//WGM32位置1
 	TCCR3B &= 0xF8;			//关闭定时器（清除时钟选择位 CS30 CS31 CS32）
 	
-	OCR3A = 16000000UL/baud/2;	//定时时间为波特率的1/2（这里不启动定时器，启动时需要定时器时钟不分频 TCCR3B |= 0x01）
+	OCR3A = 16000000UL/baud;	//定时时间为波特率的1/2（这里不启动定时器，启动时需要定时器时钟不分频 TCCR3B |= 0x01）
 	
 	ETIMSK |= 0x10;			//定时器3 A输出比较中断使能
 }

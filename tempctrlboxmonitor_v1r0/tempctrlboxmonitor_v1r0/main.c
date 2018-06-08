@@ -60,6 +60,8 @@ void system_init()
 	gpio_init();
 	usart0_init(MYUBRR(9600));
 	usart1_init(MYUBRR(8928));
+	usart2_init(9600);
+	
 	timer0_init();
 	timer2_init();
 	timer1_init();

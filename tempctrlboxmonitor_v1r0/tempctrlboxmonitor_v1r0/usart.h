@@ -14,6 +14,7 @@
 #include "dgus.h"
 #include "timer.h"
 #include "gpio.h"
+#include <util/delay.h>
 
 #define MYUBRR(baud)	 ((F_CPU)/(baud*16UL)-1)
 
@@ -101,6 +102,8 @@ void usart0_send_char(uint8_t data);
 void usart0_send_str(uint8_t *p, uint8_t data_size);
 void usart1_send_char(uint8_t data);
 void usart1_send_str(uint8_t *p, uint8_t data_size);
+void usart2_send_char(uint8_t data);
+void usart2_send_str(uint8_t *str, uint8_t data_size);
 
 uint16_t crc_check(uint8_t *p, uint8_t dataSize);
 
