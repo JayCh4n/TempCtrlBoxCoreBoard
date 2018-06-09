@@ -266,7 +266,7 @@ ISR(TIMER3_COMPA_vect)
 	{
 		if(cnt <= 8)
 		{
-			if(((usart2_tx_buff & (1<<pos))>>pos) == 1)
+			if(((usart2_buff & (1<<pos))>>pos) == 1)
 			{
 				USART2_TX_PIN_SET;
 			}

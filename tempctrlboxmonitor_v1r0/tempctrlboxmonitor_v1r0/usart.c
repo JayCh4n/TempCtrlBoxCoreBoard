@@ -6,18 +6,25 @@
  */ 
 #include "usart.h"
 
+uint8_t usart0_rx_buff[200] = {0};
+uint8_t usart0_tx_buff[200] = {0};
+	
+uint8_t usart0_rx_end = 0;
+uint8_t usart0_rx_lenth = 0;
+uint8_t usart0_rx_cnt = 0;
+
+
 uint8_t usart1_rx_buff[200] = {0};
 uint8_t usart1_tx_buff[200] = {0};
+
 uint8_t usart1_rx_end = 0;
 uint8_t usart1_rx_lenth = 0;
 uint8_t usart1_rx_cnt = 0;
 
-	
-uint8_t usart0_rx_buff[200] = {0};
-uint8_t usart0_tx_buff[200] = {0};
-uint8_t usart0_rx_end = 0;
-uint8_t usart0_rx_lenth = 0;
-uint8_t usart0_rx_cnt = 0;
+uint8_t usart2_tx_buff[200] = {0};
+
+uint8_t usart2_buff = 0x00;
+uint8_t usart2_sta;
 
 uint16_t all_temp_buff = 100;
 uint16_t preheat_time_buff = 3;
@@ -32,14 +39,7 @@ uint16_t p_value_buff = 100;
 uint16_t i_value_buff = 100;			
 uint16_t d_value_buff = 100;
 
-uint16_t t1_buff = 500;
-uint16_t t2_buff = 500;
-uint16_t t3_buff = 500;
-uint16_t t4_buff = 500;
-
-uint8_t usart2_tx_buff = 0x00;
-uint8_t usart2_rx_buff = 0x00;
-uint8_t usart2_sta;
+uint16_t time_ctrl_value_buff[4][8][4];
 
 ISR(USART0_RX_vect)
 {
@@ -128,15 +128,51 @@ int usart0_deal(void)
 			case PID_P:						p_value_buff = variable;				break;
 			case PID_I:						i_value_buff = variable;				break;
 			case PID_D:						d_value_buff = variable;				break;
-			case TIME_CTRL_IQR:				pre_iqr = variable;	
-											update_time_ctrl_page();				break;
-			case TIME_CTRL_T1:				t1_buff = variable;						break;
-			case TIME_CTRL_T2:				t2_buff = variable;						break;
-			case TIME_CTRL_T3:				t3_buff = variable;						break;
-			case TIME_CTRL_T4:				t4_buff = variable;						break;
+			
+			case IQR1_T1:					time_ctrl_value_buff[module_num -1][0][0] = variable;	break;
+			case IQR1_T2:					time_ctrl_value_buff[module_num -1][0][1] = variable;	break;
+			case IQR1_T3:					time_ctrl_value_buff[module_num -1][0][2] = variable;	break;
+			case IQR1_T4:					time_ctrl_value_buff[module_num -1][0][3] = variable;	break;
+			
+			case IQR2_T1:					time_ctrl_value_buff[module_num -1][1][0] = variable;	break;
+			case IQR2_T2:					time_ctrl_value_buff[module_num -1][1][1] = variable;	break;
+			case IQR2_T3:					time_ctrl_value_buff[module_num -1][1][2] = variable;	break;
+			case IQR2_T4:					time_ctrl_value_buff[module_num -1][1][3] = variable;	break;
+			
+			case IQR3_T1:					time_ctrl_value_buff[module_num -1][2][0] = variable;	break;
+			case IQR3_T2:					time_ctrl_value_buff[module_num -1][2][1] = variable;	break;
+			case IQR3_T3:					time_ctrl_value_buff[module_num -1][2][2] = variable;	break;
+			case IQR3_T4:					time_ctrl_value_buff[module_num -1][2][3] = variable;	break;
+			
+			case IQR4_T1:					time_ctrl_value_buff[module_num -1][3][0] = variable;	break;
+			case IQR4_T2:					time_ctrl_value_buff[module_num -1][3][1] = variable;	break;
+			case IQR4_T3:					time_ctrl_value_buff[module_num -1][3][2] = variable;	break;
+			case IQR4_T4:					time_ctrl_value_buff[module_num -1][3][3] = variable;	break;
+			
+			case IQR5_T1:					time_ctrl_value_buff[module_num -1][4][0] = variable;	break;
+			case IQR5_T2:					time_ctrl_value_buff[module_num -1][4][1] = variable;	break;
+			case IQR5_T3:					time_ctrl_value_buff[module_num -1][4][2] = variable;	break;
+			case IQR5_T4:					time_ctrl_value_buff[module_num -1][4][3] = variable;	break;
+			
+			case IQR6_T1:					time_ctrl_value_buff[module_num -1][5][0] = variable;	break;
+			case IQR6_T2:					time_ctrl_value_buff[module_num -1][5][1] = variable;	break;
+			case IQR6_T3:					time_ctrl_value_buff[module_num -1][5][2] = variable;	break;
+			case IQR6_T4:					time_ctrl_value_buff[module_num -1][5][3] = variable;	break;
+
+			case IQR7_T1:					time_ctrl_value_buff[module_num -1][6][0] = variable;	break;
+			case IQR7_T2:					time_ctrl_value_buff[module_num -1][6][1] = variable;	break;
+			case IQR7_T3:					time_ctrl_value_buff[module_num -1][6][2] = variable;	break;
+			case IQR7_T4:					time_ctrl_value_buff[module_num -1][6][3] = variable;	break;
+			
+			case IQR8_T1:					time_ctrl_value_buff[module_num -1][7][0] = variable;	break;
+			case IQR8_T2:					time_ctrl_value_buff[module_num -1][7][1] = variable;	break;
+			case IQR8_T3:					time_ctrl_value_buff[module_num -1][7][2] = variable;	break;
+			case IQR8_T4:					time_ctrl_value_buff[module_num -1][7][3] = variable;	break;
+			
 			default: break;
 		}
 	}
+	
 	return 0;	
 }
 
@@ -207,7 +243,7 @@ void usart1_send_str(uint8_t *str, uint8_t data_size)
 
 void usart2_send_char(uint8_t data)
 {	
-	usart2_tx_buff = data;						//把数据保存到发送数据缓冲区
+	usart2_buff = data;						//把数据保存到发送数据缓冲区
 	
 	usart2_sta = USART2_IN_TX;					//状态更改为发送状态
 	

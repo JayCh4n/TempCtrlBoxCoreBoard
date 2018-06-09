@@ -68,10 +68,19 @@
 #define CURVE_PAGE_BACK		0x0019
 #define MENU_PAGE_ENTER		0x001A
 #define TIME_CTRL_ENTER		0x001B
-#define TIME_CTRL_BACK		0x001C
-#define AUTO_CTRL_TIME		0x001F
-#define STOP_CTRL_TIME		0x0020	
-#define TIME_CTRL_OK		0x0021
+#define TIME_CTRL_STOP		0x001C
+#define TIME_CTRL_START		0x001D
+#define TIME_CTRL_SAVEDAT	0x001E
+#define TIME_CTRL_PAGEUP	0x001F
+#define TIME_CTRL_PAGEDOWN	0x0020
+#define IQR1_TEST			0x0021
+#define IQR2_TEST			0x0022
+#define IQR3_TEST			0x0023
+#define IQR4_TEST			0x0024
+#define IQR5_TEST			0x0025
+#define IQR6_TEST			0x0026
+#define IQR7_TEST			0x0027
+#define IQR8_TEST			0x0028
 
 
 //曲线通道号
@@ -161,14 +170,12 @@
 #define CURVE_PAGE_OUTRATE_ADDR		0x0042			//曲线界面输出比例显示地址
 #define CURVE_PAGE_SENSORTYPE_ADDR	0x02A0			//曲线界面传感器类型显示地址
 
-#define TIME_CTRL_T1_ADDR			0x0070			//
-#define TIME_CTRL_T2_ADDR			0x0072
-#define TIME_CTRL_T3_ADDR			0x0074
-#define TIME_CTRL_T4_ADDR			0x0076
-
 #define PID_P_ADDR				0x0036			//pid设置界面P参数显示地址
 #define PID_I_ADDR				0x0038			//pid设置界面I参数显示地址
 #define PID_D_ADDR				0x003A			//pid设置界面D参数显示地址
+
+#define	MODULE_STATUS_ADDR		0x0070			//射胶控制模块状态图标显示地址    0：停止		1：开启
+#define MODULE_NUM_ADDR			0x0072			//射胶控制模块号码显示地址
 
 #define TEMP_UINT_ADDR			0x023C			//温度单位显示地址
 #define ALL_SENSOR_TYPE_ADDR	0x0294			//全局传感器类型显示地址
@@ -177,7 +184,6 @@
 
 
 //////////////////
-extern uint16_t pre_iqr;
 extern uint8_t run_temp_page;
 extern uint8_t update_run_temp_flag;
 extern uint8_t in_main_page;
@@ -192,14 +198,6 @@ extern uint16_t p_value[12];				//发送
 extern uint16_t i_value[12];				//发送
 extern uint16_t d_value[12];				//发送
 
-extern uint16_t t1[8];
-extern uint16_t t2[8];
-extern uint16_t t3[8];
-extern uint16_t t4[8];
-
-extern uint8_t first_start_iqr[8];
-extern uint8_t start_iqr[8];
-
 extern uint8_t output_rate[12];
 extern int16_t run_temp[12];
 extern int16_t set_temp[12];
@@ -212,14 +210,17 @@ extern uint16_t all_sensor_type;
 extern uint16_t temp_unit;
 extern uint32_t set_name[12];
 
-extern uint8_t in_time_ctrl_page;
+extern uint8_t	module_num;
 
+void init_time_ctrl_value(void);
 void update_main_page(void);
 void update_single_set_page(void);
 void update_pid_page(uint8_t channel);
 void update_curve_page(void);
-void get_time_ctrl_value(void);
 void update_time_ctrl_page(void);
+void save_time_ctrl_data(void);
+void start_time_ctrl(uint8_t slave_num);
+void stop_time_ctrl(uint8_t slave_num);
 void switch_language(void);
 void change_page(uint8_t page_num);
 void key_action(uint16_t key_code);

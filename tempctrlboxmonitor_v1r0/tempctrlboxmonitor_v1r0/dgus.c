@@ -7,7 +7,6 @@
 
 #include "dgus.h"
 
-uint16_t pre_iqr = 0;
 uint8_t run_temp_page = 0;
 uint8_t update_run_temp_flag = 0;
 uint8_t in_main_page = 1;			//当前是否在主界面，刷新主页面数据标志位 0：否 1：是
@@ -35,25 +34,36 @@ uint16_t p_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1
 uint16_t i_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};				//发送
 uint16_t d_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};				//发送
 
-uint16_t t1[8] = {500, 500, 500, 500, 500, 500, 500, 500};
-uint16_t t2[8] = {500, 500, 500, 500, 500, 500, 500, 500};
-uint16_t t3[8] = {500, 500, 500, 500, 500, 500, 500, 500};
-uint16_t t4[8] = {500, 500, 500, 500, 500, 500, 500, 500};
-
-uint8_t first_start_iqr[8] = {0};
-uint8_t start_iqr[8] = {0};
-
 uint16_t preheat_time = 3;			//发送
 uint16_t all_sensor_type = 0;		//发送	
 uint16_t temp_unit = 0;				//				
 uint16_t all_temp = 100;			//发送
 
-uint8_t in_time_ctrl_page = 0;
+uint8_t	module_num = 1;				//射胶模块号码
+uint8_t module_status[8] = {0};		//射胶模块运行状态
+uint16_t time_ctrl_value[4][8][4];	//射胶时间控制数据   共四个模块  每个模块8个通道  每个通道有 T1 T2 T3 T4 4个时间段
 
 uint8_t alarm_msg[4][16] ={{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xB6, 0xCF, 0xBF, 0xAA},		//感温线断开
 						   {0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xBD, 0xD3, 0xB7, 0xB4},		//感温线接反
 						   {0xB3, 0xAC, 0xCE, 0xC2, 0xB1, 0xA8, 0xBE, 0xAF},					//超温报警
 						   {0xC9, 0xFD, 0xCE, 0xC2, 0xB5, 0xBD, 0xB4, 0xEF, 0xC9, 0xE8, 0xB6, 0xA8, 0xCE, 0xC2, 0xB6, 0xC8}}; //升温到达设定温度
+
+void init_time_ctrl_value(void)
+{
+	uint8_t i, j, k;
+	
+	for(i=0; i<4; i++)
+	{
+		for(j=0; j<8; j++)
+		{
+			for(k=0; k<4; k++)
+			{
+				time_ctrl_value[i][j][k] = 500;			//射胶控制时间所有数据初始化为
+				time_ctrl_value_buff[i][j][k] = 500;
+			}
+		}
+	}
+}
 
 void update_main_page(void)
 {
@@ -103,11 +113,21 @@ void key_action(uint16_t key_code)
 		case CURVE_PAGE_ENTER:		update_curve_page();										break;
 		case CURVE_PAGE_BACK:		CLOSE_CURVE; update_run_temp_flag = 0;						break;
 		case MENU_PAGE_ENTER:		in_main_page = 0; 											break;
-		case TIME_CTRL_ENTER:		in_time_ctrl_page = 1; update_time_ctrl_page();				break;
-		case TIME_CTRL_BACK:		in_time_ctrl_page = 0; 										break;
-		case AUTO_CTRL_TIME:		first_start_iqr[pre_iqr] = 1; start_iqr[pre_iqr] = 1;		break;
-		case STOP_CTRL_TIME:		start_iqr[pre_iqr] = 0;										break;
-		case TIME_CTRL_OK:			get_time_ctrl_value();										break;
+		case TIME_CTRL_ENTER:		module_num = 1; update_time_ctrl_page();					break;
+		case TIME_CTRL_STOP:		stop_time_ctrl(module_num);									break;		
+		case TIME_CTRL_START:		start_time_ctrl(module_num);								break;		
+		case TIME_CTRL_SAVEDAT:		save_time_ctrl_data();										break;
+		case TIME_CTRL_PAGEUP:		module_num -= 1; update_time_ctrl_page();					break;
+		case TIME_CTRL_PAGEDOWN:	module_num += 1; update_time_ctrl_page();					break;
+//		case IQR1_TEST:				
+//		case IQR2_TEST:			
+//		case IQR3_TEST:			
+//		case IQR4_TEST:			
+//		case IQR5_TEST:			
+//		case IQR6_TEST:			
+//		case IQR7_TEST:			
+//		case IQR8_TEST:			
+		
 		default: break;	
 	}
 }
@@ -535,49 +555,102 @@ void update_curve_page(void)
 	OPEN_CURVE(count);
 }
 
-void get_time_ctrl_value(void)
-{
-	t1[pre_iqr] = t1_buff;
-	t2[pre_iqr] = t2_buff;
-	t3[pre_iqr] = t3_buff;
-	t4[pre_iqr] = t4_buff;
-	
-	eeprom_write(TIME_CTRL_T1_EEADDR+(pre_iqr*2), t1[pre_iqr]);
-	eeprom_write(TIME_CTRL_T1_EEADDR+(pre_iqr*2)+1, t1[pre_iqr]>>8);
-		
-	eeprom_write(TIME_CTRL_T2_EEADDR+(pre_iqr*2), t2[pre_iqr]);
-	eeprom_write(TIME_CTRL_T2_EEADDR+(pre_iqr*2)+1, t2[pre_iqr]>>8);
-			
-	eeprom_write(TIME_CTRL_T3_EEADDR+(pre_iqr*2), t3[pre_iqr]);
-	eeprom_write(TIME_CTRL_T3_EEADDR+(pre_iqr*2)+1, t3[pre_iqr]>>8);
-			
-	eeprom_write(TIME_CTRL_T4_EEADDR+(pre_iqr*2), t4[pre_iqr]);
-	eeprom_write(TIME_CTRL_T4_EEADDR+(pre_iqr*2)+1, t4[pre_iqr]>>8);
-	
-	send_variables(TIME_CTRL_T1_ADDR, t1[pre_iqr]);
-	send_variables(TIME_CTRL_T2_ADDR, t2[pre_iqr]);
-	send_variables(TIME_CTRL_T3_ADDR, t3[pre_iqr]);
-	send_variables(TIME_CTRL_T4_ADDR, t4[pre_iqr]);
-}
-
+/*更新射胶时间控制界面*/
 void update_time_ctrl_page(void)
 {
+	uint8_t j, k;
+	uint8_t addr_offset = 0x00;
 	
-	clear_curve_buff(CHANNEL0_BUFF);
+	if(module_num < 1)
+	{
+		module_num = 1;
+	}
+	else if(module_num > 4)
+	{
+		module_num = 4;
+	}
+	else
+	{
+		send_variables(MODULE_NUM_ADDR, module_num);
+		send_variables(MODULE_STATUS_ADDR, module_status[module_num-1]);
+		
+		for(j=0; j<8; j++)
+		{
+			for(k=0; k<4; k++)
+			{
+				send_variables(IQR1_T1 + addr_offset, time_ctrl_value[module_num-1][j][k]);
+				addr_offset += 0x02; 
+			}
+		}
+	}
+}
+
+/*按下保存键 保存输入的数据  不按保存直接返回的话  则不保存*/
+void save_time_ctrl_data(void)
+{
+	uint8_t i,j;
 	
-	t1_buff = t1[pre_iqr];
-	t2_buff = t2[pre_iqr];
-	t3_buff = t3[pre_iqr];
-	t4_buff = t4[pre_iqr];
+	for(i=0; i<8; i++)
+	{
+		for(j=0; j<4; j++)
+		{
+			time_ctrl_value[module_num-1][i][j]
+							 = time_ctrl_value_buff[module_num-1][i][j];
+		}
+	}
+}
+
+/*向时间控制子模块发送开始命令 并发送每个通道的 T1—T4 数据*/
+void start_time_ctrl(uint8_t slave_num)
+{
+	uint8_t i, j;
+	uint8_t cnt = 0;		//计数第几个数据
+	uint16_t crc = 0;
 	
-	send_variables(TIME_CTRL_T1, t1[pre_iqr]);
-	send_variables(TIME_CTRL_T2, t2[pre_iqr]);
-	send_variables(TIME_CTRL_T3, t3[pre_iqr]);
-	send_variables(TIME_CTRL_T4, t4[pre_iqr]);
-	send_variables(TIME_CTRL_T1_ADDR, t1[pre_iqr]);
-	send_variables(TIME_CTRL_T2_ADDR, t2[pre_iqr]);
-	send_variables(TIME_CTRL_T3_ADDR, t3[pre_iqr]);
-	send_variables(TIME_CTRL_T4_ADDR, t4[pre_iqr]);
+	
+	usart2_tx_buff[0] = 0xA5;
+	usart2_tx_buff[1] = 0x5A;
+	usart2_tx_buff[2] = 22;
+	usart2_tx_buff[3] = TIME_CTRL_START;
+	usart2_tx_buff[4] = slave_num;
+	
+	for(i=0; i<8; i++)
+	{
+		for(j=0; j<4; j++)
+		{
+			usart2_tx_buff[cnt+5] = time_ctrl_value[slave_num-1][i][j];
+			cnt++;
+		}
+	}
+	
+	crc = crc_check(usart2_tx_buff, 39);
+	
+	usart2_tx_buff[37] = crc & 0x00FF;
+	usart2_tx_buff[38] = crc >> 8;
+	usart2_tx_buff[39] = 0x0D;		//数据尾
+	
+	usart2_send_str(usart2_tx_buff, 40);
+}
+
+/*向时间控制子模块发送停止命令 不需要发送每个通道的 T1—T4 数据*/
+void stop_time_ctrl(uint8_t slave_num)
+{
+	uint16_t crc = 0;
+	
+	usart2_tx_buff[0] = 0xA5;
+	usart2_tx_buff[1] = 0x5A;
+	usart2_tx_buff[2] = 0x02;
+	usart2_tx_buff[3] = TIME_CTRL_STOP;
+	usart2_tx_buff[4] = slave_num;
+	
+	crc = crc_check(usart2_tx_buff, 7);
+	
+	usart2_tx_buff[5] = crc & 0x00FF;
+	usart2_tx_buff[6] = crc >> 8;
+	
+	usart2_tx_buff[7] = 0x0D;
+	
+	usart2_send_str(usart2_tx_buff, 8);
 }
 
 void update_alarm_page(uint8_t page_num)

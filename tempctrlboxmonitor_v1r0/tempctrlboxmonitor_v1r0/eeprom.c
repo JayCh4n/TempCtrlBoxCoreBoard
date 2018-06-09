@@ -37,7 +37,7 @@ void read_eeprom_data(void)
 			eeprom_write(SET_NAME_EEADDR+(i*4)+2, set_name[i]>>16);
 			eeprom_write(SET_NAME_EEADDR+(i*4)+3, set_name[i]>>24);
 		}
-		
+		/*
 		for(i=0; i<8; i++)
 		{
 			eeprom_write(TIME_CTRL_T1_EEADDR+(i*2), t1[i]);
@@ -52,7 +52,7 @@ void read_eeprom_data(void)
 			eeprom_write(TIME_CTRL_T4_EEADDR+(i*2), t4[i]);
 			eeprom_write(TIME_CTRL_T4_EEADDR+(i*2)+1, t4[i]>>8);
 		}
-		
+		*/
 		eeprom_write(PRE_LANGUAGE_EEADDR, 0);
 		eeprom_write(ALL_SENSORTYPE_EEADDR, 0);
 		eeprom_write(TEMP_UNIT_EEADDR, 0);
@@ -95,6 +95,7 @@ void read_eeprom_data(void)
 			set_name[i] = (set_name[i]<<8) | eeprom_read(SET_NAME_EEADDR+(i*4));
 		}
 		
+		/*
 		for(i=0; i<8; i++)
 		{
 			t1[i] = eeprom_read(TIME_CTRL_T1_EEADDR+(i*2)+1);
@@ -109,6 +110,7 @@ void read_eeprom_data(void)
 			t4[i] = eeprom_read(TIME_CTRL_T4_EEADDR+(i*2)+1);
 			t4[i] = (t4[i]<<8) | eeprom_read(TIME_CTRL_T4_EEADDR+(i*2));
 		}
+		*/
 		
 		pre_language = eeprom_read(PRE_LANGUAGE_EEADDR);
 		
