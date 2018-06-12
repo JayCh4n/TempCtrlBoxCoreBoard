@@ -3,8 +3,7 @@
  *
  * Created: 2018-04-03 09:32:17
  *  Author: chenlong
- */ 
-
+ */
 
 #ifndef UART_H_
 #define UART_H_
@@ -16,85 +15,85 @@
 #include "gpio.h"
 #include <util/delay.h>
 
-#define MYUBRR(baud)	 ((F_CPU)/(baud*16UL)-1)
+#define MYUBRR(baud) ((F_CPU) / (baud * 16UL) - 1)
 
-//¶¨ÒåUSART¶Ë¿Ú·½Ïò	
-#define	USART1_TX_PIN_OUTPUT	DDRD |= (1<<3)
-#define USART1_RX_PIN_INPUT		DDRD &= ~(1<<2)
-#define USART0_TX_PIN_OUTPUT	DDRE |= (1<<1)
-#define USART0_RX_PIN_INPUT		DDRE &= ~(1<<0)
+//ï¿½ï¿½ï¿½ï¿½USARTï¿½Ë¿Ú·ï¿½ï¿½ï¿½
+#define USART1_TX_PIN_OUTPUT DDRD |= (1 << 3)
+#define USART1_RX_PIN_INPUT DDRD &= ~(1 << 2)
+#define USART0_TX_PIN_OUTPUT DDRE |= (1 << 1)
+#define USART0_RX_PIN_INPUT DDRE &= ~(1 << 0)
 
-#define RX1_COMMAND				usart1_rx_buff[3]			//usart1½ÓÊÕÊý¾Ý°üÖÐµÄÃüÁî
-#define RX0_COMMAND				usart0_rx_buff[3]			//usart0½ÓÊÕÊý¾Ý°üÖÐµÄÃüÁî
+#define RX1_COMMAND usart1_rx_buff[3] //usart1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½
+#define RX0_COMMAND usart0_rx_buff[3] //usart0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½
 
-/* usart2µ±Ç°×´Ì¬¶¨Òå */
-#define USART2_IN_TX			0							
-#define USART2_IN_RX			1
-#define USART2_TX_END			3
-#define USART2_RX_END			4
+/* usart2ï¿½ï¿½Ç°×´Ì¬ï¿½ï¿½ï¿½ï¿½ */
+#define USART2_IN_TX 0
+#define USART2_IN_RX 1
+#define USART2_TX_END 3
+#define USART2_RX_END 4
 
-#define ACCESS_VARIABLE			0x83						//USART0·ÃÎÊ±äÁ¿ÃüÁî
+#define ACCESS_VARIABLE 0x83 //USART0ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-#define READ_DATA_ALL			0x01						//USART1¶ÁÈ¡È«²¿Êý¾ÝÃüÁî
+#define READ_DATA_ALL 0x01 //USART1ï¿½ï¿½È¡È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-//ºê¶¨Òåusart1½ÓÊÕ±äÁ¿µØÖ·
-#define MASTER_SWITCH			0x0140
-#define SINGLE_SET_SENSOR_TYPE	0x0142
-#define SINGLE_SET_SWITCH		0x0144
-#define SINGLE_SET_TEMP			0x0146
-#define SINGLE_SET_NAME			0x0158   				//~~!!!!!!!!!!!!!!z  0x0158 - 0x015F
-#define ALL_SET_TEMP			0x0148
-#define SET_PREHEAT_TIME		0x014A
-#define ALL_SET_SENSOR_TYPE		0x014C
-#define SET_TEMP_UNIT			0x014E
+//ï¿½ê¶¨ï¿½ï¿½usart1ï¿½ï¿½ï¿½Õ±ï¿½ï¿½ï¿½ï¿½ï¿½Ö·
+#define MASTER_SWITCH 0x0140
+#define SINGLE_SET_SENSOR_TYPE 0x0142
+#define SINGLE_SET_SWITCH 0x0144
+#define SINGLE_SET_TEMP 0x0146
+#define SINGLE_SET_NAME 0x0158 //~~!!!!!!!!!!!!!!z  0x0158 - 0x015F
+#define ALL_SET_TEMP 0x0148
+#define SET_PREHEAT_TIME 0x014A
+#define ALL_SET_SENSOR_TYPE 0x014C
+#define SET_TEMP_UNIT 0x014E
 
-#define PID_CHANNEL				0x0150
-#define PID_P					0x0152
-#define PID_I					0x0154
-#define PID_D					0x0156
+#define PID_CHANNEL 0x0150
+#define PID_P 0x0152
+#define PID_I 0x0154
+#define PID_D 0x0156
 
-/*Éä½ºÊ±¼ä¿ØÖÆ²ÎÊý  ÊäÈë+ÏÔÊ¾µØÖ·*/
-#define IQR1_T1					0x0162
-#define IQR1_T2					0x0164
-#define IQR1_T3					0x0166
-#define IQR1_T4					0x0168
+/*ï¿½ä½ºÊ±ï¿½ï¿½ï¿½ï¿½Æ²ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½+ï¿½ï¿½Ê¾ï¿½ï¿½Ö·*/
+#define IQR1_T1 0x0162
+#define IQR1_T2 0x0164
+#define IQR1_T3 0x0166
+#define IQR1_T4 0x0168
 
-#define IQR2_T1					0x016A
-#define IQR2_T2					0x016C
-#define IQR2_T3					0x016E
-#define IQR2_T4					0x0170
+#define IQR2_T1 0x016A
+#define IQR2_T2 0x016C
+#define IQR2_T3 0x016E
+#define IQR2_T4 0x0170
 
-#define IQR3_T1					0x0172
-#define IQR3_T2					0x0174
-#define IQR3_T3					0x0176
-#define IQR3_T4					0x0178
+#define IQR3_T1 0x0172
+#define IQR3_T2 0x0174
+#define IQR3_T3 0x0176
+#define IQR3_T4 0x0178
 
-#define IQR4_T1					0x017A
-#define IQR4_T2					0x017C
-#define IQR4_T3					0x017E
-#define IQR4_T4					0x0180
+#define IQR4_T1 0x017A
+#define IQR4_T2 0x017C
+#define IQR4_T3 0x017E
+#define IQR4_T4 0x0180
 
-#define IQR5_T1					0x0182
-#define IQR5_T2					0x0184
-#define IQR5_T3					0x0186
-#define IQR5_T4					0x0188
+#define IQR5_T1 0x0182
+#define IQR5_T2 0x0184
+#define IQR5_T3 0x0186
+#define IQR5_T4 0x0188
 
-#define IQR6_T1					0x018A
-#define IQR6_T2					0x018C
-#define IQR6_T3					0x018E
-#define IQR6_T4					0x0190
+#define IQR6_T1 0x018A
+#define IQR6_T2 0x018C
+#define IQR6_T3 0x018E
+#define IQR6_T4 0x0190
 
-#define IQR7_T1					0x0192
-#define IQR7_T2					0x0194
-#define IQR7_T3					0x0196
-#define IQR7_T4					0x0198
+#define IQR7_T1 0x0192
+#define IQR7_T2 0x0194
+#define IQR7_T3 0x0196
+#define IQR7_T4 0x0198
 
-#define IQR8_T1					0x019A
-#define IQR8_T2					0x019C
-#define IQR8_T3					0x019E
-#define IQR8_T4					0x01A0
+#define IQR8_T1 0x019A
+#define IQR8_T2 0x019C
+#define IQR8_T3 0x019E
+#define IQR8_T4 0x01A0
 
-#define KEY_ADDR				0x01FF
+#define KEY_ADDR 0x01FF
 
 extern uint8_t usart0_rx_buff[200];
 extern uint8_t usart0_tx_buff[200];

@@ -3,16 +3,15 @@
  *
  * Created: 2018-04-03 09:31:55
  *  Author: chenlong
- */ 
+ */
 #include "usart.h"
 
 uint8_t usart0_rx_buff[200] = {0};
 uint8_t usart0_tx_buff[200] = {0};
-	
+
 uint8_t usart0_rx_end = 0;
 uint8_t usart0_rx_lenth = 0;
 uint8_t usart0_rx_cnt = 0;
-
 
 uint8_t usart1_rx_buff[200] = {0};
 uint8_t usart1_tx_buff[200] = {0};
@@ -32,11 +31,11 @@ uint16_t all_sensor_type_buff = 0;
 uint16_t temp_unit_buff = 0;
 
 uint16_t set_temp_buff[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-uint16_t switch_sensor_buff[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};						//Ä¬ÈÏ×´Ì¬Îª¹Ø±Õ
+uint16_t switch_sensor_buff[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //Ä¬ï¿½ï¿½×´Ì¬Îªï¿½Ø±ï¿½
 uint16_t sensor_type_buff[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	
-uint16_t p_value_buff = 100;	
-uint16_t i_value_buff = 100;			
+
+uint16_t p_value_buff = 100;
+uint16_t i_value_buff = 100;
 uint16_t d_value_buff = 100;
 
 uint16_t time_ctrl_value_buff[4][8][4];
@@ -45,19 +44,18 @@ ISR(USART0_RX_vect)
 {
 	usart0_rx_buff[usart0_rx_cnt++] = UDR0;
 
-	if(usart0_rx_cnt >= 200)
+	if (usart0_rx_cnt >= 200)
 	{
 		usart0_rx_lenth = usart0_rx_cnt;
 		usart0_rx_cnt = 0;
 	}
 }
 
-
 ISR(USART1_RX_vect)
 {
 	usart1_rx_buff[usart1_rx_cnt++] = UDR1;
-	
-	if(usart1_rx_cnt >= 200)
+
+	if (usart1_rx_cnt >= 200)
 	{
 		usart1_rx_lenth = usart1_rx_cnt;
 		usart1_rx_cnt = 0;
@@ -67,197 +65,288 @@ ISR(USART1_RX_vect)
 int usart0_deal(void)
 {
 	uint16_t crc_data = 0;
-	
+
 	uint16_t variable_addr = 0;
 	uint16_t variable = 0;
-	
-	crc_data = usart0_rx_buff[usart0_rx_lenth-1];
-	crc_data = (crc_data<<8) + usart0_rx_buff[usart0_rx_lenth-2];		//¶ÁÈ¡½ÓÊÕÊı¾İºóÁ½¸ö×Ö½ÚµÄĞ£ÑéÖµ
-	
+
+	crc_data = usart0_rx_buff[usart0_rx_lenth - 1];
+	crc_data = (crc_data << 8) + usart0_rx_buff[usart0_rx_lenth - 2]; //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½Úµï¿½Ğ£ï¿½ï¿½Öµ
+
 	variable_addr = usart0_rx_buff[4];
-	variable_addr = (variable_addr<<8) | usart0_rx_buff[5];				//¶ÁÈ¡±äÁ¿µØÖ·
-	
-	variable = usart0_rx_buff[usart0_rx_lenth-4];
-	variable = (variable<<8) | usart0_rx_buff[usart0_rx_lenth - 3];		//¶ÁÈ¡±äÁ¿Öµ
-	
-	if((usart0_rx_buff[0]!=0xA5) || (usart0_rx_buff[1]!=0x5A))			//ÅĞ¶ÏÊı¾İÍ·ÊÇ·ñÕıÈ·
+	variable_addr = (variable_addr << 8) | usart0_rx_buff[5]; //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·
+
+	variable = usart0_rx_buff[usart0_rx_lenth - 4];
+	variable = (variable << 8) | usart0_rx_buff[usart0_rx_lenth - 3]; //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Öµ
+
+	if ((usart0_rx_buff[0] != 0xA5) || (usart0_rx_buff[1] != 0x5A)) //ï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½Ç·ï¿½ï¿½ï¿½È·
 	{
 		usart0_rx_end = 0;
 		return 0;
 	}
-	
-	if((usart0_rx_buff[2]+5)!=usart0_rx_lenth)							//ÅĞ¶ÏÊı¾İ³¤¶ÈÊÇ·ñÕıÈ·
+
+	if ((usart0_rx_buff[2] + 5) != usart0_rx_lenth) //ï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½İ³ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½È·
 	{
 		usart0_rx_end = 0;
 		return 0;
 	}
-	
-	if(crc_data != crc_check(usart0_rx_buff,usart0_rx_lenth))			//ÅĞ¶ÏcrcĞ£ÑéÊÇ·ñÕıÈ·
+
+	if (crc_data != crc_check(usart0_rx_buff, usart0_rx_lenth)) //ï¿½Ğ¶ï¿½crcĞ£ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½È·
 	{
 		usart0_rx_end = 0;
 		return 0;
 	}
-	
-	if(RX0_COMMAND == ACCESS_VARIABLE)
+
+	if (RX0_COMMAND == ACCESS_VARIABLE)
 	{
 		switch (variable_addr)
 		{
-			case KEY_ADDR:					key_action(variable);					break;					//Èç¹û±äÁ¿µØÖ·Îª°´¼ü±äÁ¿µØÖ·  Ö´ĞĞ°´¼ü¶¯×÷
-			case MASTER_SWITCH:				ctrl_command = SWITCH_SENSOR;									//¶¨Ê±Æ÷ÖĞ¶ÏÖĞ´¦Àí
-											global = ALL;
-											all_senser_sta = variable;
-																					break;
-			case SINGLE_SET_SENSOR_TYPE:	sensor_type_buff[set_num] = variable;
-											send_variables(SINGLE_SENSORTYPE_ADDR, 
-														   TYPE_J + (sensor_type_buff[set_num]*TYPE_K));
-																					break;
-			case SINGLE_SET_SWITCH:			switch_sensor_buff[set_num] = variable;	break;
-			case SINGLE_SET_TEMP:			set_temp_buff[set_num] = variable;		break;
-			case SINGLE_SET_NAME:			get_set_name();							break;
-			case ALL_SET_TEMP:				all_temp_buff = variable; 				break;
-			case SET_PREHEAT_TIME:			preheat_time_buff = variable;			break;
-			case ALL_SET_SENSOR_TYPE:		all_sensor_type_buff = variable; 
-											send_variables(ALL_SENSOR_TYPE_ADDR, 
-														   TYPE_J+(all_sensor_type_buff*TYPE_K));
-																			 		break;
-			case SET_TEMP_UNIT:				temp_unit_buff = variable;
-											send_variables(TEMP_UINT_ADDR, 
-														  (CELSIUS+temp_unit_buff*FAHRENHEIT));				
-																					break;
-			case PID_CHANNEL:				update_pid_page(variable);				break;
-			case PID_P:						p_value_buff = variable;				break;
-			case PID_I:						i_value_buff = variable;				break;
-			case PID_D:						d_value_buff = variable;				break;
-			
-			case IQR1_T1:					time_ctrl_value_buff[module_num -1][0][0] = variable;	break;
-			case IQR1_T2:					time_ctrl_value_buff[module_num -1][0][1] = variable;	break;
-			case IQR1_T3:					time_ctrl_value_buff[module_num -1][0][2] = variable;	break;
-			case IQR1_T4:					time_ctrl_value_buff[module_num -1][0][3] = variable;	break;
-			
-			case IQR2_T1:					time_ctrl_value_buff[module_num -1][1][0] = variable;	break;
-			case IQR2_T2:					time_ctrl_value_buff[module_num -1][1][1] = variable;	break;
-			case IQR2_T3:					time_ctrl_value_buff[module_num -1][1][2] = variable;	break;
-			case IQR2_T4:					time_ctrl_value_buff[module_num -1][1][3] = variable;	break;
-			
-			case IQR3_T1:					time_ctrl_value_buff[module_num -1][2][0] = variable;	break;
-			case IQR3_T2:					time_ctrl_value_buff[module_num -1][2][1] = variable;	break;
-			case IQR3_T3:					time_ctrl_value_buff[module_num -1][2][2] = variable;	break;
-			case IQR3_T4:					time_ctrl_value_buff[module_num -1][2][3] = variable;	break;
-			
-			case IQR4_T1:					time_ctrl_value_buff[module_num -1][3][0] = variable;	break;
-			case IQR4_T2:					time_ctrl_value_buff[module_num -1][3][1] = variable;	break;
-			case IQR4_T3:					time_ctrl_value_buff[module_num -1][3][2] = variable;	break;
-			case IQR4_T4:					time_ctrl_value_buff[module_num -1][3][3] = variable;	break;
-			
-			case IQR5_T1:					time_ctrl_value_buff[module_num -1][4][0] = variable;	break;
-			case IQR5_T2:					time_ctrl_value_buff[module_num -1][4][1] = variable;	break;
-			case IQR5_T3:					time_ctrl_value_buff[module_num -1][4][2] = variable;	break;
-			case IQR5_T4:					time_ctrl_value_buff[module_num -1][4][3] = variable;	break;
-			
-			case IQR6_T1:					time_ctrl_value_buff[module_num -1][5][0] = variable;	break;
-			case IQR6_T2:					time_ctrl_value_buff[module_num -1][5][1] = variable;	break;
-			case IQR6_T3:					time_ctrl_value_buff[module_num -1][5][2] = variable;	break;
-			case IQR6_T4:					time_ctrl_value_buff[module_num -1][5][3] = variable;	break;
+		case KEY_ADDR:
+			key_action(variable);
+			break; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·  Ö´ï¿½Ğ°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		case MASTER_SWITCH:
+			ctrl_command = SWITCH_SENSOR; //ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½Ğ´ï¿½ï¿½ï¿½
+			global = ALL;
+			all_senser_sta = variable;
+			break;
+		case SINGLE_SET_SENSOR_TYPE:
+			sensor_type_buff[set_num] = variable;
+			send_variables(SINGLE_SENSORTYPE_ADDR,
+						   TYPE_J + (sensor_type_buff[set_num] * TYPE_K));
+			break;
+		case SINGLE_SET_SWITCH:
+			switch_sensor_buff[set_num] = variable;
+			break;
+		case SINGLE_SET_TEMP:
+			set_temp_buff[set_num] = variable;
+			break;
+		case SINGLE_SET_NAME:
+			get_set_name();
+			break;
+		case ALL_SET_TEMP:
+			all_temp_buff = variable;
+			break;
+		case SET_PREHEAT_TIME:
+			preheat_time_buff = variable;
+			break;
+		case ALL_SET_SENSOR_TYPE:
+			all_sensor_type_buff = variable;
+			send_variables(ALL_SENSOR_TYPE_ADDR,
+						   TYPE_J + (all_sensor_type_buff * TYPE_K));
+			break;
+		case SET_TEMP_UNIT:
+			temp_unit_buff = variable;
+			send_variables(TEMP_UINT_ADDR,
+						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
+			break;
+		case PID_CHANNEL:
+			update_pid_page(variable);
+			break;
+		case PID_P:
+			p_value_buff = variable;
+			break;
+		case PID_I:
+			i_value_buff = variable;
+			break;
+		case PID_D:
+			d_value_buff = variable;
+			break;
 
-			case IQR7_T1:					time_ctrl_value_buff[module_num -1][6][0] = variable;	break;
-			case IQR7_T2:					time_ctrl_value_buff[module_num -1][6][1] = variable;	break;
-			case IQR7_T3:					time_ctrl_value_buff[module_num -1][6][2] = variable;	break;
-			case IQR7_T4:					time_ctrl_value_buff[module_num -1][6][3] = variable;	break;
-			
-			case IQR8_T1:					time_ctrl_value_buff[module_num -1][7][0] = variable;	break;
-			case IQR8_T2:					time_ctrl_value_buff[module_num -1][7][1] = variable;	break;
-			case IQR8_T3:					time_ctrl_value_buff[module_num -1][7][2] = variable;	break;
-			case IQR8_T4:					time_ctrl_value_buff[module_num -1][7][3] = variable;	break;
-			
-			default: break;
+		case IQR1_T1:
+			time_ctrl_value_buff[module_num - 1][0][0] = variable;
+			break;
+		case IQR1_T2:
+			time_ctrl_value_buff[module_num - 1][0][1] = variable;
+			break;
+		case IQR1_T3:
+			time_ctrl_value_buff[module_num - 1][0][2] = variable;
+			break;
+		case IQR1_T4:
+			time_ctrl_value_buff[module_num - 1][0][3] = variable;
+			break;
+
+		case IQR2_T1:
+			time_ctrl_value_buff[module_num - 1][1][0] = variable;
+			break;
+		case IQR2_T2:
+			time_ctrl_value_buff[module_num - 1][1][1] = variable;
+			break;
+		case IQR2_T3:
+			time_ctrl_value_buff[module_num - 1][1][2] = variable;
+			break;
+		case IQR2_T4:
+			time_ctrl_value_buff[module_num - 1][1][3] = variable;
+			break;
+
+		case IQR3_T1:
+			time_ctrl_value_buff[module_num - 1][2][0] = variable;
+			break;
+		case IQR3_T2:
+			time_ctrl_value_buff[module_num - 1][2][1] = variable;
+			break;
+		case IQR3_T3:
+			time_ctrl_value_buff[module_num - 1][2][2] = variable;
+			break;
+		case IQR3_T4:
+			time_ctrl_value_buff[module_num - 1][2][3] = variable;
+			break;
+
+		case IQR4_T1:
+			time_ctrl_value_buff[module_num - 1][3][0] = variable;
+			break;
+		case IQR4_T2:
+			time_ctrl_value_buff[module_num - 1][3][1] = variable;
+			break;
+		case IQR4_T3:
+			time_ctrl_value_buff[module_num - 1][3][2] = variable;
+			break;
+		case IQR4_T4:
+			time_ctrl_value_buff[module_num - 1][3][3] = variable;
+			break;
+
+		case IQR5_T1:
+			time_ctrl_value_buff[module_num - 1][4][0] = variable;
+			break;
+		case IQR5_T2:
+			time_ctrl_value_buff[module_num - 1][4][1] = variable;
+			break;
+		case IQR5_T3:
+			time_ctrl_value_buff[module_num - 1][4][2] = variable;
+			break;
+		case IQR5_T4:
+			time_ctrl_value_buff[module_num - 1][4][3] = variable;
+			break;
+
+		case IQR6_T1:
+			time_ctrl_value_buff[module_num - 1][5][0] = variable;
+			break;
+		case IQR6_T2:
+			time_ctrl_value_buff[module_num - 1][5][1] = variable;
+			break;
+		case IQR6_T3:
+			time_ctrl_value_buff[module_num - 1][5][2] = variable;
+			break;
+		case IQR6_T4:
+			time_ctrl_value_buff[module_num - 1][5][3] = variable;
+			break;
+
+		case IQR7_T1:
+			time_ctrl_value_buff[module_num - 1][6][0] = variable;
+			break;
+		case IQR7_T2:
+			time_ctrl_value_buff[module_num - 1][6][1] = variable;
+			break;
+		case IQR7_T3:
+			time_ctrl_value_buff[module_num - 1][6][2] = variable;
+			break;
+		case IQR7_T4:
+			time_ctrl_value_buff[module_num - 1][6][3] = variable;
+			break;
+
+		case IQR8_T1:
+			time_ctrl_value_buff[module_num - 1][7][0] = variable;
+			break;
+		case IQR8_T2:
+			time_ctrl_value_buff[module_num - 1][7][1] = variable;
+			break;
+		case IQR8_T3:
+			time_ctrl_value_buff[module_num - 1][7][2] = variable;
+			break;
+		case IQR8_T4:
+			time_ctrl_value_buff[module_num - 1][7][3] = variable;
+			break;
+
+		default:
+			break;
 		}
 	}
-	
-	return 0;	
+
+	return 0;
 }
 
 int usart1_deal(void)
 {
 	uint16_t crc_data = 0;
-	
-	crc_data = usart1_rx_buff[usart1_rx_lenth-1];
-	crc_data = (crc_data<<8) + usart1_rx_buff[usart1_rx_lenth-2];
-	
-	if((usart1_rx_buff[0]!=0xA5) || (usart1_rx_buff[1]!=0x5A))
+
+	crc_data = usart1_rx_buff[usart1_rx_lenth - 1];
+	crc_data = (crc_data << 8) + usart1_rx_buff[usart1_rx_lenth - 2];
+
+	if ((usart1_rx_buff[0] != 0xA5) || (usart1_rx_buff[1] != 0x5A))
 	{
 		usart1_rx_end = 0;
 		return 0;
 	}
-	
-	if((usart1_rx_buff[2]+5) != usart1_rx_lenth)
+
+	if ((usart1_rx_buff[2] + 5) != usart1_rx_lenth)
 	{
 		usart1_rx_end = 0;
 		return 0;
 	}
-	
-	if(crc_data != crc_check(usart1_rx_buff, usart1_rx_lenth))
+
+	if (crc_data != crc_check(usart1_rx_buff, usart1_rx_lenth))
 	{
 		usart1_rx_end = 0;
 		return 0;
 	}
-	
-	if(RX1_COMMAND == READ_DATA_ALL)
-	{ 
+
+	if (RX1_COMMAND == READ_DATA_ALL)
+	{
 		get_data_all();
 	}
-	
+
 	return 0;
 }
 
 void usart0_send_char(uint8_t data)
 {
-	while(!( UCSR0A & (1<<UDRE0)));
+	while (!(UCSR0A & (1 << UDRE0)))
+		;
 	UDR0 = data;
 }
 
 void usart0_send_str(uint8_t *str, uint8_t data_size)
 {
 	uint8_t i = 0;
-	
-	for(i=0; i<data_size; i++)
+
+	for (i = 0; i < data_size; i++)
 	{
 		usart0_send_char(*str++);
-	} 
+	}
 }
 
 void usart1_send_char(uint8_t data)
 {
-	while(!( UCSR1A & (1<<UDRE1)));					//µÈ´ı·¢ËÍ¼Ä´æÆ÷Îª¿Õ
+	while (!(UCSR1A & (1 << UDRE1)))
+		; //ï¿½È´ï¿½ï¿½ï¿½ï¿½Í¼Ä´ï¿½ï¿½ï¿½Îªï¿½ï¿½
 	UDR1 = data;
 }
 
 void usart1_send_str(uint8_t *str, uint8_t data_size)
 {
 	uint8_t i = 0;
-	
-	for(i=0; i<data_size; i++)
+
+	for (i = 0; i < data_size; i++)
 	{
 		usart1_send_char(*str++);
 	}
 }
 
 void usart2_send_char(uint8_t data)
-{	
-	usart2_buff = data;						//°ÑÊı¾İ±£´æµ½·¢ËÍÊı¾İ»º³åÇø
-	
-	usart2_sta = USART2_IN_TX;					//×´Ì¬¸ü¸ÄÎª·¢ËÍ×´Ì¬
-	
-	USART2_TX_PIN_RESET;						//¸øÆğÊ¼Î»
-	
-	TCNT3 = 0x0000;								//¶¨Ê±Æ÷3¼ÆÊıÆ÷ÇåÁã
-	TCCR3B |= 0x01;								//Æô¶¯¶¨Ê±Æ÷
+{
+	usart2_buff = data; //ï¿½ï¿½ï¿½ï¿½ï¿½İ±ï¿½ï¿½æµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ»ï¿½ï¿½ï¿½ï¿½ï¿½
+
+	usart2_sta = USART2_IN_TX; //×´Ì¬ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½×´Ì¬
+
+	USART2_TX_PIN_RESET; //ï¿½ï¿½ï¿½ï¿½Ê¼Î»
+
+	TCNT3 = 0x0000; //ï¿½ï¿½Ê±ï¿½ï¿½3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	TCCR3B |= 0x01; //ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
 }
 
 void usart2_send_str(uint8_t *str, uint8_t data_size)
 {
 	uint8_t i = 0;
-	
-	for(i=0; i<data_size; i++)
+
+	for (i = 0; i < data_size; i++)
 	{
 		usart2_send_char(*str++);
 		_delay_us(1200);
@@ -268,67 +357,67 @@ uint16_t crc_check(uint8_t *p, uint8_t data_size)
 {
 	uint16_t crc = 0xFFFF;
 	uint8_t i, j;
-	
-	for (j=0;j<(data_size-5);j++)
+
+	for (j = 0; j < (data_size - 5); j++)
 	{
-		crc = crc ^ *(p+j+3);
-		for ( i=0; i<8; i++)
+		crc = crc ^ *(p + j + 3);
+		for (i = 0; i < 8; i++)
 		{
-			if ((crc&0x0001)>0)
+			if ((crc & 0x0001) > 0)
 			{
-				crc>>=1;
-				crc^=0xA001;
+				crc >>= 1;
+				crc ^= 0xA001;
 			}
 			else
-			crc>>=1;
+				crc >>= 1;
 		}
 	}
-	
+
 	return crc;
 }
 
-void usart0_init(uint16_t ubrr0)					//ÆÁÄ»Í¨Ñ¶Ê¹ÓÃ
+void usart0_init(uint16_t ubrr0) //ï¿½ï¿½Ä»Í¨Ñ¶Ê¹ï¿½ï¿½
 {
 	USART0_TX_PIN_OUTPUT;
-	USART0_RX_PIN_INPUT;							//ÅäÖÃÒı½Å·½Ïò
-	
-	UBRR0H = (uint8_t)(ubrr0>>8);
+	USART0_RX_PIN_INPUT; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å·ï¿½ï¿½ï¿½
+
+	UBRR0H = (uint8_t)(ubrr0 >> 8);
 	UBRR0L = (uint8_t)ubrr0;
-	
-//	UBRR0H = 0;
-//	UBRR0L = 103;									//²¨ÌØÂÊ9600£¬¾§Õñ16M
-	UCSR0C |= (1<<UCSZ01)|(1<<UCSZ00);				// Set frame format: 8data, 1stop bit ÎŞĞ£Ñé,Òì²½Õı³£Ä£Ê½
-	UCSR0B |= (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0); 	//Ê¹ÄÜ·¢ËÍ¡¢½ÓÊÕ£»Ê¹ÄÜ½ÓÊÕÖĞ¶Ï
+
+	//	UBRR0H = 0;
+	//	UBRR0L = 103;									//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½9600ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½16M
+	UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);			   // Set frame format: 8data, 1stop bit ï¿½ï¿½Ğ£ï¿½ï¿½,ï¿½ì²½ï¿½ï¿½ï¿½ï¿½Ä£Ê½
+	UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0); //Ê¹ï¿½Ü·ï¿½ï¿½Í¡ï¿½ï¿½ï¿½ï¿½Õ£ï¿½Ê¹ï¿½Ü½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½
 }
 
-void usart1_init(uint16_t ubrr1)					//Éè±¸Í¨Ñ¶Ê¹ÓÃ
+void usart1_init(uint16_t ubrr1) //ï¿½è±¸Í¨Ñ¶Ê¹ï¿½ï¿½
 {
 	USART1_TX_PIN_OUTPUT;
-	USART1_RX_PIN_INPUT;							//ÅäÖÃÒı½Å·½Ïò
-	
-	UBRR1H = (uint8_t)(ubrr1>>8);
+	USART1_RX_PIN_INPUT; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å·ï¿½ï¿½ï¿½
+
+	UBRR1H = (uint8_t)(ubrr1 >> 8);
 	UBRR1L = (uint8_t)ubrr1;
-	
-//	UBRR1H = 0;
-//	UBRR1L = 103;						//²¨ÌØÂÊ9600£¬¾§Õñ16M
-	UCSR1C = (1<<UCSZ11)|(1<<UCSZ10);	// Set frame format: 8data, 1stop bit ÎŞĞ£Ñé
-	UCSR1B = (1<<RXEN1)|(1<<TXEN1)|(1<<RXCIE1);		//Ê¹ÄÜ½ÓÊÕ,·¢ËÍ
+
+	//	UBRR1H = 0;
+	//	UBRR1L = 103;						//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½9600ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½16M
+	UCSR1C = (1 << UCSZ11) | (1 << UCSZ10);				  // Set frame format: 8data, 1stop bit ï¿½ï¿½Ğ£ï¿½ï¿½
+	UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1); //Ê¹ï¿½Ü½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½
 }
 
-/*Ê¹ÓÃIO¿Ú+TIMER3Ä£Äâ´®¿Ú*/
+/*Ê¹ï¿½ï¿½IOï¿½ï¿½+TIMER3Ä£ï¿½â´®ï¿½ï¿½*/
 void usart2_init(uint16_t baud)
 {
-	/*io¿ÚÄ£ÄâuartÏà¹ØIO³õÊ¼»¯*/
-	USART2_TX_PIN_OUTPUT;	//TX½ÅÅäÖÃÎªÊä³ö
+	/*ioï¿½ï¿½Ä£ï¿½ï¿½uartï¿½ï¿½ï¿½IOï¿½ï¿½Ê¼ï¿½ï¿½*/
+	USART2_TX_PIN_OUTPUT; //TXï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½
 	USART2_RX_PIN_INPUT;
-	USART2_RX_PIN_PULLUP;	//RXÅäÖÃÎªÊäÈëÉÏÀ­
-		
-	USART2_TX_PIN_SET;		//TX½ÅÊä³ö¸ß
-	
-	TCCR3B |= 0x08;			//WGM32Î»ÖÃ1
-	TCCR3B &= 0xF8;			//¹Ø±Õ¶¨Ê±Æ÷£¨Çå³ıÊ±ÖÓÑ¡ÔñÎ» CS30 CS31 CS32£©
-	
-	OCR3A = 16000000UL/baud;	//¶¨Ê±Ê±¼äÎª²¨ÌØÂÊµÄ1/2£¨ÕâÀï²»Æô¶¯¶¨Ê±Æ÷£¬Æô¶¯Ê±ĞèÒª¶¨Ê±Æ÷Ê±ÖÓ²»·ÖÆµ TCCR3B |= 0x01£©
-	
-	ETIMSK |= 0x10;			//¶¨Ê±Æ÷3 AÊä³ö±È½ÏÖĞ¶ÏÊ¹ÄÜ
+	USART2_RX_PIN_PULLUP; //RXï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+
+	USART2_TX_PIN_SET; //TXï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+
+	TCCR3B |= 0x08; //WGM32Î»ï¿½ï¿½1
+	TCCR3B &= 0xF8; //ï¿½Ø±Õ¶ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ñ¡ï¿½ï¿½Î» CS30 CS31 CS32ï¿½ï¿½
+
+	OCR3A = 16000000UL / baud; //ï¿½ï¿½Ê±Ê±ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½1/2ï¿½ï¿½ï¿½ï¿½ï¿½ï²»ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Òªï¿½ï¿½Ê±ï¿½ï¿½Ê±ï¿½Ó²ï¿½ï¿½ï¿½Æµ TCCR3B |= 0x01ï¿½ï¿½
+
+	ETIMSK |= 0x10; //ï¿½ï¿½Ê±ï¿½ï¿½3 Aï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½Ğ¶ï¿½Ê¹ï¿½ï¿½
 }

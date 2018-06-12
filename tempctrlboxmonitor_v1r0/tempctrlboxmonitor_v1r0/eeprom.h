@@ -3,8 +3,7 @@
  *
  * Created: 2018-04-11 17:31:02
  *  Author: chenlong
- */ 
-
+ */
 
 #ifndef EEPROM_H_
 #define EEPROM_H_
@@ -13,25 +12,24 @@
 #include "dgus.h"
 #include "usart.h"
 
-#define FIRST_START_ADDR			0x00FC		//¼ì²âÊÇ·ñÎªµÚÒ»´ÎÆô¶¯µØÖ·
+#define FIRST_START_ADDR 0x00FC //ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Îªï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ö·
 
-#define PRE_LANGUAGE_EEADDR			0x0000		//µ±Ç°ÓïÑÔÉèÖÃEEPROM´æ´¢µØÖ·		0:ÖÐÎÄ		1:Ó¢ÎÄ
-#define ALL_SENSORTYPE_EEADDR		0x0001		//È«¾ÖÉè¶¨´«¸ÐÆ÷ÀàÐÍEEPROM´æ´¢µØÖ·	0:TYPE_J	1:TYPE_K
-#define TEMP_UNIT_EEADDR			0x0002		//ÎÂ¶Èµ¥Î»EEPROM´æ´¢µØÖ·			0:C			1:F
-#define ALL_SETTEMP_EEADDR			0x0003		//È«¾ÖÎÂ¶ÈEEPROM´æ´¢µØÖ·	 Ë«×Ö½Ú 0x0003 - 0x0004	
-#define SINGLE_SETTEMP_EEADDR		0x0005		//µ¥¶ÀÉè¶¨ÎÂ¶ÈEEPROMµØÖ·  12¸ö	 Ë«×Ö½Ú 0x0005 - 0x001C
-#define SINGLE_SENSORTYPE_EEADDR	0x001D		//µ¥¶ÀÉè¶¨´«¸ÐÆ÷ÀàÐÍEEPROMEµØÖ·	12¸ö  µ¥×Ö½Ú  0x001D - 0x0028
-#define PREHEAT_TIME_EEADDR			0x00FE		//Ô¤ÈÈÊ±¼äEEPROM´æ´¢µØÖ·		
-#define PID_P_EEADDR				0x002A		//0x002A - 0x0041
-#define PID_I_EEADDR				0x0042		//0x0042 - 0x0059
-#define PID_D_EEADDR				0x005A		//0x005A - 0x0071
-#define SINGLE_SWSENSOR_EEADDR		0x0072		//µ¥¶ÀÉè¶¨´«¸ÐÆ÷¿ªÆô»ò¹Ø±ÕEEPROMµØÖ· 0:¹Ø±Õ 1:¿ªÆô  µ¥×Ö½Ú  0x0072 - 0x007D
-#define SET_NAME_EEADDR				0x007E		//Éè¶¨Ãû³ÆEEpromeµØÖ·		0x007E-0x00AD
-#define TIME_CTRL_T1_EEADDR			0x00AE
-#define TIME_CTRL_T2_EEADDR			0x00BE
-#define TIME_CTRL_T3_EEADDR			0x00CE
-#define TIME_CTRL_T4_EEADDR			0x00DE
-
+#define PRE_LANGUAGE_EEADDR 0x0000      //ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½EEPROMï¿½æ´¢ï¿½ï¿½Ö·		0:ï¿½ï¿½ï¿½ï¿½		1:Ó¢ï¿½ï¿½
+#define ALL_SENSORTYPE_EEADDR 0x0001    //È«ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½EEPROMï¿½æ´¢ï¿½ï¿½Ö·	0:TYPE_J	1:TYPE_K
+#define TEMP_UNIT_EEADDR 0x0002         //ï¿½Â¶Èµï¿½Î»EEPROMï¿½æ´¢ï¿½ï¿½Ö·			0:C			1:F
+#define ALL_SETTEMP_EEADDR 0x0003       //È«ï¿½ï¿½ï¿½Â¶ï¿½EEPROMï¿½æ´¢ï¿½ï¿½Ö·	 Ë«ï¿½Ö½ï¿½ 0x0003 - 0x0004
+#define SINGLE_SETTEMP_EEADDR 0x0005    //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½Â¶ï¿½EEPROMï¿½ï¿½Ö·  12ï¿½ï¿½	 Ë«ï¿½Ö½ï¿½ 0x0005 - 0x001C
+#define SINGLE_SENSORTYPE_EEADDR 0x001D //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½EEPROMEï¿½ï¿½Ö·	12ï¿½ï¿½  ï¿½ï¿½ï¿½Ö½ï¿½  0x001D - 0x0028
+#define PREHEAT_TIME_EEADDR 0x00FE      //Ô¤ï¿½ï¿½Ê±ï¿½ï¿½EEPROMï¿½æ´¢ï¿½ï¿½Ö·
+#define PID_P_EEADDR 0x002A             //0x002A - 0x0041
+#define PID_I_EEADDR 0x0042             //0x0042 - 0x0059
+#define PID_D_EEADDR 0x005A             //0x005A - 0x0071
+#define SINGLE_SWSENSOR_EEADDR 0x0072   //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø±ï¿½EEPROMï¿½ï¿½Ö· 0:ï¿½Ø±ï¿½ 1:ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½Ö½ï¿½  0x0072 - 0x007D
+#define SET_NAME_EEADDR 0x007E          //ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½EEpromeï¿½ï¿½Ö·		0x007E-0x00AD
+#define TIME_CTRL_T1_EEADDR 0x00AE
+#define TIME_CTRL_T2_EEADDR 0x00BE
+#define TIME_CTRL_T3_EEADDR 0x00CE
+#define TIME_CTRL_T4_EEADDR 0x00DE
 
 void eeprom_write(uint16_t addr, uint8_t data);
 uint8_t eeprom_read(uint16_t addr);

@@ -3,133 +3,145 @@
  *
  * Created: 2018-04-03 09:57:22
  *  Author: chenlong
- */ 
+ */
 #include "timer.h"
 
 uint8_t timer2_ovf = 0;
-uint8_t ctrl_command = READ_DATA_ALL;		//ÃüÁî
-uint8_t global;								//ÊÇ·ñÎªÈ«¾ÖÉè¶¨
+uint8_t ctrl_command = READ_DATA_ALL; //ï¿½ï¿½ï¿½ï¿½
+uint8_t global;						  //ï¿½Ç·ï¿½ÎªÈ«ï¿½ï¿½ï¿½è¶¨
 uint8_t all_senser_sta;
 
-ISR (TIMER0_OVF_vect)
+ISR(TIMER0_OVF_vect)
 {
-	static uint8_t usart1_cnt = 0;						//USART1½ÓÊÕÊ±¼ä¼ÆÊý
-	static uint8_t pre_usart1_rx_cnt = 0;				//USART1ÉÏ´Î½ÓÊÕ¼ÆÊý
-	
-	static uint8_t usart0_cnt = 0;						//USART0½ÓÊÕÊ±¼ä¼ÆÊý
-	static uint8_t pre_usart0_rx_cnt = 0;				//USART0ÉÏ´Î½ÓÊÕ¼ÆÊý
-	
-	static uint8_t time_cnt = 0;						//Ê±¼ä¼ÆÊý
-	static uint8_t slave_num = 1;						//¿ØÖÆ°åºÅÂë
+	static uint8_t usart1_cnt = 0;		  //USART1ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
+	static uint8_t pre_usart1_rx_cnt = 0; //USART1ï¿½Ï´Î½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½
+
+	static uint8_t usart0_cnt = 0;		  //USART0ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
+	static uint8_t pre_usart0_rx_cnt = 0; //USART0ï¿½Ï´Î½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½
+
+	static uint8_t time_cnt = 0;  //Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
+	static uint8_t slave_num = 1; //ï¿½ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ï¿½
 	static uint16_t update_run_temp_cnt = 0;
-	
+
 	EN_INTERRUPT;
 	TCNT0 = 0xB2;
-	
+
 	time_cnt++;
-	
-	if(time_cnt >= 100)
+
+	if (time_cnt >= 100)
 	{
 		time_cnt = 0;
-		
-		switch(ctrl_command)
+
+		switch (ctrl_command)
 		{
-			case READ_DATA_ALL: send_request_all(slave_num++); if(slave_num >= 4) slave_num = 1; break;
-			
-			case PID:			set_pid(); break;
-			
-			case TEMP:			single_set(TEMP, set_temp[set_num]); break;
-			
-			case SENSOR_TYPE:   single_set(SENSOR_TYPE, sensor_type[set_num]); break;
-								
-			case SWITCH_SENSOR: if(global == SINGLE)
-								{
-									single_set(SWITCH_SENSOR, switch_sensor[set_num]);
-								}
-								else
-								{
-									 switch_all_sensor(all_senser_sta);
-								}
-								break;
-								
-			case ALL_SET_CMD:	all_set_ok(); break;
-			
-			default: break;
+		case READ_DATA_ALL:
+			send_request_all(slave_num++);
+			if (slave_num >= 4)
+				slave_num = 1;
+			break;
+
+		case PID:
+			set_pid();
+			break;
+
+		case TEMP:
+			single_set(TEMP, set_temp[set_num]);
+			break;
+
+		case SENSOR_TYPE:
+			single_set(SENSOR_TYPE, sensor_type[set_num]);
+			break;
+
+		case SWITCH_SENSOR:
+			if (global == SINGLE)
+			{
+				single_set(SWITCH_SENSOR, switch_sensor[set_num]);
+			}
+			else
+			{
+				switch_all_sensor(all_senser_sta);
+			}
+			break;
+
+		case ALL_SET_CMD:
+			all_set_ok();
+			break;
+
+		default:
+			break;
 		}
 
-	}													//Ã¿Ò»°ÙºÁÃëÇëÇóÒ»¸öÖ÷¿Ø°å·¢ËÍËùÓÐ²É¼¯Êý¾Ý  300ºÁÃëÍê³É3¸öÖ÷¿Ø°å²É¼¯Êý¾ÝµÄ·¢ËÍ
+	} //Ã¿Ò»ï¿½Ùºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ø°å·¢ï¿½ï¿½ï¿½ï¿½ï¿½Ð²É¼ï¿½ï¿½ï¿½ï¿½ï¿½  300ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3ï¿½ï¿½ï¿½ï¿½ï¿½Ø°ï¿½É¼ï¿½ï¿½ï¿½ï¿½ÝµÄ·ï¿½ï¿½ï¿½
 
-	if(update_run_temp_flag)							//Èç¹ûÔÚµ¥¶ÀÉè¶¨½çÃæ£¬1s¸üÐÂÒ»´ÎÔËÐÐÎÂ¶È
+	if (update_run_temp_flag) //ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½æ£¬1sï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¶ï¿½
 	{
 		update_run_temp_cnt++;
-		
-		if(update_run_temp_cnt >= 200)
+
+		if (update_run_temp_cnt >= 200)
 		{
 			update_run_temp_cnt = 0;
-			
-			if(run_temp_page)
+
+			if (run_temp_page)
 			{
-				send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num]+temp_unit*((run_temp[set_num]*8/10)+32));		//µ¥¶ÀÉè¶¨½çÃæ¸üÐÂÔËÐÐÎÂ¶È
+				send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num] + temp_unit * ((run_temp[set_num] * 8 / 10) + 32)); //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¶ï¿½
 			}
 			else
 			{
 				send_variables(CURVE_PAGE_RUNTEMP_ADDR, run_temp[curve_page_num] +
-														temp_unit*(run_temp[curve_page_num]*8/10 + 32));	//ÇúÏß½çÃæ¸üÐÂÔËÐÐÎÂ¶È
-														
-				send_variables(CURVE_PAGE_OUTRATE_ADDR, output_rate[curve_page_num]);						//ÇúÏß½çÃæ¸üÐÂÊä³ö±ÈÀý
+															temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)); //ï¿½ï¿½ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¶ï¿½
+
+				send_variables(CURVE_PAGE_OUTRATE_ADDR, output_rate[curve_page_num]); //ï¿½ï¿½ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			}
 		}
 	}
-	
-	
-	if(usart1_rx_cnt != pre_usart1_rx_cnt)
+
+	if (usart1_rx_cnt != pre_usart1_rx_cnt)
 	{
 		pre_usart1_rx_cnt = usart1_rx_cnt;
 		usart1_cnt = 0;
-	}													//Èç¹ûusart1µ±Ç°½ÓÊÕ¼ÆÊýÓëÉÏ´Î¼ÆÊý²»Ò»Ñù ±íÊ¾ÓÐÊý¾Ý½ÓÊÕ  Çå³ýÊ±¼ä¼ÆÊý
-	else												
-	{		
-		if(usart1_rx_cnt != 0)							//Èç¹ûusart1½ÓÊÕ¼ÆÊýÎª0 ÈÏÎªÃ»ÓÐ¿ªÊ¼½ÓÊÕÊý¾Ý  Ôò²»½øÐÐ³¬Ê±¼ÆÊý
+	} //ï¿½ï¿½ï¿½usart1ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Î¼ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
+	else
+	{
+		if (usart1_rx_cnt != 0) //ï¿½ï¿½ï¿½usart1ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½Îª0 ï¿½ï¿½ÎªÃ»ï¿½Ð¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ò²»½ï¿½ï¿½Ð³ï¿½Ê±ï¿½ï¿½ï¿½ï¿½
 		{
 			usart1_cnt++;
-			
-			if(usart1_cnt >= 4)
+
+			if (usart1_cnt >= 4)
 			{
 				usart1_rx_lenth = usart1_rx_cnt;
 				usart1_rx_end = 1;
-				
+
 				usart1_rx_cnt = 0;
 				pre_usart1_rx_cnt = 0;
-				
-				usart1_cnt = 0;		
+
+				usart1_cnt = 0;
 			}
 		}
-	}													//Èç¹û´óÓÚ21ºÁÃëÃ»ÓÐÊý¾Ý½ÓÊÕ  ÈÏÎªÍê³ÉÒ»´ÎÊý¾ÝµÄ½ÓÊÕ      Çå³ýÊ±¼ä¼ÆÊý
-	
-	if(usart0_rx_cnt != pre_usart0_rx_cnt)
+	} //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½21ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½  ï¿½ï¿½Îªï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ÝµÄ½ï¿½ï¿½ï¿½      ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
+
+	if (usart0_rx_cnt != pre_usart0_rx_cnt)
 	{
 		pre_usart0_rx_cnt = usart0_rx_cnt;
 		usart0_cnt = 0;
-	}													//Èç¹ûusart0µ±Ç°½ÓÊÕ¼ÆÊýÓëÉÏ´Î¼ÆÊý²»Ò»Ñù ±íÊ¾ÓÐÊý¾Ý½ÓÊÕ  Çå³ýÊ±¼ä¼ÆÊý
+	} //ï¿½ï¿½ï¿½usart0ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Î¼ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
 	else
 	{
-		if(usart0_rx_cnt != 0)							//Èç¹ûusart0½ÓÊÕ¼ÆÊýÎª0   ÈÏÎªÃ»ÓÐ¿ªÊ¼½ÓÊÕÊý¾Ý  Ôò²»½øÐÐ³¬Ê±¼ÆÊý
+		if (usart0_rx_cnt != 0) //ï¿½ï¿½ï¿½usart0ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½Îª0   ï¿½ï¿½ÎªÃ»ï¿½Ð¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ò²»½ï¿½ï¿½Ð³ï¿½Ê±ï¿½ï¿½ï¿½ï¿½
 		{
 			usart0_cnt++;
-			
-			if(usart0_cnt >= 4)
+
+			if (usart0_cnt >= 4)
 			{
 				usart0_rx_lenth = usart0_rx_cnt;
 				usart0_rx_end = 1;
-				
+
 				usart0_rx_cnt = 0;
 				pre_usart0_rx_cnt = 0;
-				
+
 				usart0_cnt = 0;
 			}
 		}
-	}													//Èç¹û´óÓÚ21ºÁÃëÃ»ÓÐÊý¾Ý½ÓÊÕ  ÈÏÎªÍê³ÉÒ»´ÎÊý¾ÝµÄ½ÓÊÕ      Çå³ýÊ±¼ä¼ÆÊý
-
+	} //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½21ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½  ï¿½ï¿½Îªï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ÝµÄ½ï¿½ï¿½ï¿½      ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
 }
 
 ISR(TIMER1_COMPA_vect)
@@ -176,11 +188,11 @@ ISR(TIMER1_COMPA_vect)
 			{
 				if((sta[i] == 0) || (sta[i] == 2))
 				{
-					PORTC &= ~(1<<i);	//¿ªÆôÍ¨µÀ
+					PORTC &= ~(1<<i);	//ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½
 				}
 				else if((sta[i] == 1) || (sta[i] == 3))
 				{
-					PORTC |= (1<<i);	//¹Ø±ÕÍ¨µÀ
+					PORTC |= (1<<i);	//ï¿½Ø±ï¿½Í¨ï¿½ï¿½
 				}
 				
 				sta[i] = sta[i] + 1;
@@ -240,33 +252,32 @@ ISR(TIMER2_OVF_vect)
 {
 	static uint8_t time_cnt = 0;
 	int16_t temp_differ = 0;
-	
+
 	EN_INTERRUPT;
 	TCNT2 = 0xB2;
-	
-	temp_differ = (run_temp[curve_page_num] - set_temp[curve_page_num])+100;
-	
+
+	temp_differ = (run_temp[curve_page_num] - set_temp[curve_page_num]) + 100;
+
 	time_cnt++;
-	if(time_cnt >= timer2_ovf)
+	if (time_cnt >= timer2_ovf)
 	{
 		time_cnt = 0;
 		send_to_channel(CHANNEL0, temp_differ);
 	}
-	
 }
 
 ISR(TIMER3_COMPA_vect)
 {
 	static uint8_t cnt = 0;
-	static uint8_t pos = 0;		//µ±Ç°·¢ËÍÊý¾ÝBIt µÄÎ»ÖÃ 
-	
+	static uint8_t pos = 0; //ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½BIt ï¿½ï¿½Î»ï¿½ï¿½
+
 	cnt++;
-	
-	if(usart2_sta == USART2_IN_TX)
+
+	if (usart2_sta == USART2_IN_TX)
 	{
-		if(cnt <= 8)
+		if (cnt <= 8)
 		{
-			if(((usart2_buff & (1<<pos))>>pos) == 1)
+			if (((usart2_buff & (1 << pos)) >> pos) == 1)
 			{
 				USART2_TX_PIN_SET;
 			}
@@ -276,66 +287,66 @@ ISR(TIMER3_COMPA_vect)
 			}
 			pos++;
 		}
-		
-		if(cnt == 9)
+
+		if (cnt == 9)
 		{
-			pos = 0;				//Êý¾Ý·¢ËÍÍê³É£¬·¢ËÍÎ»ÖÃ»Ö¸´1
-			USART2_TX_PIN_SET;		//Í£Ö¹Î»
+			pos = 0;		   //ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã»Ö¸ï¿½1
+			USART2_TX_PIN_SET; //Í£Ö¹Î»
 		}
-		
-		if(cnt == 10)
+
+		if (cnt == 10)
 		{
 			cnt = 0;
-			usart2_sta = USART2_TX_END;		//¸ü¸ÄUSART2×´Ì¬Îª·¢ËÍÍê³É
-			TCCR3B &= 0xF8;					//¹Ø±Õ¹Ø±Õ¶¨Ê±Æ÷
+			usart2_sta = USART2_TX_END; //ï¿½ï¿½ï¿½ï¿½USART2×´Ì¬Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			TCCR3B &= 0xF8;				//ï¿½Ø±Õ¹Ø±Õ¶ï¿½Ê±ï¿½ï¿½
 		}
 	}
 }
 
 void timer0_init()
 {
-		TCCR0 &= 0xF8;		//¹Ø±Õ¶¨Ê±Æ÷0
-		
-		TCNT0 = 0xB2;		//¶¨Ê±5ms
-		
-		TIMSK &= 0xFC;
-		TIMSK |= 0x01;		//Ê¹ÄÜ¶¨Ê±Æ÷0Òç³öÖÐ¶Ï
-		
-		TCCR0 |= 0x07;		//¿ªÆô¶¨Ê±Æ÷0 Õý³£Ä£Ê½TOP:0xFF, OC0²»Êä³öÐÅºÅ, clk/1024
+	TCCR0 &= 0xF8; //ï¿½Ø±Õ¶ï¿½Ê±ï¿½ï¿½0
+
+	TCNT0 = 0xB2; //ï¿½ï¿½Ê±5ms
+
+	TIMSK &= 0xFC;
+	TIMSK |= 0x01; //Ê¹ï¿½Ü¶ï¿½Ê±ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
+
+	TCCR0 |= 0x07; //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½0 ï¿½ï¿½ï¿½ï¿½Ä£Ê½TOP:0xFF, OC0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½, clk/1024
 }
 
 void timer1_init()
 {
-	TCCR1B |= 0x08;			//WGM12Î»ÖÃ1			
-	TCCR1B &= 0xF8;			//¹Ø±Õ¶¨Ê±Æ÷£¨Çå³ýÊ±ÖÓÑ¡ÔñÎ» CS10 CS11 CS12£©
-	
-	OCR1AH = 0x09;			//¶¨Ê±10ms
+	TCCR1B |= 0x08; //WGM12Î»ï¿½ï¿½1
+	TCCR1B &= 0xF8; //ï¿½Ø±Õ¶ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ñ¡ï¿½ï¿½Î» CS10 CS11 CS12ï¿½ï¿½
+
+	OCR1AH = 0x09; //ï¿½ï¿½Ê±10ms
 	OCR1AL = 0xC4;
-	
-	TIMSK |= 0x10;			//¶¨Ê±Æ÷1 AÊä³ö±È½ÏÖÐ¶ÏÊ¹ÄÜ
-	
-	TCCR1B |= 0x03;			//¿ªÆô¶¨Ê±Æ÷1 CTCÄ£Ê½ top:OCR1A, OC1A OC1B OC1C DISCONNECT,CLK/64
+
+	TIMSK |= 0x10; //ï¿½ï¿½Ê±ï¿½ï¿½1 Aï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½Ð¶ï¿½Ê¹ï¿½ï¿½
+
+	TCCR1B |= 0x03; //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½1 CTCÄ£Ê½ top:OCR1A, OC1A OC1B OC1C DISCONNECT,CLK/64
 }
 
 void timer2_init()
 {
-	TCCR2 &= 0xF8;			//¹Ø±Õ¶¨Ê±Æ÷
-	
-	TCNT2 = 0xB2;			//¶¨Ê±5ms
-	
-	TIMSK &= 0x3F;			
-	TIMSK |= 0x40;			//Ê¹ÄÜ¶¨Ê±Æ÷2Òç³öÖÐ¶Ï
-	
-	TCCR2 |= 0x05;			//¿ªÆô¶¨Ê±Æ÷2 Õý³£Ä£Ê½TOP:0xFF, OC0²»Êä³öÐÅºÅ, clk/1024
+	TCCR2 &= 0xF8; //ï¿½Ø±Õ¶ï¿½Ê±ï¿½ï¿½
+
+	TCNT2 = 0xB2; //ï¿½ï¿½Ê±5ms
+
+	TIMSK &= 0x3F;
+	TIMSK |= 0x40; //Ê¹ï¿½Ü¶ï¿½Ê±ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
+
+	TCCR2 |= 0x05; //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½2 ï¿½ï¿½ï¿½ï¿½Ä£Ê½TOP:0xFF, OC0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Åºï¿½, clk/1024
 	TCCR2 &= 0xF8;
 }
 
 /*
 void timer3_init()
 {
-	TCCR3B |= 0x80;			//WGM32Î»ÖÃ1	
-	TCCR3B &= 0xF8;			//¹Ø±Õ¶¨Ê±Æ÷£¨Çå³ýÊ±ÖÓÑ¡ÔñÎ» CS30 CS31 CS32£©
+	TCCR3B |= 0x80;			//WGM32Î»ï¿½ï¿½1	
+	TCCR3B &= 0xF8;			//ï¿½Ø±Õ¶ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ñ¡ï¿½ï¿½Î» CS30 CS31 CS32ï¿½ï¿½
 	
-	ETIMSK |= 0x10;			//¶¨Ê±Æ÷3 AÊä³ö±È½ÏÖÐ¶ÏÊ¹ÄÜ
+	ETIMSK |= 0x10;			//ï¿½ï¿½Ê±ï¿½ï¿½3 Aï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½Ð¶ï¿½Ê¹ï¿½ï¿½
 }
 */

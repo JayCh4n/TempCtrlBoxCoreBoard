@@ -3,8 +3,7 @@
  *
  * Created: 2018-04-04 09:46:55
  *  Author: chenlong
- */ 
-
+ */
 
 #ifndef DGUS_H_
 #define DGUS_H_
@@ -15,173 +14,177 @@
 #include "eeprom.h"
 #include "timer.h"
 
-#define EN_INTERRUPT		SREG |= 0x80
-#define DISEN_INTERRUPT		SREG &= 0x7F
+#define EN_INTERRUPT SREG |= 0x80
+#define DISEN_INTERRUPT SREG &= 0x7F
 
-#define OPEN_CURVE(count)			do {timer2_ovf = count; TCNT2 = 0xB2; TCCR2 |= 0x05;} while(0)
-#define CLOSE_CURVE					TCCR2 &= 0xF8
+#define OPEN_CURVE(count)   \
+    do                      \
+    {                       \
+        timer2_ovf = count; \
+        TCNT2 = 0xB2;       \
+        TCCR2 |= 0x05;      \
+    } while (0)
+#define CLOSE_CURVE TCCR2 &= 0xF8
 
-//ºê¶¨Òå´®¿Ú1·¢ËÍÃüÁî
-#define READ_DATA_ALL		0x01						//USART1¶ÁÈ¡È«²¿Êý¾ÝÃüÁî
-#define PID					0x02						
-#define TEMP				0x03
-#define PREHEAT_TIME		0x04
-#define	SENSOR_TYPE			0x05
-#define SWITCH_SENSOR		0x06
+//ï¿½ê¶¨ï¿½å´®ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define READ_DATA_ALL 0x01 //USART1ï¿½ï¿½È¡È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define PID 0x02
+#define TEMP 0x03
+#define PREHEAT_TIME 0x04
+#define SENSOR_TYPE 0x05
+#define SWITCH_SENSOR 0x06
 
-#define ALL_SET_CMD			0x07						//²Ëµ¥ÀïÈ«¾ÖÉè¶¨OK¼ü±êÖ¾
+#define ALL_SET_CMD 0x07 //ï¿½Ëµï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½è¶¨OKï¿½ï¿½ï¿½ï¿½Ö¾
 
-//ÎÂ¶Èµ¥Î»
-#define CELSIUS				0x4300
-#define FAHRENHEIT			0x0300
+//ï¿½Â¶Èµï¿½Î»
+#define CELSIUS 0x4300
+#define FAHRENHEIT 0x0300
 
-//´«¸ÐÆ÷ÀàÐÍ
-#define	TYPE_J				0x4A00
-#define TYPE_K				0x0100
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define TYPE_J 0x4A00
+#define TYPE_K 0x0100
 
-//ºê¶¨Òå°´¼ü¶¯×÷
-#define SWITCH_LANGUAGE		0x0000
-#define CLEAR_ALARM_SOUND	0x0001
-#define MAIN_PAGE_UP		0x0002
-#define MAIN_PAGE_DOWN		0x0003
-#define MAIN_SENSOR1_SET	0x0004
-#define MAIN_SENSOR2_SET	0x0005
-#define MAIN_SENSOR3_SET	0x0006
-#define MAIN_SENSOR4_SET	0x0007
-#define MAIN_SENSOR5_SET	0x0008
-#define MAIN_SENSOR6_SET	0x0009
-#define SINGLE_SET_OK		0x000A
-#define ALL_SET_OK			0x000B
-#define PID_SET_OK			0x000C
-#define CURVE_ZOOM_OUT		0x000D
-#define CURVE_ZOOM_IN		0x000E
-#define CURVE_PAGE_UP		0x000F
-#define CURVE_PAGE_DOWN		0x0010
-#define CLEAR_ALARM_MSG		0x0011
-#define ALARM_PAGE_UP		0x0012
-#define ALARM_PAGE_DOWN		0x0013
-#define SINGLE_SET_BACK		0x0014
-#define ALL_SET_BACK		0x0015
-#define	PID_PAGE_ENTER		0x0016
-#define ALARM_PAGE_ENTER	0x0017
-#define CURVE_PAGE_ENTER	0x0018
-#define CURVE_PAGE_BACK		0x0019
-#define MENU_PAGE_ENTER		0x001A
-#define TIME_CTRL_ENTER		0x001B
-#define TIME_CTRL_STOP		0x001C
-#define TIME_CTRL_START		0x001D
-#define TIME_CTRL_SAVEDAT	0x001E
-#define TIME_CTRL_PAGEUP	0x001F
-#define TIME_CTRL_PAGEDOWN	0x0020
-#define IQR1_TEST			0x0021
-#define IQR2_TEST			0x0022
-#define IQR3_TEST			0x0023
-#define IQR4_TEST			0x0024
-#define IQR5_TEST			0x0025
-#define IQR6_TEST			0x0026
-#define IQR7_TEST			0x0027
-#define IQR8_TEST			0x0028
+//ï¿½ê¶¨ï¿½å°´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define SWITCH_LANGUAGE 0x0000
+#define CLEAR_ALARM_SOUND 0x0001
+#define MAIN_PAGE_UP 0x0002
+#define MAIN_PAGE_DOWN 0x0003
+#define MAIN_SENSOR1_SET 0x0004
+#define MAIN_SENSOR2_SET 0x0005
+#define MAIN_SENSOR3_SET 0x0006
+#define MAIN_SENSOR4_SET 0x0007
+#define MAIN_SENSOR5_SET 0x0008
+#define MAIN_SENSOR6_SET 0x0009
+#define SINGLE_SET_OK 0x000A
+#define ALL_SET_OK 0x000B
+#define PID_SET_OK 0x000C
+#define CURVE_ZOOM_OUT 0x000D
+#define CURVE_ZOOM_IN 0x000E
+#define CURVE_PAGE_UP 0x000F
+#define CURVE_PAGE_DOWN 0x0010
+#define CLEAR_ALARM_MSG 0x0011
+#define ALARM_PAGE_UP 0x0012
+#define ALARM_PAGE_DOWN 0x0013
+#define SINGLE_SET_BACK 0x0014
+#define ALL_SET_BACK 0x0015
+#define PID_PAGE_ENTER 0x0016
+#define ALARM_PAGE_ENTER 0x0017
+#define CURVE_PAGE_ENTER 0x0018
+#define CURVE_PAGE_BACK 0x0019
+#define MENU_PAGE_ENTER 0x001A
+#define TIME_CTRL_ENTER 0x001B
+#define TIME_CTRL_STOP 0x001C
+#define TIME_CTRL_START 0x001D
+#define TIME_CTRL_SAVEDAT 0x001E
+#define TIME_CTRL_PAGEUP 0x001F
+#define TIME_CTRL_PAGEDOWN 0x0020
+#define IQR1_TEST 0x0021
+#define IQR2_TEST 0x0022
+#define IQR3_TEST 0x0023
+#define IQR4_TEST 0x0024
+#define IQR5_TEST 0x0025
+#define IQR6_TEST 0x0026
+#define IQR7_TEST 0x0027
+#define IQR8_TEST 0x0028
 
+//ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½
+#define CHANNEL0 0x01
+#define CHANNEL1 0x02
+#define CHANNEL2 0x04
+#define CHANNEL3 0x08
+#define CHANNEL4 0x10
+#define CHANNEL5 0x20
+#define CHANNEL6 0x40
+#define CHANNEL7 0x80
 
-//ÇúÏßÍ¨µÀºÅ
-#define CHANNEL0			0x01
-#define CHANNEL1			0x02
-#define CHANNEL2			0x04
-#define CHANNEL3			0x08
-#define CHANNEL4			0x10
-#define CHANNEL5			0x20
-#define CHANNEL6			0x40
-#define CHANNEL7			0x80
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß»ï¿½ï¿½ï¿½ï¿½ï¿½
+#define CHANNEL0_BUFF 0x5A
+#define CHANNEL1_BUFF 0x5B
 
-//Çå³ýÇúÏß»º³åÇø
-#define CHANNEL0_BUFF		0x5A
-#define CHANNEL1_BUFF		0x5B
+//ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½Å²ï¿½Î»ï¿½ï¿½Ö·
+#define MAINPAGE_NUM1_ADDR 0x0000
+#define MAINPAGE_NUM2_ADDR 0x0002
+#define MAINPAGE_NUM3_ADDR 0x0004
+#define MAINPAGE_NUM4_ADDR 0x0006
+#define MAINPAGE_NUM5_ADDR 0x0008
+#define MAINPAGE_NUM6_ADDR 0x000A
 
-//Ö÷Ò³ÃæÐòºÅ²ÛÎ»µØÖ·
-#define MAINPAGE_NUM1_ADDR	0x0000
-#define MAINPAGE_NUM2_ADDR	0x0002
-#define MAINPAGE_NUM3_ADDR	0x0004
-#define MAINPAGE_NUM4_ADDR	0x0006
-#define MAINPAGE_NUM5_ADDR	0x0008
-#define MAINPAGE_NUM6_ADDR	0x000A
-	
-//Ö÷Ò³ÃæÊä³ö±ÈÀý²ÛÎ»µØÖ·
-#define MAIN_OUTRATE1_ADDR		0x000C
-#define MAIN_OUTRATE2_ADDR		0x000E
-#define MAIN_OUTRATE3_ADDR		0x0010
-#define MAIN_OUTRATE4_ADDR		0x0012
-#define MAIN_OUTRATE5_ADDR		0x0014
-#define MAIN_OUTRATE6_ADDR		0x0016
+//ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Ö·
+#define MAIN_OUTRATE1_ADDR 0x000C
+#define MAIN_OUTRATE2_ADDR 0x000E
+#define MAIN_OUTRATE3_ADDR 0x0010
+#define MAIN_OUTRATE4_ADDR 0x0012
+#define MAIN_OUTRATE5_ADDR 0x0014
+#define MAIN_OUTRATE6_ADDR 0x0016
 
-//Ö÷Ò³ÃæÔËÐÐÎÂ¶È²ÛÎ»µØÖ·
-#define MAIN_RUNTEMP1_ADDR		0x0018
-#define MAIN_RUNTEMP2_ADDR		0x001A
-#define MAIN_RUNTEMP3_ADDR		0x001C
-#define MAIN_RUNTEMP4_ADDR		0x001E
-#define MAIN_RUNTEMP5_ADDR		0x0020
-#define MAIN_RUNTEMP6_ADDR		0x0022
+//ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¶È²ï¿½Î»ï¿½ï¿½Ö·
+#define MAIN_RUNTEMP1_ADDR 0x0018
+#define MAIN_RUNTEMP2_ADDR 0x001A
+#define MAIN_RUNTEMP3_ADDR 0x001C
+#define MAIN_RUNTEMP4_ADDR 0x001E
+#define MAIN_RUNTEMP5_ADDR 0x0020
+#define MAIN_RUNTEMP6_ADDR 0x0022
 
-//Ö÷Ò³ÃæÉè¶¨ÎÂ¶È²ÛÎ»µØÖ·
-#define MAIN_SETTEMP1_ADDR		0x0024
-#define MAIN_SETTEMP2_ADDR		0x0026
-#define MAIN_SETTEMP3_ADDR		0x0028
-#define MAIN_SETTEMP4_ADDR		0x002A
-#define MAIN_SETTEMP5_ADDR		0x002C
-#define MAIN_SETTEMP6_ADDR		0x002E
+//ï¿½ï¿½Ò³ï¿½ï¿½ï¿½è¶¨ï¿½Â¶È²ï¿½Î»ï¿½ï¿½Ö·
+#define MAIN_SETTEMP1_ADDR 0x0024
+#define MAIN_SETTEMP2_ADDR 0x0026
+#define MAIN_SETTEMP3_ADDR 0x0028
+#define MAIN_SETTEMP4_ADDR 0x002A
+#define MAIN_SETTEMP5_ADDR 0x002C
+#define MAIN_SETTEMP6_ADDR 0x002E
 
-//Ö÷Ò³Ãæ´«¸ÐÆ÷ÀàÐÍ²ÛÎ»µØÖ·
-#define MAIN_SENSOR1_TYPE_ADDR	0x0230
-#define MAIN_SENSOR2_TYPE_ADDR	0x0232
-#define MAIN_SENSOR3_TYPE_ADDR	0x0234
-#define MAIN_SENSOR4_TYPE_ADDR	0x0236
-#define MAIN_SENSOR5_TYPE_ADDR	0x0238
-#define MAIN_SENSOR6_TYPE_ADDR	0x023A
+//ï¿½ï¿½Ò³ï¿½æ´«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í²ï¿½Î»ï¿½ï¿½Ö·
+#define MAIN_SENSOR1_TYPE_ADDR 0x0230
+#define MAIN_SENSOR2_TYPE_ADDR 0x0232
+#define MAIN_SENSOR3_TYPE_ADDR 0x0234
+#define MAIN_SENSOR4_TYPE_ADDR 0x0236
+#define MAIN_SENSOR5_TYPE_ADDR 0x0238
+#define MAIN_SENSOR6_TYPE_ADDR 0x023A
 
-#define MAIN_NAME1_ADDR			0x0200
-#define MAIN_NAME2_ADDR			0x0208
-#define MAIN_NAME3_ADDR			0x0210
-#define MAIN_NAME4_ADDR			0x0218
-#define MAIN_NAME5_ADDR			0x0220
-#define MAIN_NAME6_ADDR			0x0228
+#define MAIN_NAME1_ADDR 0x0200
+#define MAIN_NAME2_ADDR 0x0208
+#define MAIN_NAME3_ADDR 0x0210
+#define MAIN_NAME4_ADDR 0x0218
+#define MAIN_NAME5_ADDR 0x0220
+#define MAIN_NAME6_ADDR 0x0228
 
-//¸æ¾¯½çÃæÐòºÅÏÔÊ¾²ÛÎ»µØÖ·
-#define ALARM_PAGE_NUM1_ADDR	0x0044
-#define ALARM_PAGE_NUM2_ADDR	0x0046
-#define ALARM_PAGE_NUM3_ADDR	0x0048
-#define ALARM_PAGE_NUM4_ADDR	0x004A
-#define ALARM_PAGE_NUM5_ADDR	0x004C
-#define ALARM_PAGE_NUM6_ADDR	0x004E
-#define ALARM_PAGE_NUM7_ADDR	0x0050
+//ï¿½æ¾¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Î»ï¿½ï¿½Ö·
+#define ALARM_PAGE_NUM1_ADDR 0x0044
+#define ALARM_PAGE_NUM2_ADDR 0x0046
+#define ALARM_PAGE_NUM3_ADDR 0x0048
+#define ALARM_PAGE_NUM4_ADDR 0x004A
+#define ALARM_PAGE_NUM5_ADDR 0x004C
+#define ALARM_PAGE_NUM6_ADDR 0x004E
+#define ALARM_PAGE_NUM7_ADDR 0x0050
 
-#define ALARM_DEVICE_NUM1_ADDR	0x0078
+#define ALARM_DEVICE_NUM1_ADDR 0x0078
 
-#define ALAEM_MSG1_ADDR			0x02B0			//02B0-02BF
+#define ALAEM_MSG1_ADDR 0x02B0 //02B0-02BF
 
-#define SINGLE_NAME_ADDR		0x0288			//µ¥¶ÀÉè¶¨½çÃæÃû³ÆÏÔÊ¾µØÖ·µÍ
-#define	SINGLE_SENSORTYPE_ADDR	0x0290			//µ¥¶ÀÉè¶¨½çÃæ´«¸ÐÆ÷ÀàÐÍµØÖ·
-#define SINGLE_NUM_ADDR			0x0030			//µ¥¶ÀÉè¶¨½çÃæÐòºÅÏÔÊ¾µØÖ·
-#define SINGLE_RUNTEMP_ADDR		0x0032			//µ¥¶ÀÉè¶¨½çÃæÔËÐÐÎÂ¶ÈÏÔÊ¾µØÖ·
-#define SINGLE_SETTEMP_ADDR		0x0034			//µ¥¶ÀÉè¶¨½çÃæÉè¶¨ÎÂ¶ÈÏÔÊ¾µØÖ·
+#define SINGLE_NAME_ADDR 0x0288       //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·ï¿½ï¿½
+#define SINGLE_SENSORTYPE_ADDR 0x0290 //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½æ´«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½Ö·
+#define SINGLE_NUM_ADDR 0x0030        //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define SINGLE_RUNTEMP_ADDR 0x0032    //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¶ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define SINGLE_SETTEMP_ADDR 0x0034    //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½Â¶ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
 
-#define CURVE_PAGE_NUM_ADDR			0x003C			//ÇúÏß½çÃæÐòºÅÏÔÊ¾µØÖ·
-#define CURVE_PAGE_NAME_ADDR		0x0298			//ÇúÏß½çÃæÃû³ÆÏÔÊ¾µØÖ·
-#define CURVE_PAGE_RUNTEMP_ADDR		0x003E			//ÇúÏß½çÃæÔËÐÐÎÂ¶ÈÏÔÊ¾µØÖ·
-#define CURVE_PAGE_SETTEMP_ADDR		0x0040			//ÇúÏß½çÃæÉè¶¨ÎÂ¶ÈÏÔÊ¾µØÖ·
-#define CURVE_PAGE_OUTRATE_ADDR		0x0042			//ÇúÏß½çÃæÊä³ö±ÈÀýÏÔÊ¾µØÖ·
-#define CURVE_PAGE_SENSORTYPE_ADDR	0x02A0			//ÇúÏß½çÃæ´«¸ÐÆ÷ÀàÐÍÏÔÊ¾µØÖ·
+#define CURVE_PAGE_NUM_ADDR 0x003C        //ï¿½ï¿½ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define CURVE_PAGE_NAME_ADDR 0x0298       //ï¿½ï¿½ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define CURVE_PAGE_RUNTEMP_ADDR 0x003E    //ï¿½ï¿½ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¶ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define CURVE_PAGE_SETTEMP_ADDR 0x0040    //ï¿½ï¿½ï¿½ß½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½Â¶ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define CURVE_PAGE_OUTRATE_ADDR 0x0042    //ï¿½ï¿½ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define CURVE_PAGE_SENSORTYPE_ADDR 0x02A0 //ï¿½ï¿½ï¿½ß½ï¿½ï¿½æ´«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
 
-#define PID_P_ADDR				0x0036			//pidÉèÖÃ½çÃæP²ÎÊýÏÔÊ¾µØÖ·
-#define PID_I_ADDR				0x0038			//pidÉèÖÃ½çÃæI²ÎÊýÏÔÊ¾µØÖ·
-#define PID_D_ADDR				0x003A			//pidÉèÖÃ½çÃæD²ÎÊýÏÔÊ¾µØÖ·
+#define PID_P_ADDR 0x0036 //pidï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½Pï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define PID_I_ADDR 0x0038 //pidï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define PID_D_ADDR 0x003A //pidï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
 
-#define	MODULE_STATUS_ADDR		0x0070			//Éä½º¿ØÖÆÄ£¿é×´Ì¬Í¼±êÏÔÊ¾µØÖ·    0£ºÍ£Ö¹		1£º¿ªÆô
-#define MODULE_NUM_ADDR			0x0072			//Éä½º¿ØÖÆÄ£¿éºÅÂëÏÔÊ¾µØÖ·
+#define MODULE_STATUS_ADDR 0x0070 //ï¿½ä½ºï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½×´Ì¬Í¼ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·    0ï¿½ï¿½Í£Ö¹		1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define MODULE_NUM_ADDR 0x0072    //ï¿½ä½ºï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
 
-#define TEMP_UINT_ADDR			0x023C			//ÎÂ¶Èµ¥Î»ÏÔÊ¾µØÖ·
-#define ALL_SENSOR_TYPE_ADDR	0x0294			//È«¾Ö´«¸ÐÆ÷ÀàÐÍÏÔÊ¾µØÖ·
+#define TEMP_UINT_ADDR 0x023C       //ï¿½Â¶Èµï¿½Î»ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
+#define ALL_SENSOR_TYPE_ADDR 0x0294 //È«ï¿½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö·
 
-#define CURVE_TIMELINE_ADDR		0x0052			//ÇúÏßÊ±¼äÖáÏÔÊ¾µØÖ· 2byte ¹²Ê®¸ö 0x0052-0x0065
-
+#define CURVE_TIMELINE_ADDR 0x0052 //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ö· 2byte ï¿½ï¿½Ê®ï¿½ï¿½ 0x0052-0x0065
 
 //////////////////
 extern uint8_t run_temp_page;
@@ -194,9 +197,9 @@ extern uint8_t set_num;
 extern uint8_t set_pid_channel;
 extern int8_t curve_page_num;
 
-extern uint16_t p_value[12];				//·¢ËÍ
-extern uint16_t i_value[12];				//·¢ËÍ
-extern uint16_t d_value[12];				//·¢ËÍ
+extern uint16_t p_value[12]; //ï¿½ï¿½ï¿½ï¿½
+extern uint16_t i_value[12]; //ï¿½ï¿½ï¿½ï¿½
+extern uint16_t d_value[12]; //ï¿½ï¿½ï¿½ï¿½
 
 extern uint8_t output_rate[12];
 extern int16_t run_temp[12];
@@ -210,7 +213,7 @@ extern uint16_t all_sensor_type;
 extern uint16_t temp_unit;
 extern uint32_t set_name[12];
 
-extern uint8_t	module_num;
+extern uint8_t module_num;
 
 void init_time_ctrl_value(void);
 void update_main_page(void);

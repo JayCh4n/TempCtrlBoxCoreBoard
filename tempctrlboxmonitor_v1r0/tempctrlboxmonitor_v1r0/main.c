@@ -3,7 +3,7 @@
  *
  * Created: 2018-04-03 09:05:18
  * Author : chenlong
- */ 
+ */
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -22,36 +22,36 @@ int main(void)
 	read_eeprom_data();
 
 	_delay_ms(2000);
-	
-	send_variables(MASTER_SWITCH, pre_system_sta);	//Ä¬ÈÏÏµÍ³Îª¹Ø±Õ×´Ì¬ µ÷½ÚÆÁÄ»×´Ì¬Í¼±êÎª¿ªÆô
+
+	send_variables(MASTER_SWITCH, pre_system_sta); //Ä¬ï¿½ï¿½ÏµÍ³Îªï¿½Ø±ï¿½×´Ì¬ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»×´Ì¬Í¼ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½
 	send_variables(ALL_SET_TEMP, all_temp);
 	send_variables(SET_PREHEAT_TIME, preheat_time);
-	send_variables(TEMP_UINT_ADDR, (CELSIUS+temp_unit*FAHRENHEIT));
-	send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J+(all_sensor_type*TYPE_K));
-	
+	send_variables(TEMP_UINT_ADDR, (CELSIUS + temp_unit * FAHRENHEIT));
+	send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
+
 	switch_language();
-	
-    /* Replace with your application code */
-    while (1) 
-    {
-		if(usart0_rx_end)//ÆÁÏà¹ØÊý¾Ý½ÓÊÕÍê³É
+
+	/* Replace with your application code */
+	while (1)
+	{
+		if (usart0_rx_end) //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		{
 			usart0_deal();
 			usart0_rx_end = 0;
 		}
-		
-		if(usart1_rx_end)//¿ØÖÆ¿¨Êý¾Ý½ÓÊÕÍê³É
+
+		if (usart1_rx_end) //ï¿½ï¿½ï¿½Æ¿ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		{
 			usart1_deal();
 			usart1_rx_end = 0;
 		}
-		
-		if(in_main_page)//
+
+		if (in_main_page) //
 		{
 			update_main_page();
 		}
-    }
-	
+	}
+
 	return 0;
 }
 
@@ -61,7 +61,7 @@ void system_init()
 	usart0_init(MYUBRR(9600));
 	usart1_init(MYUBRR(8928));
 	usart2_init(9600);
-	
+
 	timer0_init();
 	timer2_init();
 	timer1_init();

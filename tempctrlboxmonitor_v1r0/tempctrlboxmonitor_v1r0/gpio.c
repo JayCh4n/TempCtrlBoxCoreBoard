@@ -3,16 +3,16 @@
  *
  * Created: 2018-04-04 12:59:22
  *  Author: chenlong
- */ 
+ */
 #include <avr/io.h>
 #include "gpio.h"
 
 /*
- *³õÊ¼»¯gpio 
- */ 
+ *ï¿½ï¿½Ê¼ï¿½ï¿½gpio 
+ */
 void gpio_init()
 {
-	/* LEDÏà¹ØIO¿Ú³õÊ¼»¯ */	
+	/* LEDï¿½ï¿½ï¿½IOï¿½Ú³ï¿½Ê¼ï¿½ï¿½ */
 	LED1_PIN_OUTPUT;
 	LED2_PIN_OUTPUT;
 	LED3_PIN_OUTPUT;
@@ -20,7 +20,7 @@ void gpio_init()
 	LED5_PIN_OUTPUT;
 	LED6_PIN_OUTPUT;
 	LED7_PIN_OUTPUT;
-	
+
 	LED1_OFF;
 	LED2_OFF;
 	LED3_OFF;
@@ -28,7 +28,7 @@ void gpio_init()
 	LED5_ON;
 	LED6_OFF;
 	LED7_ON;
-	
+
 	/*
 	IQR0_PIN_OUTPUT;
 	IQR1_PIN_OUTPUT;
@@ -48,12 +48,11 @@ void gpio_init()
 	IQR6_CLOSE;
 	IQR7_CLOSE;
 	*/
-	
-	/* ¼ÌµçÆ÷Ïà¹ØIO¿Ú³õÊ¼»¯ */
+
+	/* ï¿½Ìµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IOï¿½Ú³ï¿½Ê¼ï¿½ï¿½ */
 	ALARM_PIN_OUTPUT;
 	ACCON_PIN_OUTPUT;
-	
+
 	ALARM_OFF;
 	ACCON_ON;
-	
 }
