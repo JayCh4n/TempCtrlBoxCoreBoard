@@ -610,26 +610,26 @@ void start_time_ctrl(uint8_t slave_num)
 	
 	usart2_tx_buff[0] = 0xA5;
 	usart2_tx_buff[1] = 0x5A;
-	usart2_tx_buff[2] = 22;
+	usart2_tx_buff[2] = 0x42;
 	usart2_tx_buff[3] = TIME_CTRL_START;
-	usart2_tx_buff[4] = slave_num;
+	usart2_tx_buff[4] = slave_num-1;
 	
 	for(i=0; i<8; i++)
 	{
 		for(j=0; j<4; j++)
 		{
-			usart2_tx_buff[cnt+5] = time_ctrl_value[slave_num-1][i][j];
-			cnt++;
+			usart2_tx_buff[cnt+5] = time_ctrl_value[slave_num-1][i][j] >> 8;
+			usart2_tx_buff[cnt+6] = time_ctrl_value[slave_num-1][i][j];
+			cnt += 2;
 		}
 	}
 	
-	crc = crc_check(usart2_tx_buff, 39);
+	crc = crc_check(usart2_tx_buff, 71);
 	
-	usart2_tx_buff[37] = crc & 0x00FF;
-	usart2_tx_buff[38] = crc >> 8;
-	usart2_tx_buff[39] = 0x0D;		//数据尾
+	usart2_tx_buff[69] = crc & 0x00FF;
+	usart2_tx_buff[70] = crc >> 8;
 	
-	usart2_send_str(usart2_tx_buff, 40);
+	usart2_send_str(usart2_tx_buff, 71);
 }
 
 /*向时间控制子模块发送停止命令 不需要发送每个通道的 T1—T4 数据*/
@@ -641,16 +641,14 @@ void stop_time_ctrl(uint8_t slave_num)
 	usart2_tx_buff[1] = 0x5A;
 	usart2_tx_buff[2] = 0x02;
 	usart2_tx_buff[3] = TIME_CTRL_STOP;
-	usart2_tx_buff[4] = slave_num;
+	usart2_tx_buff[4] = slave_num-1;
 	
 	crc = crc_check(usart2_tx_buff, 7);
 	
 	usart2_tx_buff[5] = crc & 0x00FF;
 	usart2_tx_buff[6] = crc >> 8;
 	
-	usart2_tx_buff[7] = 0x0D;
-	
-	usart2_send_str(usart2_tx_buff, 8);
+	usart2_send_str(usart2_tx_buff, 7);
 }
 
 void update_alarm_page(uint8_t page_num)
