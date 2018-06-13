@@ -339,6 +339,10 @@ void pid_set_ok(void)
 
 	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2), d_value[set_pid_channel - 1]);
 	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2) + 1, d_value[set_pid_channel - 1] >> 8);
+
+	send_variables(PID_P_ADDR, p_value[channel - 1]);
+	send_variables(PID_I_ADDR, i_value[channel - 1]);
+	send_variables(PID_D_ADDR, d_value[channel - 1]);		//保存所设置的PID数据之后，更新所在界面界面
 }
 
 /*
