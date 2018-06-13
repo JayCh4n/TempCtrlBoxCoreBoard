@@ -40,7 +40,7 @@ uint16_t temp_unit = 0;		  //
 uint16_t all_temp = 100;	  //����
 
 uint8_t module_num = 1;			   //�佺ģ�����
-uint8_t module_status[8] = {0};	//�佺ģ������״̬
+uint8_t module_status[4] = {0};	//�佺ģ������״̬
 uint16_t time_ctrl_value[4][8][4]; //�佺ʱ���������   ���ĸ�ģ��  ÿ��ģ��8��ͨ��  ÿ��ͨ���� T1 T2 T3 T4 4��ʱ���
 
 uint8_t alarm_msg[4][16] = {{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xB6, 0xCF, 0xBF, 0xAA},									   //�����߶Ͽ�
@@ -712,6 +712,10 @@ void start_time_ctrl(uint8_t slave_num)
 	usart2_tx_buff[70] = crc >> 8;
 
 	usart2_send_str(usart2_tx_buff, 71);
+
+	module_status[slave_num - 1] = 1;
+	send_variables(MODULE_STATUS_ADDR, module_status[slave_num - 1]);
+	PORTA &= ~(1 << slave_num);
 }
 
 /*��ʱ�������ģ�鷢��ֹͣ���� ����Ҫ����ÿ��ͨ���� T1��T4 ����*/
@@ -731,6 +735,9 @@ void stop_time_ctrl(uint8_t slave_num)
 	usart2_tx_buff[6] = crc >> 8;
 
 	usart2_send_str(usart2_tx_buff, 7);
+	module_status[slave_num - 1] = 0;
+	send_variables(MODULE_STATUS_ADDR, module_status[slave_num - 1]);
+	PORTA |= (1 << slave_num);
 }
 
 void update_alarm_page(uint8_t page_num)
