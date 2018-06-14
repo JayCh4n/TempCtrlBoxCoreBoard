@@ -75,7 +75,9 @@ ISR(TIMER0_OVF_vect)
 			case ALL_SET_CMD:
 				all_set_ok();
 				break;
-
+			case SET_FOLLOW:
+				single_set(SET_FOLLOW, follow_sta[set_num]);
+				break;
 			default:
 				break;
 			}

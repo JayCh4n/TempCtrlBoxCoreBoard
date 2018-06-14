@@ -34,6 +34,7 @@
 #define SENSOR_TYPE 0x05
 #define SWITCH_SENSOR 0x06
 #define READ_SETTING_DATA 0x07
+#define SET_FOLLOW 0x08
 
 #define ALL_SET_CMD 0x07 //菜单里全局设定OK键标志 用来轮询发送获取控制板卡数据
 
@@ -207,6 +208,8 @@ extern int16_t run_temp[12];
 extern int16_t set_temp[12];
 extern uint16_t sensor_type[12];
 extern uint16_t switch_sensor[12];
+extern uint8_t follow_sta[12];
+extern uint8_t follow_sta_buff[12];
 
 extern uint16_t preheat_time;
 extern uint16_t all_temp;

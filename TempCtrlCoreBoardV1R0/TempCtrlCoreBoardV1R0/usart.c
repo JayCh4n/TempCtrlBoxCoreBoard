@@ -108,6 +108,9 @@ int usart0_deal(void)
 			global = ALL;
 			all_senser_sta = variable;
 			break;
+		case SINGLE_SET_FOLLOW:
+			follow_sta_buff[set_num] = variable;
+			break;
 		case SINGLE_SET_SENSOR_TYPE:
 			sensor_type_buff[set_num] = variable;
 			send_variables(SINGLE_SENSORTYPE_ADDR,
@@ -254,7 +257,6 @@ int usart0_deal(void)
 		case IQR8_T4:
 			time_ctrl_value_buff[module_num - 1][7][3] = variable;
 			break;
-
 		default:
 			break;
 		}
@@ -282,11 +284,11 @@ int usart1_deal(void)
 		return 0;
 	}
 
-	if (crc_data != crc_check(usart1_rx_buff, usart1_rx_lenth))
-	{
-		usart1_rx_end = 0;
-		return 0;
-	}
+// 	if (crc_data != crc_check(usart1_rx_buff, usart1_rx_lenth))
+// 	{
+// 		usart1_rx_end = 0;
+// 		return 0;
+// 	}
 
 	if (RX1_COMMAND == READ_DATA_ALL)
 	{

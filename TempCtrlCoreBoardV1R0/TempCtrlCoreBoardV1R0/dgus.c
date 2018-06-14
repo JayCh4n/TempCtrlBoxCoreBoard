@@ -32,6 +32,9 @@ uint32_t set_name[12] = {0x23310000, 0x23320000, 0x23330000, 0x23340000, 0x23350
 0x23370000, 0x23380000, 0x23390000, 0x23313000, 0x23313100, 0x23313200};
 uint32_t set_name_buff = 0;
 
+uint8_t follow_sta[12] = {0};	//通道跟随状态  0：禁止 1~12：跟随通道号
+uint8_t follow_sta_buff[12] = {0};
+
 uint16_t p_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //发送
 uint16_t i_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //发送
 uint16_t d_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //发送
@@ -231,24 +234,30 @@ void single_set_ok(void)
 		switch_sensor[set_num] = switch_sensor_buff[set_num];
 		ctrl_command = SWITCH_SENSOR;
 		global = SINGLE;
-		//		eeprom_write(SINGLE_SWSENSOR_EEADDR+set_num, switch_sensor[set_num]);
+		//		eeprom_write(SINGLE_SWSENSOR_EEADDR+set_num, switch_sensor[set_num]);	//开启默认关闭 不用写eeprom
 	}
 
 	if (sensor_type_buff[set_num] != sensor_type[set_num])
 	{
 		sensor_type[set_num] = sensor_type_buff[set_num];
 		ctrl_command = SENSOR_TYPE;
-		eeprom_write(SINGLE_SENSORTYPE_EEADDR + set_num, sensor_type[set_num]);
+//		eeprom_write(SINGLE_SENSORTYPE_EEADDR + set_num, sensor_type[set_num]);
 	}
-
+	
+	if(follow_sta_buff[set_num]!= follow_sta[set_num])
+	{
+		follow_sta[set_num] = follow_sta_buff[set_num];
+		ctrl_command = SET_FOLLOW;
+	}
+	
 	if (set_name_buff != set_name[set_num])
 	{
 		set_name[set_num] = set_name_buff;
 
-		eeprom_write(SET_NAME_EEADDR + (set_num * 4), set_name[set_num]);
-		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 1, set_name[set_num] >> 8);
-		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 2, set_name[set_num] >> 16);
-		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 3, set_name[set_num] >> 24);
+// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4), set_name[set_num]);
+// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 1, set_name[set_num] >> 8);
+// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 2, set_name[set_num] >> 16);
+// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 3, set_name[set_num] >> 24);
 	}
 
 	in_main_page = 1;
@@ -333,14 +342,14 @@ void pid_set_ok(void)
 
 	ctrl_command = PID;
 
-	eeprom_write(PID_P_EEADDR + ((set_pid_channel - 1) * 2), p_value[set_pid_channel - 1]);
-	eeprom_write(PID_P_EEADDR + ((set_pid_channel - 1) * 2) + 1, p_value[set_pid_channel - 1] >> 8);
-
-	eeprom_write(PID_I_EEADDR + ((set_pid_channel - 1) * 2), i_value[set_pid_channel - 1]);
-	eeprom_write(PID_I_EEADDR + ((set_pid_channel - 1) * 2) + 1, i_value[set_pid_channel - 1] >> 8);
-
-	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2), d_value[set_pid_channel - 1]);
-	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2) + 1, d_value[set_pid_channel - 1] >> 8);
+// 	eeprom_write(PID_P_EEADDR + ((set_pid_channel - 1) * 2), p_value[set_pid_channel - 1]);
+// 	eeprom_write(PID_P_EEADDR + ((set_pid_channel - 1) * 2) + 1, p_value[set_pid_channel - 1] >> 8);
+// 
+// 	eeprom_write(PID_I_EEADDR + ((set_pid_channel - 1) * 2), i_value[set_pid_channel - 1]);
+// 	eeprom_write(PID_I_EEADDR + ((set_pid_channel - 1) * 2) + 1, i_value[set_pid_channel - 1] >> 8);
+// 
+// 	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2), d_value[set_pid_channel - 1]);
+// 	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2) + 1, d_value[set_pid_channel - 1] >> 8);
 
 	send_variables(PID_P_ADDR, p_value[set_pid_channel - 1]);
 	send_variables(PID_I_ADDR, i_value[set_pid_channel - 1]);
@@ -961,38 +970,57 @@ void get_setting_data(uint8_t addr)
 {
 	uint8_t iqr_num = ((addr >> 4) - 1) * 4 + (addr & 0x0F);
 
-	set_temp[iqr_num] = usart1_rx_buff[5];
-	set_temp[iqr_num] = (set_temp[iqr_num] << 8) | usart1_rx_buff[6];
+	set_name[iqr_num] = usart1_rx_buff[5];
+	set_name[iqr_num] = (set_name[iqr_num] << 8) | usart1_rx_buff[6];
+	set_name[iqr_num] = (set_name[iqr_num] << 8) | usart1_rx_buff[7];
+	set_name[iqr_num] = (set_name[iqr_num] << 8) | usart1_rx_buff[8];
+
+	set_temp[iqr_num] = usart1_rx_buff[9];
+	set_temp[iqr_num] = (set_temp[iqr_num] << 8) | usart1_rx_buff[10];
 	set_temp_buff[iqr_num] = set_temp[iqr_num];
 
-	sensor_type[iqr_num] = usart1_rx_buff[7];
-	sensor_type_buff[iqr_num] = sensor_type[iqr_num];
+	all_sensor_type = usart1_rx_buff[12];
+	all_sensor_type_buff = all_sensor_type;
+	
+	follow_sta[iqr_num] = usart1_rx_buff[14];
+	follow_sta_buff[iqr_num] = follow_sta[iqr_num];
+	
+	if(usart1_rx_buff[16] < 1)				//通道状态： 0：关闭 1：开启 2:跟随 3：4：..........
+	{
+		switch_sensor[iqr_num] = usart1_rx_buff[16];
+		switch_sensor_buff[iqr_num] = switch_sensor[iqr_num];
+		
+		sensor_sta[iqr_num] = usart1_rx_buff[16];
+	}
+	else
+	{
+		sensor_sta[iqr_num] = usart1_rx_buff[16];
+		switch_sensor[iqr_num] = 0;
+		switch_sensor_buff[iqr_num] = 0;
+	}
+	
+	
+	p_value[iqr_num] = usart1_rx_buff[17];
+	p_value[iqr_num] = (p_value[iqr_num] << 8) | usart1_rx_buff[18];
+	
+	i_value[iqr_num] = usart1_rx_buff[19];
+	i_value[iqr_num] = (i_value[iqr_num] << 8) | usart1_rx_buff[20];
+	
+	d_value[iqr_num] = usart1_rx_buff[21];
+	d_value[iqr_num] = (d_value[iqr_num] << 8) | usart1_rx_buff[22];
 
-	p_value[iqr_num] = usart1_rx_buff[8];
-	p_value[iqr_num] = (p_value[iqr_num] << 8) | usart1_rx_buff[9];
+	//
+	// 	temp_unit = usart1_rx_buff[19];
+	// 	temp_unit_buff = temp_unit;
+	//
+	// 	all_temp = usart1_rx_buff[20];
+	// 	all_temp = (all_temp << 8) | usart1_rx_buff[21];
+	// 	all_temp_buff = all_temp;
+	//
+	// 	preheat_time = usart1_rx_buff[22];
+	// 	preheat_time_buff = preheat_time;
 
-	i_value[iqr_num] = usart1_rx_buff[10];
-	i_value[iqr_num] = (i_value[iqr_num] << 8) | usart1_rx_buff[11];
-
-	d_value[iqr_num] = usart1_rx_buff[12];
-	d_value[iqr_num] = (d_value[iqr_num] << 8) | usart1_rx_buff[13];
-
-	set_name[iqr_num] = usart1_rx_buff[14];
-	set_name[iqr_num] = (set_name[iqr_num] << 8) | usart1_rx_buff[15];
-	set_name[iqr_num] = (set_name[iqr_num] << 8) | usart1_rx_buff[16];
-	set_name[iqr_num] = (set_name[iqr_num] << 8) | usart1_rx_buff[17];
-
-	all_sensor_type = usart1_rx_buff[18];
-
-	temp_unit = usart1_rx_buff[19];
-	temp_unit_buff = temp_unit;
-
-	all_temp = usart1_rx_buff[20];
-	all_temp = (all_temp << 8) | usart1_rx_buff[21];
-	all_temp_buff = all_temp;
-
-	preheat_time = usart1_rx_buff[22];
-	preheat_time_buff = preheat_time;
+	//	pre_system_sta
 }
 
 void send_request_all(uint8_t addr)
