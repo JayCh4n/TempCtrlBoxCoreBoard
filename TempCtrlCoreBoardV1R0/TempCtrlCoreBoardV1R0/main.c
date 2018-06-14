@@ -21,8 +21,8 @@ int main(void)
 	EN_INTERRUPT;
 	//	read_eeprom_data();
 
-	//	_delay_ms(1000);
-
+	_delay_ms(300);
+	
 	read_setting_data_all(); //开机从主控板读取设定数据
 
 	//	send_variables(MASTER_SWITCH, pre_system_sta);	//默认系统为关闭状态 调节屏幕状态图标为关闭

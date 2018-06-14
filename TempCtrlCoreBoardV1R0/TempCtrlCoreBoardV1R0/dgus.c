@@ -29,7 +29,7 @@ int16_t set_temp[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1
 uint16_t switch_sensor[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 uint16_t sensor_type[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 uint32_t set_name[12] = {0x23310000, 0x23320000, 0x23330000, 0x23340000, 0x23350000, 0x23360000,
-						 0x23370000, 0x23380000, 0x23390000, 0x23313000, 0x23313100, 0x23313200};
+0x23370000, 0x23380000, 0x23390000, 0x23313000, 0x23313100, 0x23313200};
 uint32_t set_name_buff = 0;
 
 uint16_t p_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //发送
@@ -46,9 +46,9 @@ uint8_t module_status[4] = {0};	//射胶模块运行状态
 uint16_t time_ctrl_value[4][8][4]; //射胶时间控制数据   共四个模块  每个模块8个通道  每个通道有 T1 T2 T3 T4 4个时间段
 
 uint8_t alarm_msg[4][16] = {{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xB6, 0xCF, 0xBF, 0xAA},									   //感温线断开
-							{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xBD, 0xD3, 0xB7, 0xB4},									   //感温线接反
-							{0xB3, 0xAC, 0xCE, 0xC2, 0xB1, 0xA8, 0xBE, 0xAF},												   //超温报警
-							{0xC9, 0xFD, 0xCE, 0xC2, 0xB5, 0xBD, 0xB4, 0xEF, 0xC9, 0xE8, 0xB6, 0xA8, 0xCE, 0xC2, 0xB6, 0xC8}}; //升温到达设定温度
+{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xBD, 0xD3, 0xB7, 0xB4},									   //感温线接反
+{0xB3, 0xAC, 0xCE, 0xC2, 0xB1, 0xA8, 0xBE, 0xAF},												   //超温报警
+{0xC9, 0xFD, 0xCE, 0xC2, 0xB5, 0xBD, 0xB4, 0xEF, 0xC9, 0xE8, 0xB6, 0xA8, 0xCE, 0xC2, 0xB6, 0xC8}}; //升温到达设定温度
 
 void init_time_ctrl_value(void)
 {
@@ -76,7 +76,7 @@ void update_main_page(void)
 		send_variables(MAINPAGE_NUM1_ADDR + (i * 2), (i + (pre_main_page * 6) + 1));		//主页面传感器序号显示
 		send_variables(MAIN_OUTRATE1_ADDR + (i * 2), output_rate[i + (pre_main_page * 6)]); //传感器输出比例
 		send_variables(MAIN_RUNTEMP1_ADDR + (i * 2), run_temp[i + (pre_main_page * 6)] +
-														 temp_unit * (run_temp[i + (pre_main_page * 6)] * 8 / 10 + 32)); //运行温度
+		temp_unit * (run_temp[i + (pre_main_page * 6)] * 8 / 10 + 32)); //运行温度
 		send_variables(MAIN_SETTEMP1_ADDR + (i * 2), set_temp[i + (pre_main_page * 6)]);								 //设定温度
 		send_variables(MAIN_SENSOR1_TYPE_ADDR + (i * 2), TYPE_J + (sensor_type[i + (pre_main_page * 6)]) * TYPE_K);
 
@@ -88,117 +88,117 @@ void key_action(uint16_t key_code)
 {
 	switch (key_code)
 	{
-	case SWITCH_LANGUAGE:
+		case SWITCH_LANGUAGE:
 		pre_language ^= 0x01;
 		switch_language();
 		break;
-	case CLEAR_ALARM_SOUND:
+		case CLEAR_ALARM_SOUND:
 		ALARM_OFF;
 		break;
-	case MAIN_PAGE_UP:
+		case MAIN_PAGE_UP:
 		pre_main_page = 0;
 		break;
-	case MAIN_PAGE_DOWN:
+		case MAIN_PAGE_DOWN:
 		pre_main_page = 1;
 		break;
-	case MAIN_SENSOR1_SET:
+		case MAIN_SENSOR1_SET:
 		set_num = 0 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-	case MAIN_SENSOR2_SET:
+		case MAIN_SENSOR2_SET:
 		set_num = 1 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-	case MAIN_SENSOR3_SET:
+		case MAIN_SENSOR3_SET:
 		set_num = 2 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-	case MAIN_SENSOR4_SET:
+		case MAIN_SENSOR4_SET:
 		set_num = 3 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-	case MAIN_SENSOR5_SET:
+		case MAIN_SENSOR5_SET:
 		set_num = 4 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-	case MAIN_SENSOR6_SET:
+		case MAIN_SENSOR6_SET:
 		set_num = 5 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-	case SINGLE_SET_OK:
+		case SINGLE_SET_OK:
 		single_set_ok();
 		break;
-	case ALL_SET_OK:
+		case ALL_SET_OK:
 		ctrl_command = ALL_SET_CMD;
 		break;
-	case PID_SET_OK:
+		case PID_SET_OK:
 		pid_set_ok();
 		break;
-	case CURVE_ZOOM_OUT:
+		case CURVE_ZOOM_OUT:
 		curve_time_level--;
 		update_curve_page();
 		break;
-	case CURVE_ZOOM_IN:
+		case CURVE_ZOOM_IN:
 		curve_time_level++;
 		update_curve_page();
 		break;
-	case CURVE_PAGE_UP:
+		case CURVE_PAGE_UP:
 		curve_page_num--;
 		update_curve_page();
 		break;
-	case CURVE_PAGE_DOWN:
+		case CURVE_PAGE_DOWN:
 		curve_page_num++;
 		update_curve_page();
 		break;
-	case CLEAR_ALARM_MSG:
+		case CLEAR_ALARM_MSG:
 		clear_alarm_msg(15);
 		break;
-	case ALARM_PAGE_UP:
+		case ALARM_PAGE_UP:
 		update_alarm_page(1);
 		break;
-	case ALARM_PAGE_DOWN:
+		case ALARM_PAGE_DOWN:
 		update_alarm_page(2);
 		break;
-	case SINGLE_SET_BACK:
+		case SINGLE_SET_BACK:
 		single_set_back();
 		break;
-	case ALL_SET_BACK:
+		case ALL_SET_BACK:
 		all_set_back();
 		break;
-	case PID_PAGE_ENTER:
+		case PID_PAGE_ENTER:
 		update_pid_page(1);
 		break;
-	case ALARM_PAGE_ENTER:
+		case ALARM_PAGE_ENTER:
 		update_alarm_page(1);
 		break;
-	case CURVE_PAGE_ENTER:
+		case CURVE_PAGE_ENTER:
 		update_curve_page();
 		break;
-	case CURVE_PAGE_BACK:
+		case CURVE_PAGE_BACK:
 		CLOSE_CURVE;
 		update_run_temp_flag = 0;
 		break;
-	case MENU_PAGE_ENTER:
+		case MENU_PAGE_ENTER:
 		in_main_page = 0;
 		break;
-	case TIME_CTRL_ENTER:
+		case TIME_CTRL_ENTER:
 		module_num = 1;
 		update_time_ctrl_page();
 		break;
-	case TIME_CTRL_STOP:
+		case TIME_CTRL_STOP:
 		stop_time_ctrl(module_num);
 		break;
-	case TIME_CTRL_START:
+		case TIME_CTRL_START:
 		start_time_ctrl(module_num);
 		break;
-	case TIME_CTRL_SAVEDAT:
+		case TIME_CTRL_SAVEDAT:
 		save_time_ctrl_data();
 		break;
-	case TIME_CTRL_PAGEUP:
+		case TIME_CTRL_PAGEUP:
 		module_num -= 1;
 		update_time_ctrl_page();
 		break;
-	case TIME_CTRL_PAGEDOWN:
+		case TIME_CTRL_PAGEDOWN:
 		module_num += 1;
 		update_time_ctrl_page();
 		break;
@@ -211,7 +211,7 @@ void key_action(uint16_t key_code)
 		//		case IQR7_TEST:
 		//		case IQR8_TEST:
 
-	default:
+		default:
 		break;
 	}
 }
@@ -632,7 +632,7 @@ void update_curve_page(void)
 
 	send_variables(CURVE_PAGE_NUM_ADDR, curve_page_num + 1);
 	send_variables(CURVE_PAGE_RUNTEMP_ADDR, run_temp[curve_page_num] +
-												temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)); //运行温度
+	temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)); //运行温度
 	send_variables(CURVE_PAGE_SETTEMP_ADDR, set_temp[curve_page_num]);								   //设定温度
 	send_variables(CURVE_PAGE_OUTRATE_ADDR, output_rate[curve_page_num]);
 	send_variables(CURVE_PAGE_SENSORTYPE_ADDR, TYPE_J + (sensor_type[curve_page_num] * TYPE_K));
@@ -917,7 +917,7 @@ void read_setting_data_all(void)
 	ctrl_board_sta[2] = read_setting_data(3);
 }
 
-/* 
+/*
 *功能：读取一块主控板设定数据
 *返回数据：0:断线 1:连接（收到数据）
 */
@@ -925,32 +925,36 @@ uint8_t read_setting_data(uint8_t addr)
 {
 	uint8_t board_sta = 0;
 	uint16_t crc = 0;
-
-	usart1_tx_buff[0] = 0xA5;
-	usart1_tx_buff[1] = 0x5A;
-	usart1_tx_buff[2] = 0x02;
-	usart1_tx_buff[3] = READ_SETTING_DATA;
-	usart1_tx_buff[4] = (addr << 4);
-
-	crc = crc_check(usart1_tx_buff, 7);
-
-	usart1_tx_buff[5] = crc & 0x00FF;
-	usart1_tx_buff[6] = crc >> 8;
-
-	usart1_send_str(usart1_tx_buff, 7);
-
-	while (read_setting_data_mask != 1)
+	uint8_t i;
+	read_setting_data_mask = 0;
+	read_setting_data_cnt = 0;
+	
+	for (i=1;i<5;i++)
 	{
-		if (usart1_rx_end)
+		usart1_tx_buff[0] = 0xA5;
+		usart1_tx_buff[1] = 0x5A;
+		usart1_tx_buff[2] = 0x02;
+		usart1_tx_buff[3] = READ_SETTING_DATA;
+		usart1_tx_buff[4] = (addr << 4)+i;
+
+		crc = crc_check(usart1_tx_buff, 7);
+
+		usart1_tx_buff[5] = crc & 0x00FF;
+		usart1_tx_buff[6] = crc >> 8;
+
+		usart1_send_str(usart1_tx_buff, 7);
+
+		while (read_setting_data_mask != 1)
 		{
-			usart1_deal();
-			usart1_rx_end = 0;
-			board_sta = 1;
+			if (usart1_rx_end)
+			{
+				usart1_deal();
+				usart1_rx_end = 0;
+				board_sta = 1;
+			}
 		}
+		read_setting_data_mask = 0; read_setting_data_cnt = 0;
 	}
-
-	read_setting_data_mask = 0; read_setting_data_cnt = 0;
-
 	return board_sta;
 }
 void get_setting_data(uint8_t addr)

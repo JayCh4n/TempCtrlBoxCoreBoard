@@ -29,7 +29,7 @@ ISR(TIMER0_OVF_vect)
 	EN_INTERRUPT;
 	TCNT0 = 0xB2;
 
-	if (++read_setting_data_cnt >= 100)
+	if (++read_setting_data_cnt >= 60)
 	{
 		read_setting_data_cnt = 0;
 		read_setting_data_mask = 1;
