@@ -104,9 +104,7 @@ int usart0_deal(void)
 			key_action(variable);
 			break; //如果变量地址为按键变量地址  执行按键动作
 		case MASTER_SWITCH:
-			ctrl_command = SWITCH_SENSOR; //定时器中断中处理
-			global = ALL;
-			all_senser_sta = variable;
+			switch_all_sensor(variable);
 			break;
 		case SINGLE_SET_FOLLOW:
 			follow_sta_buff[set_num] = variable;

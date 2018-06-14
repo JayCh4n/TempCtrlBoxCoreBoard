@@ -9,9 +9,11 @@
 uint8_t timer2_ovf = 0;
 uint8_t ctrl_command = READ_DATA_ALL; //命令
 uint8_t global;						  //是否为全局设定
-uint8_t all_senser_sta;
+/*uint8_t all_senser_sta;*/
 uint8_t read_setting_data_mask = 0;
 uint8_t read_setting_data_cnt = 0;
+uint8_t usart1_tx_timecnt = 0;
+uint8_t usart1_tx_overtime_mask = 0;
 uint8_t init_complete = 0;
 
 ISR(TIMER0_OVF_vect)
@@ -21,14 +23,14 @@ ISR(TIMER0_OVF_vect)
 
 	static uint8_t usart0_cnt = 0;		  //USART0接收时间计数
 	static uint8_t pre_usart0_rx_cnt = 0; //USART0上次接收计数
-
-	static uint8_t time_cnt = 0;  //时间计数
-	static uint8_t slave_num = 1; //控制板号码
+	
+/*	static uint8_t time_cnt = 0;  //时间计数*/
+/*	static uint8_t slave_num = 1; //控制板号码*/
 	static uint16_t update_run_temp_cnt = 0;
 
 	EN_INTERRUPT;
 	TCNT0 = 0xB2;
-
+	
 	if (++read_setting_data_cnt >= 60)
 	{
 		read_setting_data_cnt = 0;
@@ -37,71 +39,31 @@ ISR(TIMER0_OVF_vect)
 
 	if (init_complete)
 	{
-		if (++time_cnt >= 100)
+		if (++usart1_tx_timecnt >= 100)
 		{
-			time_cnt = 0;
-
-			switch (ctrl_command)
-			{
-			case READ_DATA_ALL:
-				send_request_all(slave_num++);
-				if (slave_num >= 4)
-					slave_num = 1;
-				break;
-
-			case PID:
-				set_pid();
-				break;
-
-			case TEMP:
-				single_set(TEMP, set_temp[set_num]);
-				break;
-
-			case SENSOR_TYPE:
-				single_set(SENSOR_TYPE, sensor_type[set_num]);
-				break;
-
-			case SWITCH_SENSOR:
-				if (global == SINGLE)
-				{
-					single_set(SWITCH_SENSOR, switch_sensor[set_num]);
-				}
-				else
-				{
-					switch_all_sensor(all_senser_sta);
-				}
-				break;
-
-			case ALL_SET_CMD:
-				all_set_ok();
-				break;
-			case SET_FOLLOW:
-				single_set(SET_FOLLOW, follow_sta[set_num]);
-				break;
-			default:
-				break;
-			}
+			usart1_tx_timecnt = 0;
+			usart1_tx_overtime_mask = 1;
 		} //每一百毫秒请求一个主控板发送所有采集数据  300毫秒完成3个主控板采集数据的发送
+	}
 
-		if (update_run_temp_flag) //如果在单独设定界面，1s更新一次运行温度
+	if (update_run_temp_flag) //如果在单独设定界面，1s更新一次运行温度
+	{
+		update_run_temp_cnt++;
+
+		if (update_run_temp_cnt >= 200)
 		{
-			update_run_temp_cnt++;
+			update_run_temp_cnt = 0;
 
-			if (update_run_temp_cnt >= 200)
+			if (run_temp_page)
 			{
-				update_run_temp_cnt = 0;
+				send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num] + temp_unit * ((run_temp[set_num] * 8 / 10) + 32)); //单独设定界面更新运行温度
+			}
+			else
+			{
+				send_variables(CURVE_PAGE_RUNTEMP_ADDR, run_temp[curve_page_num] +
+				temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)); //曲线界面更新运行温度
 
-				if (run_temp_page)
-				{
-					send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num] + temp_unit * ((run_temp[set_num] * 8 / 10) + 32)); //单独设定界面更新运行温度
-				}
-				else
-				{
-					send_variables(CURVE_PAGE_RUNTEMP_ADDR, run_temp[curve_page_num] +
-																temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)); //曲线界面更新运行温度
-
-					send_variables(CURVE_PAGE_OUTRATE_ADDR, output_rate[curve_page_num]); //曲线界面更新输出比例
-				}
+				send_variables(CURVE_PAGE_OUTRATE_ADDR, output_rate[curve_page_num]); //曲线界面更新输出比例
 			}
 		}
 	}
@@ -352,7 +314,7 @@ void timer2_init()
 	TCCR2 &= 0xF8;
 }
 
-/*
+/* 移到串口初始化里
 void timer3_init()
 {
 TCCR3B |= 0x80;			//WGM32位置1

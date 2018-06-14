@@ -20,9 +20,11 @@
 extern uint8_t timer2_ovf;
 extern uint8_t ctrl_command;
 extern uint8_t global;
-extern uint8_t all_senser_sta;
+/*extern uint8_t all_senser_sta;*/
 extern uint8_t read_setting_data_mask;
 extern uint8_t read_setting_data_cnt;
+extern uint8_t usart1_tx_timecnt;
+extern uint8_t usart1_tx_overtime_mask;
 extern uint8_t init_complete;
 
 void timer0_init();
