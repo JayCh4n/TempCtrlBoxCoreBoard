@@ -23,7 +23,7 @@ uint8_t ctrl_board_sta[4] = {0}; //控制板卡状态  0:断线 1:连接
 uint8_t output_rate[12] = {0}; //获取
 uint8_t sensor_sta[12] = {0};  //获取
 int16_t run_temp[12] = {0};	//获取
-uint8_t alarm_type[12] = {0};  //获取
+/*uint8_t alarm_type[12] = {0};  //获取*/
 
 int16_t set_temp[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //发送
 uint16_t switch_sensor[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -84,6 +84,19 @@ void update_main_page(void)
 		send_variables(MAIN_SENSOR1_TYPE_ADDR + (i * 2), TYPE_J + (sensor_type[i + (pre_main_page * 6)]) * TYPE_K);
 
 		send_name(MAIN_NAME1_ADDR + (i * 8), set_name[i + (pre_main_page * 6)]);
+		
+		/*更新传感状态图标 sensor_sta >= 3 时显示告警 0~2：关闭 开启 跟随*/
+		/*更新告警类型图标 sensor_sta >= 3 时显示对应各种告警类型  0~2：显示运行正常*/
+		if(sensor_sta[i + (pre_main_page * 6)] >= 3)
+		{
+			send_variables(MAIN_STA1_ADDR+(i * 4), 3);
+			send_variables(MAIN_ALARM1_ADDR+(i*8), sensor_sta[i + (pre_main_page * 6)]);
+		}
+		else
+		{
+			send_variables(MAIN_STA1_ADDR+(i * 4), sensor_sta[i + (pre_main_page * 6)]);
+			send_variables(MAIN_ALARM1_ADDR+(i*8), 2);
+		}
 	}
 }
 
@@ -791,10 +804,10 @@ void update_alarm_page(uint8_t page_num)
 
 	for (i = 0; i < 12; i++)
 	{
-		if (alarm_type[i] != 0)
+		if (sensor_sta[i] >= 3)
 		{
 			sensor_num = i;
-			send_alarm_msg(alarm_type[i], alarm_msg_num, sensor_num);
+			send_alarm_msg(sensor_sta[i], alarm_msg_num, sensor_num);
 			alarm_msg_num++;
 		}
 	}
@@ -947,9 +960,22 @@ void send_alarm_msg(uint8_t type, uint8_t msg_num, uint16_t sen_num)
 /* 依次读取三块主控板设定数据 */
 void read_setting_data_all(void)
 {
+	uint8_t i, j;		//i:板号   j：通道号
+	
 	ctrl_board_sta[0] = read_setting_data(1);
 	ctrl_board_sta[1] = read_setting_data(2);
 	ctrl_board_sta[2] = read_setting_data(3);
+	
+	for(i=0; i<3; i++)
+	{
+		if(ctrl_board_sta[i] == 0)
+		{
+			for (j=0; j<4; j++)
+			{
+				sensor_sta[i*4+j] = 3;
+			}
+		}
+	}
 }
 
 /*
@@ -985,7 +1011,11 @@ uint8_t read_setting_data(uint8_t addr)
 			{
 				usart1_deal();
 				usart1_rx_end = 0;
-				board_sta = 1;
+				
+				if (usart1_rx_buff[4] == (addr << 4)+i)
+				{
+					board_sta = 1;
+				}
 			}
 		}
 		read_setting_data_mask = 0; read_setting_data_cnt = 0;
@@ -994,6 +1024,7 @@ uint8_t read_setting_data(uint8_t addr)
 }
 void get_setting_data(uint8_t addr)
 {
+	uint8_t i;
 	uint8_t iqr_num = ((addr >> 4) - 1) * 4 + (addr & 0x0F) - 1;
 
 	set_name[iqr_num] = usart1_rx_buff[5];
@@ -1008,12 +1039,17 @@ void get_setting_data(uint8_t addr)
 	all_sensor_type = usart1_rx_buff[12];
 	all_sensor_type_buff = all_sensor_type;
 	
+	for(i=0; i<12; i++)
+	{
+		sensor_type[i] = all_sensor_type;
+	}
+	
 	follow_sta[iqr_num] = usart1_rx_buff[14];
 	follow_sta_buff[iqr_num] = follow_sta[iqr_num];
 	
-	if(usart1_rx_buff[16] < 1)				//通道状态： 0：关闭 1：开启 2:跟随 3：4：..........
+	if(usart1_rx_buff[16] <= 2)				//通道状态： 0：关闭  1：开启  2:跟随 3~n：告警类型
 	{
-		switch_sensor[iqr_num] = usart1_rx_buff[16];
+		switch_sensor[iqr_num] = usart1_rx_buff[16] & 0x01;		//0：关闭  1：开启 （跟随归属到开启）    
 		switch_sensor_buff[iqr_num] = switch_sensor[iqr_num];
 		
 		sensor_sta[iqr_num] = usart1_rx_buff[16];
@@ -1092,10 +1128,10 @@ void get_data_all()
 	run_temp[3 + ((slave_num - 1) * 4)] = usart1_rx_buff[19];
 	run_temp[3 + ((slave_num - 1) * 4)] = (run_temp[3 + ((slave_num - 1) * 4)] << 8) | usart1_rx_buff[20];
 
-	alarm_type[0 + ((slave_num - 1) * 4)] = usart1_rx_buff[21];
-	alarm_type[1 + ((slave_num - 1) * 4)] = usart1_rx_buff[22];
-	alarm_type[2 + ((slave_num - 1) * 4)] = usart1_rx_buff[23];
-	alarm_type[3 + ((slave_num - 1) * 4)] = usart1_rx_buff[24];
+	sensor_sta[0 + ((slave_num - 1) * 4)] = usart1_rx_buff[21];
+	sensor_sta[1 + ((slave_num - 1) * 4)] = usart1_rx_buff[22];
+	sensor_sta[2 + ((slave_num - 1) * 4)] = usart1_rx_buff[23];
+	sensor_sta[3 + ((slave_num - 1) * 4)] = usart1_rx_buff[24];
 	
 	update_main_page();
 }

@@ -150,6 +150,22 @@
 #define MAIN_NAME5_ADDR 0x0220
 #define MAIN_NAME6_ADDR 0x0228
 
+/* 主界面传感器状态图标显示槽  0：关闭  1：开启  2：跟随  3：告警*/
+#define MAIN_STA1_ADDR	0x0270
+#define MAIN_STA2_ADDR	0x0274
+#define MAIN_STA3_ADDR	0x0278
+#define MAIN_STA4_ADDR	0x027C
+#define MAIN_STA5_ADDR	0x0280
+#define MAIN_STA6_ADDR	0x0284
+
+/* 主界面告警类型图标显示槽 2：正常 3：热电偶断开 4：温度过高 5温度过低 6热电偶短路 7：热电偶接反 8加热器断开 9： 加热器短路*/
+#define MAIN_ALARM1_ADDR	0x0240
+#define MAIN_ALARM2_ADDR	0x0248
+#define MAIN_ALARM3_ADDR	0x0250
+#define MAIN_ALARM4_ADDR	0x0258
+#define MAIN_ALARM5_ADDR	0x0260
+#define MAIN_ALARM6_ADDR	0x0268
+
 //告警界面序号显示槽位地址
 #define ALARM_PAGE_NUM1_ADDR 0x0044
 #define ALARM_PAGE_NUM2_ADDR 0x0046
