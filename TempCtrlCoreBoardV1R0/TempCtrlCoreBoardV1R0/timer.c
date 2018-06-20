@@ -117,6 +117,9 @@ ISR(TIMER0_OVF_vect)
 	} //如果大于21毫秒没有数据接收  认为完成一次数据的接收      清除时间计数
 }
 
+/*射胶阀时间控制相关程序 
+**现把此功能独立成单独电路板
+*/
 ISR(TIMER1_COMPA_vect)
 {
 	/*
@@ -221,6 +224,7 @@ ISR(TIMER1_COMPA_vect)
 	*/
 }
 
+/*更新温度曲线 在曲线显示界面时才会更新*/
 ISR(TIMER2_OVF_vect)
 {
 	static uint8_t time_cnt = 0;
@@ -229,7 +233,14 @@ ISR(TIMER2_OVF_vect)
 	EN_INTERRUPT;
 	TCNT2 = 0xB2;
 
-	temp_differ = (run_temp[curve_page_num] - set_temp[curve_page_num]) + 100;
+	// temp_differ = (run_temp[curve_page_num] - set_temp[curve_page_num]) + 100;
+
+	/*温度转换 计算不同单位下的温度数值  run_temp[] 存储的是摄氏度 
+	**set_temp[]存储的是设定温度数值，与温度单位无关 发送温度设定时需转换成相应单位的数值进行发送
+	*/
+	temp_differ = run_temp[curve_page_num]
+				+ temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)
+				- set_temp[curve_page_num] + 100;
 
 	time_cnt++;
 	if (time_cnt >= timer2_ovf)
