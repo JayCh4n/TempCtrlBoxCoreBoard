@@ -204,6 +204,28 @@
 
 #define CURVE_TIMELINE_ADDR 0x0052 //曲线时间轴显示地址 2byte 共十个 0x0052-0x0065
 
+#define MAX_ALARM_HISTORY 70
+
+typedef enum
+{
+	thermocouple_disconnected,
+	temp_too_high,	
+	temp_too_low,
+	thermocouple_short_circuit,
+	thermocouple_reversed,
+	heater_disconnected,
+	heater_short_circuit
+}
+alarm_typedef;
+
+typedef struct
+{
+	alarm_typedef alarm_type;
+	uint8_t alarm_device_num;	
+}
+alarm_struct_typedef;
+
+
 //////////////////
 extern uint8_t run_temp_page;
 extern uint8_t update_run_temp_flag;

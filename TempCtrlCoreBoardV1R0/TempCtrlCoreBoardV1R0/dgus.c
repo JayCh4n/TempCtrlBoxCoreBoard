@@ -24,7 +24,6 @@ uint8_t output_rate[12] = {0}; //获取
 uint8_t sensor_sta[12] = {0};  //获取
 uint8_t pre_sensor_sta[12] = {0}; //上次监测时传感器状态 用来识别状态是否变化
 int16_t run_temp[12] = {0};	//获取
-/*uint8_t alarm_type[12] = {0};  //获取*/
 
 int16_t set_temp[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //发送
 uint16_t switch_sensor[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -49,11 +48,18 @@ uint8_t module_num = 1;			   //射胶模块号码
 uint8_t module_status[4] = {0};	//射胶模块运行状态
 uint16_t time_ctrl_value[4][8][4]; //射胶时间控制数据   共四个模块  每个模块8个通道  每个通道有 T1 T2 T3 T4 4个时间段
 
-uint8_t alarm_msg[4][16] = {{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xB6, 0xCF, 0xBF, 0xAA},									   //感温线断开
-							{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xBD, 0xD3, 0xB7, 0xB4},									   //感温线接反
-							{0xB3, 0xAC, 0xCE, 0xC2, 0xB1, 0xA8, 0xBE, 0xAF},												   //超温报警
-							{0xC9, 0xFD, 0xCE, 0xC2, 0xB5, 0xBD, 0xB4, 0xEF, 0xC9, 0xE8, 0xB6, 0xA8, 0xCE, 0xC2, 0xB6, 0xC8}}; //升温到达设定温度
+uint8_t alarm_cnt = 0;
+alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
 
+uint8_t alarm_msg[7][16] = {{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCF, 0xBF, 0xAA},									   //热电偶断开
+							{0xCE, 0xC2, 0xB6, 0xC8, 0xB9, 0xFD, 0xB8, 0xDF},												   //温度过高
+							{0xCE, 0xC2, 0xB6, 0xC8, 0xB9, 0xFD, 0xB5, 0xCD},												   //温度过低
+							{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCC, 0xC2, 0xB7},									   //热电偶短路
+							{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xBD, 0xD3, 0xB7, 0xB4},									   //热电偶接反
+							{0xBC, 0xD3, 0xC8, 0xC8, 0xC6, 0xF7, 0xB6, 0xCF, 0xBF, 0xAA},									   //加热器断开				
+							{0xBC, 0xD3, 0xC8, 0xC8, 0xC6, 0xF7, 0xB6, 0xCC, 0xC2, 0xB7},									   //加热器短路
+							};
+							
 void init_time_ctrl_value(void)
 {
 	uint8_t i, j, k;
@@ -103,6 +109,18 @@ void update_main_page(void)
 
 void key_action(uint16_t key_code)
 {
+	static uint8_t alarm_page_num = 1;
+	uint8_t max_alarm_page_num;
+	
+	if(alarm_cnt % 7 == 0)
+	{
+		max_alarm_page_num = alarm_cnt/7;
+	}
+	else
+	{
+		max_alarm_page_num = alarm_cnt/7 + 1;
+	}
+	
 	switch (key_code)
 	{
 	case SWITCH_LANGUAGE:
@@ -173,10 +191,14 @@ void key_action(uint16_t key_code)
 		clear_alarm_msg(15);
 		break;
 	case ALARM_PAGE_UP:
-		update_alarm_page(1);
+		if(--alarm_page_num <= 0)
+			alarm_page_num = 1;
+		update_alarm_page(alarm_page_num);
 		break;
 	case ALARM_PAGE_DOWN:
-		update_alarm_page(2);
+		if(++alarm_page_num >= max_alarm_page_num)
+			alarm_page_num = max_alarm_page_num;
+		update_alarm_page(alarm_page_num);
 		break;
 	case SINGLE_SET_BACK:
 		single_set_back();
@@ -845,13 +867,23 @@ void update_alarm_page(uint8_t page_num)
 {
 	uint8_t i = 0;
 	uint8_t alarm_msg_num = 0;
-	uint16_t sensor_num = 0;
 
 	for (i = 0; i < 7; i++)
 	{
+		alarm_msg_num = alarm_cnt - 1 - i - (page_num - 1) * 7; 
 		send_variables(ALARM_PAGE_NUM1_ADDR + (i * 2), i + ((page_num - 1) * 7) + 1);
+		
+		if((alarm_cnt - 1) >= i + (page_num - 1) * 7)
+		{
+			send_alarm_msg(alarm_history[alarm_msg_num].alarm_type, i, alarm_history[alarm_msg_num].alarm_device_num);
+		}
+		else
+		{
+			clear_alarm_msg(i);
+		}
 	}
-
+	
+/*
 	for (i = 0; i < 12; i++)
 	{
 		if (sensor_sta[i] >= 3)
@@ -866,6 +898,7 @@ void update_alarm_page(uint8_t page_num)
 	{
 		clear_alarm_msg(alarm_msg_num);
 	}
+*/
 }
 
 void switch_language(void)
@@ -985,7 +1018,7 @@ void send_alarm_msg(uint8_t type, uint8_t msg_num, uint16_t sen_num)
 
 	for (i = 0; i < 16; i++)
 	{
-		usart0_tx_buff[i + 6] = alarm_msg[type - 1][i];
+		usart0_tx_buff[i + 6] = alarm_msg[type][i];
 	}
 
 	crc = crc_check(usart0_tx_buff, 24);
@@ -1234,7 +1267,7 @@ void clear_curve_buff(uint8_t channel)
 
 void alarm_monitor(void)
 {
-	uint8_t i;
+	uint8_t i, j;
 	uint16_t alarm_sta_mask = 0;
 	
 	for(i=0; i<12; i++)
@@ -1242,10 +1275,22 @@ void alarm_monitor(void)
 		if(sensor_sta[i] != pre_sensor_sta[i])
 		{
 			pre_sensor_sta[i] = sensor_sta[i];
+			
 			if(sensor_sta[i] >= 3)
 			{
 				ALARM_ON;
-				//qita
+				
+				if(alarm_cnt >= MAX_ALARM_HISTORY - 1)
+				{
+					alarm_cnt = MAX_ALARM_HISTORY - 1;
+					for(j=0; j < alarm_cnt; j++)
+					{
+						alarm_history[j] = alarm_history[j+1];
+					}
+				}
+				alarm_history[alarm_cnt].alarm_type = sensor_sta[i] - 3;
+				alarm_history[alarm_cnt].alarm_device_num = i;
+				alarm_cnt++;
 			}
 		}
 		
@@ -1254,6 +1299,7 @@ void alarm_monitor(void)
 			alarm_sta_mask |= 1 << i;
 		}
 	}
+	
 	/*如果无告警 则自动关闭报警器*/
 	if(alarm_sta_mask == 0x0FFF)
 	{
