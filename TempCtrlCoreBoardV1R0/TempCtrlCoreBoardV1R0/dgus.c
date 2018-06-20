@@ -794,7 +794,7 @@ void time_ctrl_test(uint8_t slave_num, uint8_t command)
 
 	usart2_tx_buff[0] = 0xA5;
 	usart2_tx_buff[1] = 0x5A;
-	usart2_tx_buff[2] = 0x42;
+	usart2_tx_buff[2] = 0x0A;
 	usart2_tx_buff[3] = command;
 	usart2_tx_buff[4] = slave_num - 1;
 
