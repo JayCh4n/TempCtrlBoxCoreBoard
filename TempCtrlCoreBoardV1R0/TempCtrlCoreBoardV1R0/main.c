@@ -73,6 +73,13 @@ int main(void)
 				usart1_tx_timecnt = 0;
 			}
 		}
+		
+		/*1.5Ãë¼à²âÒ»´Î¸æ¾¯×´Ì¬*/
+		if(alarm_monitor_overtime_mask)
+		{
+			alarm_monitor();
+			alarm_monitor_overtime_mask = 0;
+		}
 	}
 
 	return 0;

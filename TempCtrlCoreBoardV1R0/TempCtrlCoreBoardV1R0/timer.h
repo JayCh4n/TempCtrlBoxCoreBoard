@@ -26,6 +26,7 @@ extern uint8_t read_setting_data_cnt;
 extern uint8_t usart1_tx_timecnt;
 extern uint8_t usart1_tx_overtime_mask;
 extern uint8_t init_complete;
+extern uint8_t alarm_monitor_overtime_mask;
 
 void timer0_init();
 void timer1_init();

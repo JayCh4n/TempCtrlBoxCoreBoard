@@ -22,6 +22,7 @@ uint8_t ctrl_board_sta[4] = {0}; //控制板卡状态  0:断线 1:连接
 
 uint8_t output_rate[12] = {0}; //获取
 uint8_t sensor_sta[12] = {0};  //获取
+uint8_t pre_sensor_sta[12] = {0}; //上次监测时传感器状态 用来识别状态是否变化
 int16_t run_temp[12] = {0};	//获取
 /*uint8_t alarm_type[12] = {0};  //获取*/
 
@@ -1229,4 +1230,34 @@ void clear_curve_buff(uint8_t channel)
 	usart0_tx_buff[7] = crc >> 8;
 
 	usart0_send_str(usart0_tx_buff, 8);
+}
+
+void alarm_monitor(void)
+{
+	uint8_t i;
+	uint16_t alarm_sta_mask = 0;
+	
+	for(i=0; i<12; i++)
+	{
+		if(sensor_sta[i] != pre_sensor_sta[i])
+		{
+			pre_sensor_sta[i] = sensor_sta[i];
+			if(sensor_sta[i] >= 3)
+			{
+				ALARM_ON;
+				//qita
+			}
+		}
+		
+		if(sensor_sta[i] <= 2)
+		{
+			alarm_sta_mask |= 1 << i;
+		}
+	}
+	/*如果无告警 则自动关闭报警器*/
+	if(alarm_sta_mask == 0x0FFF)
+	{
+		ALARM_OFF;
+	}
+	alarm_sta_mask = 0;
 }

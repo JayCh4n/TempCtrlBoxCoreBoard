@@ -227,6 +227,9 @@ extern uint16_t switch_sensor[12];
 extern uint8_t follow_sta[12];
 extern uint8_t follow_sta_buff[12];
 
+extern uint8_t sensor_sta[12];
+extern uint8_t pre_sensor_sta[12];
+
 extern uint16_t preheat_time;
 extern uint16_t all_temp;
 extern uint16_t all_sensor_type;
@@ -272,5 +275,6 @@ void set_pid(void);
 uint8_t read_setting_data(uint8_t addr);
 void read_setting_data_all(void);
 void get_setting_data(uint8_t addr);
+void alarm_monitor(void);
 
 #endif /* DGUS_H_ */

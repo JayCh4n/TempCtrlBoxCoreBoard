@@ -15,6 +15,7 @@ uint8_t read_setting_data_cnt = 0;
 uint8_t usart1_tx_timecnt = 0;
 uint8_t usart1_tx_overtime_mask = 0;
 uint8_t init_complete = 0;
+uint8_t alarm_monitor_overtime_mask = 0;
 
 ISR(TIMER0_OVF_vect)
 {
@@ -27,10 +28,11 @@ ISR(TIMER0_OVF_vect)
 /*	static uint8_t time_cnt = 0;  //时间计数*/
 /*	static uint8_t slave_num = 1; //控制板号码*/
 	static uint16_t update_run_temp_cnt = 0;
+	static uint16_t alarm_monitor_cnt = 0;
 
 	EN_INTERRUPT;
 	TCNT0 = 0xB2;
-	
+
 	if (++read_setting_data_cnt >= 60)
 	{
 		read_setting_data_cnt = 0;
@@ -43,7 +45,13 @@ ISR(TIMER0_OVF_vect)
 		{
 			usart1_tx_timecnt = 0;
 			usart1_tx_overtime_mask = 1;
-		} //每一百毫秒请求一个主控板发送所有采集数据  300毫秒完成3个主控板采集数据的发送
+		} //每5百毫秒请求一个主控板发送所有采集数据  1500毫秒完成3个主控板采集数据的发送
+
+		if(++alarm_monitor_cnt >= 300)
+		{
+			alarm_monitor_cnt = 0;
+			alarm_monitor_overtime_mask = 1;
+		}
 	}
 
 	if (update_run_temp_flag) //如果在单独设定界面，1s更新一次运行温度
