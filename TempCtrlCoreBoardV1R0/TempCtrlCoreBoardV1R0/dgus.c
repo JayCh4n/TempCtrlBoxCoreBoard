@@ -29,10 +29,10 @@ int16_t set_temp[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1
 uint16_t switch_sensor[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 uint16_t sensor_type[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 uint32_t set_name[12] = {0x23310000, 0x23320000, 0x23330000, 0x23340000, 0x23350000, 0x23360000,
-0x23370000, 0x23380000, 0x23390000, 0x23313000, 0x23313100, 0x23313200};
+						 0x23370000, 0x23380000, 0x23390000, 0x23313000, 0x23313100, 0x23313200};
 uint32_t set_name_buff = 0;
 
-uint8_t follow_sta[12] = {0};	//通道跟随状态  0：禁止 1~12：跟随通道号
+uint8_t follow_sta[12] = {0}; //通道跟随状态  0：禁止 1~12：跟随通道号
 uint8_t follow_sta_buff[12] = {0};
 
 uint16_t p_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //发送
@@ -49,9 +49,9 @@ uint8_t module_status[4] = {0};	//射胶模块运行状态
 uint16_t time_ctrl_value[4][8][4]; //射胶时间控制数据   共四个模块  每个模块8个通道  每个通道有 T1 T2 T3 T4 4个时间段
 
 uint8_t alarm_msg[4][16] = {{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xB6, 0xCF, 0xBF, 0xAA},									   //感温线断开
-{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xBD, 0xD3, 0xB7, 0xB4},									   //感温线接反
-{0xB3, 0xAC, 0xCE, 0xC2, 0xB1, 0xA8, 0xBE, 0xAF},												   //超温报警
-{0xC9, 0xFD, 0xCE, 0xC2, 0xB5, 0xBD, 0xB4, 0xEF, 0xC9, 0xE8, 0xB6, 0xA8, 0xCE, 0xC2, 0xB6, 0xC8}}; //升温到达设定温度
+							{0xB8, 0xD0, 0xCE, 0xC2, 0xCF, 0xDF, 0xBD, 0xD3, 0xB7, 0xB4},									   //感温线接反
+							{0xB3, 0xAC, 0xCE, 0xC2, 0xB1, 0xA8, 0xBE, 0xAF},												   //超温报警
+							{0xC9, 0xFD, 0xCE, 0xC2, 0xB5, 0xBD, 0xB4, 0xEF, 0xC9, 0xE8, 0xB6, 0xA8, 0xCE, 0xC2, 0xB6, 0xC8}}; //升温到达设定温度
 
 void init_time_ctrl_value(void)
 {
@@ -79,23 +79,23 @@ void update_main_page(void)
 		send_variables(MAINPAGE_NUM1_ADDR + (i * 2), (i + (pre_main_page * 6) + 1));		//主页面传感器序号显示
 		send_variables(MAIN_OUTRATE1_ADDR + (i * 2), output_rate[i + (pre_main_page * 6)]); //传感器输出比例
 		send_variables(MAIN_RUNTEMP1_ADDR + (i * 2), run_temp[i + (pre_main_page * 6)] +
-		temp_unit * (run_temp[i + (pre_main_page * 6)] * 8 / 10 + 32)); //运行温度
+														 temp_unit * (run_temp[i + (pre_main_page * 6)] * 8 / 10 + 32)); //运行温度
 		send_variables(MAIN_SETTEMP1_ADDR + (i * 2), set_temp[i + (pre_main_page * 6)]);								 //设定温度
 		send_variables(MAIN_SENSOR1_TYPE_ADDR + (i * 2), TYPE_J + (sensor_type[i + (pre_main_page * 6)]) * TYPE_K);
 
 		send_name(MAIN_NAME1_ADDR + (i * 8), set_name[i + (pre_main_page * 6)]);
-		
+
 		/*更新传感状态图标 sensor_sta >= 3 时显示告警 0~2：关闭 开启 跟随*/
 		/*更新告警类型图标 sensor_sta >= 3 时显示对应各种告警类型  0~2：显示运行正常*/
-		if(sensor_sta[i + (pre_main_page * 6)] >= 3)
+		if (sensor_sta[i + (pre_main_page * 6)] >= 3)
 		{
-			send_variables(MAIN_STA1_ADDR+(i * 4), 3);
-			send_variables(MAIN_ALARM1_ADDR+(i*8), sensor_sta[i + (pre_main_page * 6)]);
+			send_variables(MAIN_STA1_ADDR + (i * 4), 3);
+			send_variables(MAIN_ALARM1_ADDR + (i * 8), sensor_sta[i + (pre_main_page * 6)]);
 		}
 		else
 		{
-			send_variables(MAIN_STA1_ADDR+(i * 4), sensor_sta[i + (pre_main_page * 6)]);
-			send_variables(MAIN_ALARM1_ADDR+(i*8), 2);
+			send_variables(MAIN_STA1_ADDR + (i * 4), sensor_sta[i + (pre_main_page * 6)]);
+			send_variables(MAIN_ALARM1_ADDR + (i * 8), 2);
 		}
 	}
 }
@@ -104,132 +104,147 @@ void key_action(uint16_t key_code)
 {
 	switch (key_code)
 	{
-		case SWITCH_LANGUAGE:
+	case SWITCH_LANGUAGE:
 		pre_language ^= 0x01;
 		switch_language();
 		break;
-		case CLEAR_ALARM_SOUND:
+	case CLEAR_ALARM_SOUND:
 		ALARM_OFF;
 		break;
-		case MAIN_PAGE_UP:
+	case MAIN_PAGE_UP:
 		pre_main_page = 0;
 		update_main_page();
 		break;
-		case MAIN_PAGE_DOWN:
+	case MAIN_PAGE_DOWN:
 		pre_main_page = 1;
 		update_main_page();
 		break;
-		case MAIN_SENSOR1_SET:
+	case MAIN_SENSOR1_SET:
 		set_num = 0 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-		case MAIN_SENSOR2_SET:
+	case MAIN_SENSOR2_SET:
 		set_num = 1 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-		case MAIN_SENSOR3_SET:
+	case MAIN_SENSOR3_SET:
 		set_num = 2 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-		case MAIN_SENSOR4_SET:
+	case MAIN_SENSOR4_SET:
 		set_num = 3 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-		case MAIN_SENSOR5_SET:
+	case MAIN_SENSOR5_SET:
 		set_num = 4 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-		case MAIN_SENSOR6_SET:
+	case MAIN_SENSOR6_SET:
 		set_num = 5 + (pre_main_page * 6);
 		update_single_set_page();
 		break;
-		case SINGLE_SET_OK:
+	case SINGLE_SET_OK:
 		single_set_ok();
 		break;
-		case ALL_SET_OK:
+	case ALL_SET_OK:
 		all_set_ok();
 		break;
-		case PID_SET_OK:
+	case PID_SET_OK:
 		pid_set_ok();
 		break;
-		case CURVE_ZOOM_OUT:
+	case CURVE_ZOOM_OUT:
 		curve_time_level--;
 		update_curve_page();
 		break;
-		case CURVE_ZOOM_IN:
+	case CURVE_ZOOM_IN:
 		curve_time_level++;
 		update_curve_page();
 		break;
-		case CURVE_PAGE_UP:
+	case CURVE_PAGE_UP:
 		curve_page_num--;
 		update_curve_page();
 		break;
-		case CURVE_PAGE_DOWN:
+	case CURVE_PAGE_DOWN:
 		curve_page_num++;
 		update_curve_page();
 		break;
-		case CLEAR_ALARM_MSG:
+	case CLEAR_ALARM_MSG:
 		clear_alarm_msg(15);
 		break;
-		case ALARM_PAGE_UP:
+	case ALARM_PAGE_UP:
 		update_alarm_page(1);
 		break;
-		case ALARM_PAGE_DOWN:
+	case ALARM_PAGE_DOWN:
 		update_alarm_page(2);
 		break;
-		case SINGLE_SET_BACK:
+	case SINGLE_SET_BACK:
 		single_set_back();
 		break;
-		case ALL_SET_BACK:
+	case ALL_SET_BACK:
 		all_set_back();
 		break;
-		case PID_PAGE_ENTER:
+	case PID_PAGE_ENTER:
 		update_pid_page(1);
 		break;
-		case ALARM_PAGE_ENTER:
+	case ALARM_PAGE_ENTER:
 		update_alarm_page(1);
 		break;
-		case CURVE_PAGE_ENTER:
+	case CURVE_PAGE_ENTER:
 		update_curve_page();
 		break;
-		case CURVE_PAGE_BACK:
+	case CURVE_PAGE_BACK:
 		CLOSE_CURVE;
 		update_run_temp_flag = 0;
 		break;
-		case MENU_PAGE_ENTER:
+	case MENU_PAGE_ENTER:
 		in_main_page = 0;
 		break;
-		case TIME_CTRL_ENTER:
+	case TIME_CTRL_ENTER:
 		module_num = 1;
 		update_time_ctrl_page();
 		break;
-		case TIME_CTRL_STOP:
+	case TIME_CTRL_STOP:
 		stop_time_ctrl(module_num);
 		break;
-		case TIME_CTRL_START:
+	case TIME_CTRL_START:
 		start_time_ctrl(module_num);
 		break;
-		case TIME_CTRL_SAVEDAT:
+	case TIME_CTRL_SAVEDAT:
 		save_time_ctrl_data();
 		break;
-		case TIME_CTRL_PAGEUP:
+	case TIME_CTRL_PAGEUP:
 		module_num -= 1;
 		update_time_ctrl_page();
 		break;
-		case TIME_CTRL_PAGEDOWN:
+	case TIME_CTRL_PAGEDOWN:
 		module_num += 1;
 		update_time_ctrl_page();
 		break;
-		//		case IQR1_TEST:
-		//		case IQR2_TEST:
-		//		case IQR3_TEST:
-		//		case IQR4_TEST:
-		//		case IQR5_TEST:
-		//		case IQR6_TEST:
-		//		case IQR7_TEST:
-		//		case IQR8_TEST:
-
-		default:
+	case IQR1_TEST:
+		time_ctrl_test(module_num, IQR1_TEST);
+		break;
+	case IQR2_TEST:
+		time_ctrl_test(module_num, IQR2_TEST);
+		break;
+	case IQR3_TEST:
+		time_ctrl_test(module_num, IQR3_TEST);
+		break;
+	case IQR4_TEST:
+		time_ctrl_test(module_num, IQR4_TEST);
+		break;
+	case IQR5_TEST:
+		time_ctrl_test(module_num, IQR5_TEST);
+		break;
+	case IQR6_TEST:
+		time_ctrl_test(module_num, IQR6_TEST);
+		break;
+	case IQR7_TEST:
+		time_ctrl_test(module_num, IQR7_TEST);
+		break;
+	case IQR8_TEST:
+		time_ctrl_test(module_num, IQR8_TEST);
+		break;
+	default:
 		break;
 	}
 }
@@ -240,8 +255,8 @@ void single_set_ok(void)
 	{
 		set_temp[set_num] = set_temp_buff[set_num];
 		single_set(TEMP, set_temp[set_num]);
-// 		eeprom_write(SINGLE_SETTEMP_EEADDR + (set_num * 2), set_temp[set_num]);
-// 		eeprom_write(SINGLE_SETTEMP_EEADDR + (set_num * 2) + 1, set_temp[set_num] >> 8);
+		// 		eeprom_write(SINGLE_SETTEMP_EEADDR + (set_num * 2), set_temp[set_num]);
+		// 		eeprom_write(SINGLE_SETTEMP_EEADDR + (set_num * 2) + 1, set_temp[set_num] >> 8);
 	}
 
 	if (switch_sensor_buff[set_num] != switch_sensor[set_num])
@@ -251,27 +266,27 @@ void single_set_ok(void)
 		//		eeprom_write(SINGLE_SWSENSOR_EEADDR+set_num, switch_sensor[set_num]);	//开启默认关闭 不用写eeprom
 	}
 
-// 	if (sensor_type_buff[set_num] != sensor_type[set_num])			//单独设定传感器类型功能取消
-// 	{
-// 		sensor_type[set_num] = sensor_type_buff[set_num];
-// 		ctrl_command = SENSOR_TYPE;
-// //		eeprom_write(SINGLE_SENSORTYPE_EEADDR + set_num, sensor_type[set_num]);
-// 	}
-	
-	if(follow_sta_buff[set_num]!= follow_sta[set_num])
+	// 	if (sensor_type_buff[set_num] != sensor_type[set_num])			//单独设定传感器类型功能取消
+	// 	{
+	// 		sensor_type[set_num] = sensor_type_buff[set_num];
+	// 		ctrl_command = SENSOR_TYPE;
+	// //		eeprom_write(SINGLE_SENSORTYPE_EEADDR + set_num, sensor_type[set_num]);
+	// 	}
+
+	if (follow_sta_buff[set_num] != follow_sta[set_num])
 	{
 		follow_sta[set_num] = follow_sta_buff[set_num];
 		single_set(SET_FOLLOW, follow_sta[set_num]);
 	}
-	
+
 	if (set_name_buff != set_name[set_num])
 	{
 		set_name[set_num] = set_name_buff;
 		//设置名字   发送给主控板
-// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4), set_name[set_num]);
-// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 1, set_name[set_num] >> 8);
-// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 2, set_name[set_num] >> 16);
-// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 3, set_name[set_num] >> 24);
+		// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4), set_name[set_num]);
+		// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 1, set_name[set_num] >> 8);
+		// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 2, set_name[set_num] >> 16);
+		// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 3, set_name[set_num] >> 24);
 	}
 
 	update_main_page();
@@ -282,7 +297,7 @@ void single_set_ok(void)
 void all_set_ok(void)
 {
 	uint8_t i = 0;
-	
+
 	all_temp = all_temp_buff;
 
 	for (i = 0; i < 12; i++)
@@ -293,63 +308,61 @@ void all_set_ok(void)
 		// 		eeprom_write(SINGLE_SETTEMP_EEADDR + (i * 2) + 1, set_temp[i] >> 8);
 	}
 
-// 	if (temp_unit_buff != temp_unit)
-// 	{
-		temp_unit = temp_unit_buff;
-// 		send_variables(TEMP_UINT_ADDR, (CELSIUS + temp_unit * FAHRENHEIT));
-// 		
-// 		//发送给控制板卡  保存数据
-// 		/*		eeprom_write(TEMP_UNIT_EEADDR, temp_unit);*/
-// 	}
-	
+	// 	if (temp_unit_buff != temp_unit)
+	// 	{
+	temp_unit = temp_unit_buff;
+	// 		send_variables(TEMP_UINT_ADDR, (CELSIUS + temp_unit * FAHRENHEIT));
+	//
+	// 		//发送给控制板卡  保存数据
+	// 		/*		eeprom_write(TEMP_UNIT_EEADDR, temp_unit);*/
+	// 	}
+
 	preheat_time = preheat_time_buff;
-	
+
 	all_sensor_type = all_sensor_type_buff;
 
 	for (i = 0; i < 12; i++)
 	{
 		sensor_type[i] = all_sensor_type;
 		sensor_type_buff[i] = all_sensor_type;
-//			eeprom_write(SINGLE_SENSORTYPE_EEADDR + i, sensor_type[i]);
+		//			eeprom_write(SINGLE_SENSORTYPE_EEADDR + i, sensor_type[i]);
 	}
-//	send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
-	
+	//	send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
+
 	update_main_page();
-	
+
 	all_set(TEMP, all_temp);
 	all_set(PREHEAT_TIME, preheat_time);
 	all_set(SENSOR_TYPE, all_sensor_type);
-	
-// 	eeprom_write(ALL_SETTEMP_EEADDR, all_temp);
-// 	eeprom_write(ALL_SETTEMP_EEADDR + 1, all_temp >> 8);
 
+	// 	eeprom_write(ALL_SETTEMP_EEADDR, all_temp);
+	// 	eeprom_write(ALL_SETTEMP_EEADDR + 1, all_temp >> 8);
 
-
-// 	if (preheat_time_buff != preheat_time)
-// 	{
-// 		preheat_time = preheat_time_buff;
-// 
-// 		all_set(PREHEAT_TIME, preheat_time);
-// 
-// // 		eeprom_write(PREHEAT_TIME_EEADDR, preheat_time);
-// 	}
-// 
-// 	if (all_sensor_type_buff != all_sensor_type)
-// 	{
-// 		all_sensor_type = all_sensor_type_buff;
-// 
-// 		all_set(SENSOR_TYPE, all_sensor_type);
-// //		eeprom_write(ALL_SENSORTYPE_EEADDR, all_sensor_type);
-// 
-// 		for (i = 0; i < 12; i++)
-// 		{
-// 			sensor_type[i] = all_sensor_type;
-// 			sensor_type_buff[i] = all_sensor_type;
-// //			eeprom_write(SINGLE_SENSORTYPE_EEADDR + i, sensor_type[i]);
-// 		}
-// 		send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
-// 	}
-// 	
+	// 	if (preheat_time_buff != preheat_time)
+	// 	{
+	// 		preheat_time = preheat_time_buff;
+	//
+	// 		all_set(PREHEAT_TIME, preheat_time);
+	//
+	// // 		eeprom_write(PREHEAT_TIME_EEADDR, preheat_time);
+	// 	}
+	//
+	// 	if (all_sensor_type_buff != all_sensor_type)
+	// 	{
+	// 		all_sensor_type = all_sensor_type_buff;
+	//
+	// 		all_set(SENSOR_TYPE, all_sensor_type);
+	// //		eeprom_write(ALL_SENSORTYPE_EEADDR, all_sensor_type);
+	//
+	// 		for (i = 0; i < 12; i++)
+	// 		{
+	// 			sensor_type[i] = all_sensor_type;
+	// 			sensor_type_buff[i] = all_sensor_type;
+	// //			eeprom_write(SINGLE_SENSORTYPE_EEADDR + i, sensor_type[i]);
+	// 		}
+	// 		send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
+	// 	}
+	//
 	in_main_page = 1;
 }
 
@@ -359,19 +372,19 @@ void pid_set_ok(void)
 	i_value[set_pid_channel - 1] = i_value_buff;
 	d_value[set_pid_channel - 1] = d_value_buff;
 
-// 	eeprom_write(PID_P_EEADDR + ((set_pid_channel - 1) * 2), p_value[set_pid_channel - 1]);
-// 	eeprom_write(PID_P_EEADDR + ((set_pid_channel - 1) * 2) + 1, p_value[set_pid_channel - 1] >> 8);
-// 
-// 	eeprom_write(PID_I_EEADDR + ((set_pid_channel - 1) * 2), i_value[set_pid_channel - 1]);
-// 	eeprom_write(PID_I_EEADDR + ((set_pid_channel - 1) * 2) + 1, i_value[set_pid_channel - 1] >> 8);
-// 
-// 	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2), d_value[set_pid_channel - 1]);
-// 	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2) + 1, d_value[set_pid_channel - 1] >> 8);
+	// 	eeprom_write(PID_P_EEADDR + ((set_pid_channel - 1) * 2), p_value[set_pid_channel - 1]);
+	// 	eeprom_write(PID_P_EEADDR + ((set_pid_channel - 1) * 2) + 1, p_value[set_pid_channel - 1] >> 8);
+	//
+	// 	eeprom_write(PID_I_EEADDR + ((set_pid_channel - 1) * 2), i_value[set_pid_channel - 1]);
+	// 	eeprom_write(PID_I_EEADDR + ((set_pid_channel - 1) * 2) + 1, i_value[set_pid_channel - 1] >> 8);
+	//
+	// 	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2), d_value[set_pid_channel - 1]);
+	// 	eeprom_write(PID_D_EEADDR + ((set_pid_channel - 1) * 2) + 1, d_value[set_pid_channel - 1] >> 8);
 
 	send_variables(PID_P_ADDR, p_value[set_pid_channel - 1]);
 	send_variables(PID_I_ADDR, i_value[set_pid_channel - 1]);
 	send_variables(PID_D_ADDR, d_value[set_pid_channel - 1]);
-	
+
 	set_pid();
 }
 
@@ -382,7 +395,7 @@ void set_pid(void)
 {
 	uint16_t crc = 0;
 	uint8_t addr = 0;
-	
+
 	/*计算地址，前四位代表示板卡号，后四位表示*/
 	addr = (set_pid_channel - 1) / 4 + 1;
 	addr = (addr << 4) + ((set_pid_channel - 1) % 4) + 1;
@@ -406,13 +419,14 @@ void set_pid(void)
 
 	usart1_tx_buff[11] = crc & 0x00FF;
 	usart1_tx_buff[12] = crc >> 8;
-	
+
 	ctrl_command = PID;
-	
-	while(usart1_tx_overtime_mask != 1);
+
+	while (usart1_tx_overtime_mask != 1)
+		;
 	usart1_tx_overtime_mask = 0;
 	usart1_tx_timecnt = 0;
-	
+
 	usart1_send_str(usart1_tx_buff, 13);
 
 	ctrl_command = READ_DATA_ALL;
@@ -474,8 +488,8 @@ void switch_all_sensor(uint16_t sta)
 	uint16_t crc = 0;
 	uint8_t slave_num = 1;
 
-	ctrl_command = 0;	//不是READ_DATA_ALL 就ok
-	
+	ctrl_command = 0; //不是READ_DATA_ALL 就ok
+
 	usart1_tx_buff[0] = 0xA5;
 	usart1_tx_buff[1] = 0x5A;
 	usart1_tx_buff[2] = 0x04;
@@ -485,26 +499,27 @@ void switch_all_sensor(uint16_t sta)
 
 	pre_system_sta = sta;
 
- 	for (i = 0; i < 12; i++)		
- 	{
- 		switch_sensor[i] = sta;
- 		switch_sensor_buff[i] = sta;
-// 		eeprom_write(SINGLE_SWSENSOR_EEADDR+i, switch_sensor[i]);
+	for (i = 0; i < 12; i++)
+	{
+		switch_sensor[i] = sta;
+		switch_sensor_buff[i] = sta;
+		// 		eeprom_write(SINGLE_SWSENSOR_EEADDR+i, switch_sensor[i]);
 	}
-	
-	for (;slave_num <= 3; slave_num++)
+
+	for (; slave_num <= 3; slave_num++)
 	{
 		usart1_tx_buff[4] = slave_num << 4;
-		
+
 		crc = crc_check(usart1_tx_buff, 9);
-	
+
 		usart1_tx_buff[7] = crc & 0x00FF;
 		usart1_tx_buff[8] = crc >> 8;
-		
-		while (usart1_tx_overtime_mask != 1);
+
+		while (usart1_tx_overtime_mask != 1)
+			;
 		usart1_tx_overtime_mask = 0;
 		usart1_tx_timecnt = 0;
-		
+
 		usart1_send_str(usart1_tx_buff, 9);
 	}
 
@@ -523,9 +538,9 @@ void single_set(uint8_t command, uint16_t value)
 {
 	uint16_t crc = 0;
 	uint8_t addr = 0;
-	
+
 	ctrl_command = 0; // 不是READ_DATA_ALL 就OK
-	
+
 	if (temp_unit_buff == 1)
 	{
 		value = ((value - 32) * 10 / 18);
@@ -546,11 +561,12 @@ void single_set(uint8_t command, uint16_t value)
 
 	usart1_tx_buff[7] = crc & 0x00FF;
 	usart1_tx_buff[8] = crc >> 8;
-	
-	while(usart1_tx_overtime_mask != 1);
+
+	while (usart1_tx_overtime_mask != 1)
+		;
 	usart1_tx_overtime_mask = 0;
 	usart1_tx_timecnt = 0;
-	
+
 	usart1_send_str(usart1_tx_buff, 9);
 
 	ctrl_command = READ_DATA_ALL;
@@ -561,8 +577,8 @@ void all_set(uint8_t command, uint16_t value)
 	uint16_t crc = 0;
 	uint8_t slave_num = 1;
 
-	ctrl_command = 0;		//不是READ_DATA_ALL 就ok
-	
+	ctrl_command = 0; //不是READ_DATA_ALL 就ok
+
 	if (command == TEMP)
 	{
 		if (temp_unit_buff == 1)
@@ -570,30 +586,31 @@ void all_set(uint8_t command, uint16_t value)
 			value = ((value - 32) * 10 / 18);
 		}
 	}
-	
+
 	usart1_tx_buff[0] = 0xA5;
 	usart1_tx_buff[1] = 0x5A;
 	usart1_tx_buff[2] = 0x04;
 	usart1_tx_buff[3] = command;
 	usart1_tx_buff[5] = (value >> 8);
 	usart1_tx_buff[6] = value;
-	
-	for (;slave_num <= 3; slave_num++)
+
+	for (; slave_num <= 3; slave_num++)
 	{
 		usart1_tx_buff[4] = slave_num << 4;
-	
+
 		crc = crc_check(usart1_tx_buff, 9);
-	
+
 		usart1_tx_buff[7] = crc & 0x00FF;
 		usart1_tx_buff[8] = crc >> 8;
-	
-		while (usart1_tx_overtime_mask != 1);
+
+		while (usart1_tx_overtime_mask != 1)
+			;
 		usart1_tx_overtime_mask = 0;
 		usart1_tx_timecnt = 0;
-		
+
 		usart1_send_str(usart1_tx_buff, 9);
 	}
-	
+
 	ctrl_command = READ_DATA_ALL;
 }
 
@@ -680,7 +697,7 @@ void update_curve_page(void)
 
 	send_variables(CURVE_PAGE_NUM_ADDR, curve_page_num + 1);
 	send_variables(CURVE_PAGE_RUNTEMP_ADDR, run_temp[curve_page_num] +
-	temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)); //运行温度
+												temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)); //运行温度
 	send_variables(CURVE_PAGE_SETTEMP_ADDR, set_temp[curve_page_num]);								   //设定温度
 	send_variables(CURVE_PAGE_OUTRATE_ADDR, output_rate[curve_page_num]);
 	send_variables(CURVE_PAGE_SENSORTYPE_ADDR, TYPE_J + (sensor_type[curve_page_num] * TYPE_K));
@@ -766,6 +783,38 @@ void start_time_ctrl(uint8_t slave_num)
 	module_status[slave_num - 1] = 1;
 	send_variables(MODULE_STATUS_ADDR, module_status[slave_num - 1]);
 	PORTA &= ~(1 << (7 - slave_num));
+}
+
+/*射胶阀时间控制通道测试函数*/
+void time_ctrl_test(uint8_t slave_num, uint8_t command)
+{
+	uint8_t i;
+	uint8_t cnt = 0; //计数第几个数据
+	uint16_t crc = 0;
+
+	usart2_tx_buff[0] = 0xA5;
+	usart2_tx_buff[1] = 0x5A;
+	usart2_tx_buff[2] = 0x42;
+	usart2_tx_buff[3] = command;
+	usart2_tx_buff[4] = slave_num - 1;
+
+	for (i = 0; i < 4; i++)
+	{
+		usart2_tx_buff[cnt + 5] = time_ctrl_value[slave_num - 1][command - 0x21][i] >> 8;
+		usart2_tx_buff[cnt + 6] = time_ctrl_value[slave_num - 1][command - 0x21][i];
+		cnt += 2;
+	}
+
+	crc = crc_check(usart2_tx_buff, 15);
+
+	usart2_tx_buff[13] = crc & 0x00FF;
+	usart2_tx_buff[14] = crc >> 8;
+
+	usart2_send_str(usart2_tx_buff, 15);
+
+	// module_status[slave_num - 1] = 1;
+	// send_variables(MODULE_STATUS_ADDR, module_status[slave_num - 1]);
+	// PORTA &= ~(1 << (7 - slave_num));
 }
 
 /*向时间控制子模块发送停止命令 不需要发送每个通道的 T1—T4 数据*/
@@ -960,19 +1009,19 @@ void send_alarm_msg(uint8_t type, uint8_t msg_num, uint16_t sen_num)
 /* 依次读取三块主控板设定数据 */
 void read_setting_data_all(void)
 {
-	uint8_t i, j;		//i:板号   j：通道号
-	
+	uint8_t i, j; //i:板号   j：通道号
+
 	ctrl_board_sta[0] = read_setting_data(1);
 	ctrl_board_sta[1] = read_setting_data(2);
 	ctrl_board_sta[2] = read_setting_data(3);
-	
-	for(i=0; i<3; i++)
+
+	for (i = 0; i < 3; i++)
 	{
-		if(ctrl_board_sta[i] == 0)
+		if (ctrl_board_sta[i] == 0)
 		{
-			for (j=0; j<4; j++)
+			for (j = 0; j < 4; j++)
 			{
-				sensor_sta[i*4+j] = 3;
+				sensor_sta[i * 4 + j] = 3;
 			}
 		}
 	}
@@ -989,14 +1038,14 @@ uint8_t read_setting_data(uint8_t addr)
 	uint8_t i;
 	read_setting_data_mask = 0;
 	read_setting_data_cnt = 0;
-	
-	for (i=1;i<5;i++)
+
+	for (i = 1; i < 5; i++)
 	{
 		usart1_tx_buff[0] = 0xA5;
 		usart1_tx_buff[1] = 0x5A;
 		usart1_tx_buff[2] = 0x02;
 		usart1_tx_buff[3] = READ_SETTING_DATA;
-		usart1_tx_buff[4] = (addr << 4)+i;
+		usart1_tx_buff[4] = (addr << 4) + i;
 
 		crc = crc_check(usart1_tx_buff, 7);
 
@@ -1011,14 +1060,15 @@ uint8_t read_setting_data(uint8_t addr)
 			{
 				usart1_deal();
 				usart1_rx_end = 0;
-				
-				if (usart1_rx_buff[4] == (addr << 4)+i)
+
+				if (usart1_rx_buff[4] == (addr << 4) + i)
 				{
 					board_sta = 1;
 				}
 			}
 		}
-		read_setting_data_mask = 0; read_setting_data_cnt = 0;
+		read_setting_data_mask = 0;
+		read_setting_data_cnt = 0;
 	}
 	return board_sta;
 }
@@ -1038,20 +1088,20 @@ void get_setting_data(uint8_t addr)
 
 	all_sensor_type = usart1_rx_buff[12];
 	all_sensor_type_buff = all_sensor_type;
-	
-	for(i=0; i<12; i++)
+
+	for (i = 0; i < 12; i++)
 	{
 		sensor_type[i] = all_sensor_type;
 	}
-	
+
 	follow_sta[iqr_num] = usart1_rx_buff[14];
 	follow_sta_buff[iqr_num] = follow_sta[iqr_num];
-	
-	if(usart1_rx_buff[16] <= 2)				//通道状态： 0：关闭  1：开启  2:跟随 3~n：告警类型
+
+	if (usart1_rx_buff[16] <= 2) //通道状态： 0：关闭  1：开启  2:跟随 3~n：告警类型
 	{
-		switch_sensor[iqr_num] = usart1_rx_buff[16] & 0x01;		//0：关闭  1：开启 （跟随归属到开启）    
+		switch_sensor[iqr_num] = usart1_rx_buff[16] & 0x01; //0：关闭  1：开启 （跟随归属到开启）
 		switch_sensor_buff[iqr_num] = switch_sensor[iqr_num];
-		
+
 		sensor_sta[iqr_num] = usart1_rx_buff[16];
 	}
 	else
@@ -1060,14 +1110,13 @@ void get_setting_data(uint8_t addr)
 		switch_sensor[iqr_num] = 0;
 		switch_sensor_buff[iqr_num] = 0;
 	}
-	
-	
+
 	p_value[iqr_num] = usart1_rx_buff[17];
 	p_value[iqr_num] = (p_value[iqr_num] << 8) | usart1_rx_buff[18];
-	
+
 	i_value[iqr_num] = usart1_rx_buff[19];
 	i_value[iqr_num] = (i_value[iqr_num] << 8) | usart1_rx_buff[20];
-	
+
 	d_value[iqr_num] = usart1_rx_buff[21];
 	d_value[iqr_num] = (d_value[iqr_num] << 8) | usart1_rx_buff[22];
 
@@ -1132,7 +1181,7 @@ void get_data_all()
 	sensor_sta[1 + ((slave_num - 1) * 4)] = usart1_rx_buff[22];
 	sensor_sta[2 + ((slave_num - 1) * 4)] = usart1_rx_buff[23];
 	sensor_sta[3 + ((slave_num - 1) * 4)] = usart1_rx_buff[24];
-	
+
 	update_main_page();
 }
 

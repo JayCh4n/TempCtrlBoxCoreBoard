@@ -244,6 +244,7 @@ void update_time_ctrl_page(void);
 void save_time_ctrl_data(void);
 void start_time_ctrl(uint8_t slave_num);
 void stop_time_ctrl(uint8_t slave_num);
+void time_ctrl_test(uint8_t slave_num, uint8_t command);
 void switch_language(void);
 void change_page(uint8_t page_num);
 void key_action(uint16_t key_code);
