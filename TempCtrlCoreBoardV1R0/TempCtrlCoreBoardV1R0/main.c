@@ -21,7 +21,7 @@ int main(void)
 	
 	system_init();
 	EN_INTERRUPT;
-	//	read_eeprom_data();
+	read_eeprom_data();
 
 	_delay_ms(300);
 	

@@ -870,20 +870,20 @@ void update_alarm_page(uint8_t page_num)
 
 	for (i = 0; i < 7; i++)
 	{
-		alarm_msg_num = alarm_cnt - 1 - i - (page_num - 1) * 7; 
+		alarm_msg_num = alarm_cnt - i - (page_num - 1) * 7;
 		send_variables(ALARM_PAGE_NUM1_ADDR + (i * 2), i + ((page_num - 1) * 7) + 1);
-		
-		if((alarm_cnt - 1) >= i + (page_num - 1) * 7)
+
+		if (alarm_cnt > i + (page_num - 1) * 7)
 		{
-			send_alarm_msg(alarm_history[alarm_msg_num].alarm_type, i, alarm_history[alarm_msg_num].alarm_device_num);
+			send_alarm_msg(alarm_history[alarm_msg_num - 1].alarm_type, i, alarm_history[alarm_msg_num - 1].alarm_device_num);
 		}
 		else
 		{
 			clear_alarm_msg(i);
 		}
 	}
-	
-/*
+
+	/*
 	for (i = 0; i < 12; i++)
 	{
 		if (sensor_sta[i] >= 3)
@@ -1296,6 +1296,11 @@ void alarm_monitor(void)
 				}
 				alarm_history[alarm_cnt].alarm_type = sensor_sta[i] - 3;
 				alarm_history[alarm_cnt].alarm_device_num = i;
+
+				eeprom_write(ALARM_HISTORY_EEADDR + alarm_cnt * 2 + 1, 
+							 alarm_history[alarm_cnt].alarm_type);
+				eeprom_write(ALARM_HISTORY_EEADDR + alarm_cnt * 2, 
+							 alarm_history[alarm_cnt].alarm_device_num);
 				alarm_cnt++;
 			}
 		}

@@ -9,6 +9,28 @@
 
 void read_eeprom_data(void)
 {
+	uint8_t i;
+
+	if (eeprom_read(FIRST_START_ADDR) != 'y')
+	{
+		eeprom_write(FIRST_START_ADDR, 'y');
+
+		eeprom_write(PRE_LANGUAGE_EEADDR, 0); //当前语言 与开机时切换到的界面有关
+		eeprom_write(ALARM_CNT_EEADDR, 0);	//告警清单数量
+	}
+	else
+	{
+		pre_language = eeprom_read(PRE_LANGUAGE_EEADDR);
+		alarm_cnt = eeprom_read(ALARM_CNT_EEADDR);
+
+		for (i = 0; i < alarm_cnt; i++)
+		{
+			alarm_history[i].alarm_device_num = eeprom_read(ALARM_HISTORY_EEADDR + i * 2 + 1);
+			alarm_history[i].alarm_type = eeprom_read(ALARM_HISTORY_EEADDR + i * 2);
+		}
+	}
+
+#if 0
 	uint8_t i = 0;
 
 	if (eeprom_read(FIRST_START_ADDR) != 'y')
@@ -128,6 +150,7 @@ void read_eeprom_data(void)
 		preheat_time_buff = preheat_time;
 		all_set(PREHEAT_TIME, preheat_time);
 	}
+#endif
 }
 
 void eeprom_write(uint16_t addr, uint8_t data)
