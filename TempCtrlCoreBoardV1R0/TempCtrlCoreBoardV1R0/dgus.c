@@ -188,7 +188,7 @@ void key_action(uint16_t key_code)
 		update_curve_page();
 		break;
 	case CLEAR_ALARM_MSG:
-		clear_alarm_msg(15);
+		clear_all_alarm_msg();
 		break;
 	case ALARM_PAGE_UP:
 		if(--alarm_page_num <= 0)
@@ -1244,6 +1244,12 @@ void clear_alarm_msg(uint8_t msg_num)
 	usart0_send_str(usart0_tx_buff, 24);
 
 	send_variables(ALARM_DEVICE_NUM1_ADDR + (msg_num * 2), 0x0000);
+}
+
+/*清除所有告警清单中的信息*/
+void clear_all_alarm_msg(void)
+{
+	alarm_cnt = 0;
 }
 
 void clear_curve_buff(uint8_t channel)
