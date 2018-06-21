@@ -97,7 +97,7 @@ void init_variable(void)
 			name2 = (i + 1) % 10;
 			name1 = 0;
 		}
-		esle if (i >= 99 && i < 199)
+		else if (i >= 99 && i < 199)
 		{
 			name3 = (i + 1) / 100;
 			name2 = (i + 1) / 10;
