@@ -10,7 +10,7 @@
 #include "dgus.h"
 #include "usart.h"
 
-
+/*当前语言 告警 射胶阀控制时间参数*/
 void read_eeprom_data(void)
 {
 	uint8_t i,j,k;

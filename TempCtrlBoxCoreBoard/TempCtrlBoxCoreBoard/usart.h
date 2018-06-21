@@ -116,9 +116,9 @@ extern uint16_t preheat_time_buff;
 extern uint16_t all_sensor_type_buff;
 extern uint16_t temp_unit_buff;
 
-extern uint16_t set_temp_buff[12];
-extern uint16_t switch_sensor_buff[12];
-extern uint16_t sensor_type_buff[12];
+extern uint16_t set_temp_buff[MAX_IQR_QUANTITY];
+extern uint16_t switch_sensor_buff[MAX_IQR_QUANTITY];
+extern uint16_t sensor_type_buff[MAX_IQR_QUANTITY];
 
 extern uint16_t p_value_buff;
 extern uint16_t i_value_buff;

@@ -257,7 +257,7 @@ ISR(TIMER2_OVF_vect)
 		send_to_channel(CHANNEL0, temp_differ);
 	}
 }
-
+/*IO¿ÚÄ£Äâusart·¢ËÍ*/
 ISR(TIMER3_COMPA_vect)
 {
 	static uint8_t cnt = 0;

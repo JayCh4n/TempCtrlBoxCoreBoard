@@ -97,5 +97,5 @@ void system_init()
 	timer0_init();
 	timer2_init();
 	timer1_init();
-	init_time_ctrl_value();
+	init_variable();
 }

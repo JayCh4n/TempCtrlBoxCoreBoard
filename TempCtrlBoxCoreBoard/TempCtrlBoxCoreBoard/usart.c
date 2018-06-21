@@ -30,9 +30,9 @@ uint16_t preheat_time_buff = 3;
 uint16_t all_sensor_type_buff = 0;
 uint16_t temp_unit_buff = 0;
 
-uint16_t set_temp_buff[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-uint16_t switch_sensor_buff[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //默认状态为关闭
-uint16_t sensor_type_buff[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+uint16_t set_temp_buff[MAX_IQR_QUANTITY];
+uint16_t switch_sensor_buff[MAX_IQR_QUANTITY] = {0}; //默认状态为关闭
+uint16_t sensor_type_buff[MAX_IQR_QUANTITY] = {0};
 
 uint16_t p_value_buff = 100;
 uint16_t i_value_buff = 100;
@@ -140,7 +140,7 @@ int usart0_deal(void)
 						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
 			break;
 		case PID_CHANNEL:
-			update_pid_page(variable);
+			update_pid_page(variable);	//更改屏幕最大为24来改变最大通道数（最好改为按键返回）
 			break;
 		case PID_P:
 			p_value_buff = variable;

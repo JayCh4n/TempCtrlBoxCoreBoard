@@ -20,24 +20,23 @@ int8_t curve_time_level = 0; //ÇúÏßÊ±¼äÖá´óÐ¡
 
 uint8_t ctrl_board_sta[4] = {0}; //¿ØÖÆ°å¿¨×´Ì¬  0:¶ÏÏß 1:Á¬½Ó
 
-uint8_t output_rate[12] = {0}; //»ñÈ¡
-uint8_t sensor_sta[12] = {0};  //»ñÈ¡
-uint8_t pre_sensor_sta[12] = {0}; //ÉÏ´Î¼à²âÊ±´«¸ÐÆ÷×´Ì¬ ÓÃÀ´Ê¶±ð×´Ì¬ÊÇ·ñ±ä»¯
-int16_t run_temp[12] = {0};	//»ñÈ¡
+uint8_t output_rate[MAX_IQR_QUANTITY] = {0};	//»ñÈ¡
+uint8_t sensor_sta[MAX_IQR_QUANTITY] = {0};		//»ñÈ¡
+uint8_t pre_sensor_sta[MAX_IQR_QUANTITY] = {0}; //ÉÏ´Î¼à²âÊ±´«¸ÐÆ÷×´Ì¬ ÓÃÀ´Ê¶±ð×´Ì¬ÊÇ·ñ±ä»¯
+int16_t run_temp[MAX_IQR_QUANTITY] = {0};		//»ñÈ¡
 
-int16_t set_temp[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //·¢ËÍ
-uint16_t switch_sensor[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-uint16_t sensor_type[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-uint32_t set_name[12] = {0x23310000, 0x23320000, 0x23330000, 0x23340000, 0x23350000, 0x23360000,
-						 0x23370000, 0x23380000, 0x23390000, 0x23313000, 0x23313100, 0x23313200};
+int16_t set_temp[MAX_IQR_QUANTITY]; //·¢ËÍ
+uint16_t switch_sensor[MAX_IQR_QUANTITY] = {0};
+uint16_t sensor_type[MAX_IQR_QUANTITY] = {0};
+uint32_t set_name[MAX_IQR_QUANTITY];
 uint32_t set_name_buff = 0;
 
-uint8_t follow_sta[12] = {0}; //Í¨µÀ¸úËæ×´Ì¬  0£º½ûÖ¹ 1~12£º¸úËæÍ¨µÀºÅ
-uint8_t follow_sta_buff[12] = {0};
+uint8_t follow_sta[MAX_IQR_QUANTITY] = {0}; //Í¨µÀ¸úËæ×´Ì¬  0£º½ûÖ¹ 1~24£º¸úËæÍ¨µÀºÅ
+uint8_t follow_sta_buff[MAX_IQR_QUANTITY] = {0};
 
-uint16_t p_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //·¢ËÍ
-uint16_t i_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //·¢ËÍ
-uint16_t d_value[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100}; //·¢ËÍ
+uint16_t p_value[MAX_IQR_QUANTITY]; //·¢ËÍ
+uint16_t i_value[MAX_IQR_QUANTITY]; //·¢ËÍ
+uint16_t d_value[MAX_IQR_QUANTITY]; //·¢ËÍ
 
 uint16_t preheat_time = 3;	//·¢ËÍ
 uint16_t all_sensor_type = 0; //·¢ËÍ
@@ -51,18 +50,20 @@ uint16_t time_ctrl_value[4][8][4]; //Éä½ºÊ±¼ä¿ØÖÆÊý¾Ý   ¹²ËÄ¸öÄ£¿é  Ã¿¸öÄ£¿é8¸öÍ
 uint8_t alarm_cnt = 0;
 alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
 
-uint8_t alarm_msg[7][16] = {{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCF, 0xBF, 0xAA},									   //ÈÈµçÅ¼¶Ï¿ª
-							{0xCE, 0xC2, 0xB6, 0xC8, 0xB9, 0xFD, 0xB8, 0xDF},												   //ÎÂ¶È¹ý¸ß
-							{0xCE, 0xC2, 0xB6, 0xC8, 0xB9, 0xFD, 0xB5, 0xCD},												   //ÎÂ¶È¹ýµÍ
-							{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCC, 0xC2, 0xB7},									   //ÈÈµçÅ¼¶ÌÂ·
-							{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xBD, 0xD3, 0xB7, 0xB4},									   //ÈÈµçÅ¼½Ó·´
-							{0xBC, 0xD3, 0xC8, 0xC8, 0xC6, 0xF7, 0xB6, 0xCF, 0xBF, 0xAA},									   //¼ÓÈÈÆ÷¶Ï¿ª				
-							{0xBC, 0xD3, 0xC8, 0xC8, 0xC6, 0xF7, 0xB6, 0xCC, 0xC2, 0xB7},									   //¼ÓÈÈÆ÷¶ÌÂ·
-							};
-							
-void init_time_ctrl_value(void)
+uint8_t alarm_msg[7][16] = {
+	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCF, 0xBF, 0xAA}, //ÈÈµçÅ¼¶Ï¿ª
+	{0xCE, 0xC2, 0xB6, 0xC8, 0xB9, 0xFD, 0xB8, 0xDF},			  //ÎÂ¶È¹ý¸ß
+	{0xCE, 0xC2, 0xB6, 0xC8, 0xB9, 0xFD, 0xB5, 0xCD},			  //ÎÂ¶È¹ýµÍ
+	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCC, 0xC2, 0xB7}, //ÈÈµçÅ¼¶ÌÂ·
+	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xBD, 0xD3, 0xB7, 0xB4}, //ÈÈµçÅ¼½Ó·´
+	{0xBC, 0xD3, 0xC8, 0xC8, 0xC6, 0xF7, 0xB6, 0xCF, 0xBF, 0xAA}, //¼ÓÈÈÆ÷¶Ï¿ª
+	{0xBC, 0xD3, 0xC8, 0xC8, 0xC6, 0xF7, 0xB6, 0xCC, 0xC2, 0xB7}, //¼ÓÈÈÆ÷¶ÌÂ·
+};
+
+void init_variable(void)
 {
 	uint8_t i, j, k;
+	uint8_t name1, name2, name3;
 
 	for (i = 0; i < 4; i++)
 	{
@@ -75,33 +76,82 @@ void init_time_ctrl_value(void)
 			}
 		}
 	}
+
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
+	{
+		set_temp[i] = 100;
+		set_temp_buff[i] = 100;
+		p_value[i] = 100;
+		i_value[i] = 100;
+		d_value[i] = 100;
+
+		if (i < 9)
+		{
+			name3 = (i + 1) % 10;
+			name2 = 0;
+			name1 = 0;
+		}
+		else if (i >= 9 && i < 99)
+		{
+			name3 = (i + 1) / 10;
+			name2 = (i + 1) % 10;
+			name1 = 0;
+		}
+		esle if (i >= 99 && i < 199)
+		{
+			name3 = (i + 1) / 100;
+			name2 = (i + 1) / 10;
+			name1 = (i + 1) % 10;
+		}
+		set_name[i] |= 0x23;		//¹Ì¶¨Ç°ÃæÏÔÊ¾#
+		set_name[i] = (set_name[i] << 8) | name3;
+		set_name[i] = (set_name[i] << 8) | name2;
+		set_name[i] = (set_name[i] << 8) | name1;
+	}
 }
+
+// void init_time_ctrl_value(void)
+// {
+// 	uint8_t i, j, k;
+
+// 	for (i = 0; i < 4; i++)
+// 	{
+// 		for (j = 0; j < 8; j++)
+// 		{
+// 			for (k = 0; k < 4; k++)
+// 			{
+// 				time_ctrl_value[i][j][k] = 500; //Éä½º¿ØÖÆÊ±¼äËùÓÐÊý¾Ý³õÊ¼»¯Îª
+// 				time_ctrl_value_buff[i][j][k] = 500;
+// 			}
+// 		}
+// 	}
+// }
 
 void update_main_page(void)
 {
 	uint8_t i = 0;
 
-	for (i = 0; i < 6; i++)
+	for (i = 0; i < IQR_QUANTITY_PER_PAGE; i++)
 	{
-		send_variables(MAINPAGE_NUM1_ADDR + (i * 2), (i + (pre_main_page * 6) + 1));		//Ö÷Ò³Ãæ´«¸ÐÆ÷ÐòºÅÏÔÊ¾
-		send_variables(MAIN_OUTRATE1_ADDR + (i * 2), output_rate[i + (pre_main_page * 6)]); //´«¸ÐÆ÷Êä³ö±ÈÀý
-		send_variables(MAIN_RUNTEMP1_ADDR + (i * 2), run_temp[i + (pre_main_page * 6)] +
-														 temp_unit * (run_temp[i + (pre_main_page * 6)] * 8 / 10 + 32)); //ÔËÐÐÎÂ¶È
-		send_variables(MAIN_SETTEMP1_ADDR + (i * 2), set_temp[i + (pre_main_page * 6)]);								 //Éè¶¨ÎÂ¶È
-		send_variables(MAIN_SENSOR1_TYPE_ADDR + (i * 2), TYPE_J + (sensor_type[i + (pre_main_page * 6)]) * TYPE_K);
+		send_variables(MAINPAGE_NUM1_ADDR + (i * 2), (i + (pre_main_page * IQR_QUANTITY_PER_PAGE) + 1));		//Ö÷Ò³Ãæ´«¸ÐÆ÷ÐòºÅÏÔÊ¾
+		send_variables(MAIN_OUTRATE1_ADDR + (i * 2), output_rate[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]); //´«¸ÐÆ÷Êä³ö±ÈÀý
+		send_variables(MAIN_RUNTEMP1_ADDR + (i * 2), run_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] +
+														 temp_unit * (run_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] * 8 / 10 + 32)); //ÔËÐÐÎÂ¶È
+		send_variables(MAIN_SETTEMP1_ADDR + (i * 2), set_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);								 //Éè¶¨ÎÂ¶È
+		send_variables(MAIN_SENSOR1_TYPE_ADDR + (i * 2), TYPE_J + (sensor_type[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]) * TYPE_K);
 
-		send_name(MAIN_NAME1_ADDR + (i * 8), set_name[i + (pre_main_page * 6)]);
+		send_name(MAIN_NAME1_ADDR + (i * 8), set_name[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);
 
 		/*¸üÐÂ´«¸Ð×´Ì¬Í¼±ê sensor_sta >= 3 Ê±ÏÔÊ¾¸æ¾¯ 0~2£º¹Ø±Õ ¿ªÆô ¸úËæ*/
 		/*¸üÐÂ¸æ¾¯ÀàÐÍÍ¼±ê sensor_sta >= 3 Ê±ÏÔÊ¾¶ÔÓ¦¸÷ÖÖ¸æ¾¯ÀàÐÍ  0~2£ºÏÔÊ¾ÔËÐÐÕý³£*/
-		if (sensor_sta[i + (pre_main_page * 6)] >= 3)
+		if (sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] >= 3)
 		{
 			send_variables(MAIN_STA1_ADDR + (i * 4), 3);
-			send_variables(MAIN_ALARM1_ADDR + (i * 8), sensor_sta[i + (pre_main_page * 6)]);
+			send_variables(MAIN_ALARM1_ADDR + (i * 8), sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);
 		}
 		else
 		{
-			send_variables(MAIN_STA1_ADDR + (i * 4), sensor_sta[i + (pre_main_page * 6)]);
+			send_variables(MAIN_STA1_ADDR + (i * 4), sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);
 			send_variables(MAIN_ALARM1_ADDR + (i * 8), 2);
 		}
 	}
@@ -135,35 +185,37 @@ void key_action(uint16_t key_code)
 		ALARM_OFF;
 		break;
 	case MAIN_PAGE_UP:
-		pre_main_page = 0;
+		if (++pre_main_page >= MAX_PAGE_QUANTITY)
+			pre_main_page = MAX_PAGE_QUANTITY;
 		update_main_page();
 		break;
 	case MAIN_PAGE_DOWN:
-		pre_main_page = 1;
+		if (++pre_main_page <= 0)
+			pre_main_page = 1;
 		update_main_page();
 		break;
 	case MAIN_SENSOR1_SET:
-		set_num = 0 + (pre_main_page * 6);
+		set_num = 0 + (pre_main_page * IQR_QUANTITY_PER_PAGE);
 		update_single_set_page();
 		break;
 	case MAIN_SENSOR2_SET:
-		set_num = 1 + (pre_main_page * 6);
+		set_num = 1 + (pre_main_page * IQR_QUANTITY_PER_PAGE);
 		update_single_set_page();
 		break;
 	case MAIN_SENSOR3_SET:
-		set_num = 2 + (pre_main_page * 6);
+		set_num = 2 + (pre_main_page * IQR_QUANTITY_PER_PAGE);
 		update_single_set_page();
 		break;
 	case MAIN_SENSOR4_SET:
-		set_num = 3 + (pre_main_page * 6);
+		set_num = 3 + (pre_main_page * IQR_QUANTITY_PER_PAGE);
 		update_single_set_page();
 		break;
 	case MAIN_SENSOR5_SET:
-		set_num = 4 + (pre_main_page * 6);
+		set_num = 4 + (pre_main_page * IQR_QUANTITY_PER_PAGE);
 		update_single_set_page();
 		break;
 	case MAIN_SENSOR6_SET:
-		set_num = 5 + (pre_main_page * 6);
+		set_num = 5 + (pre_main_page * IQR_QUANTITY_PER_PAGE);
 		update_single_set_page();
 		break;
 	case SINGLE_SET_OK:
@@ -195,12 +247,12 @@ void key_action(uint16_t key_code)
 		clear_all_alarm_msg();
 		break;
 	case ALARM_PAGE_UP:
-		if(--alarm_page_num <= 0)
+		if (--alarm_page_num <= 0)
 			alarm_page_num = 1;
 		update_alarm_page(alarm_page_num);
 		break;
 	case ALARM_PAGE_DOWN:
-		if(++alarm_page_num >= max_alarm_page_num)
+		if (++alarm_page_num >= max_alarm_page_num)
 			alarm_page_num = max_alarm_page_num;
 		update_alarm_page(alarm_page_num);
 		break;
@@ -327,7 +379,7 @@ void all_set_ok(void)
 
 	all_temp = all_temp_buff;
 
-	for (i = 0; i < 12; i++)
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
 	{
 		set_temp[i] = all_temp;
 		set_temp_buff[i] = all_temp;
@@ -348,7 +400,7 @@ void all_set_ok(void)
 
 	all_sensor_type = all_sensor_type_buff;
 
-	for (i = 0; i < 12; i++)
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
 	{
 		sensor_type[i] = all_sensor_type;
 		sensor_type_buff[i] = all_sensor_type;
@@ -381,7 +433,7 @@ void all_set_ok(void)
 	// 		all_set(SENSOR_TYPE, all_sensor_type);
 	// //		eeprom_write(ALL_SENSORTYPE_EEADDR, all_sensor_type);
 	//
-	// 		for (i = 0; i < 12; i++)
+	// 		for (i = 0; i < MAX_IQR_QUANTITY; i++)
 	// 		{
 	// 			sensor_type[i] = all_sensor_type;
 	// 			sensor_type_buff[i] = all_sensor_type;
@@ -526,14 +578,14 @@ void switch_all_sensor(uint16_t sta)
 
 	pre_system_sta = sta;
 
-	for (i = 0; i < 12; i++)
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
 	{
 		switch_sensor[i] = sta;
 		switch_sensor_buff[i] = sta;
 		// 		eeprom_write(SINGLE_SWSENSOR_EEADDR+i, switch_sensor[i]);
 	}
 
-	for (; slave_num <= 3; slave_num++)
+	for (; slave_num <= TEMP_CTRL_BOARD_QUANTITY; slave_num++)
 	{
 		usart1_tx_buff[4] = slave_num << 4;
 
@@ -621,7 +673,7 @@ void all_set(uint8_t command, uint16_t value)
 	usart1_tx_buff[5] = (value >> 8);
 	usart1_tx_buff[6] = value;
 
-	for (; slave_num <= 3; slave_num++)
+	for (; slave_num <= TEMP_CTRL_BOARD_QUANTITY; slave_num++)
 	{
 		usart1_tx_buff[4] = slave_num << 4;
 
@@ -702,13 +754,13 @@ void update_curve_page(void)
 		curve_time_level = 0;
 	}
 
-	if (curve_page_num >= 12)
+	if (curve_page_num >= MAX_IQR_QUANTITY)
 	{
 		curve_page_num = 0;
 	}
 	else if (curve_page_num < 0)
 	{
-		curve_page_num = 11;
+		curve_page_num = MAX_IQR_QUANTITY - 1;
 	}
 
 	count = 10 * (curve_time_level + 1);
@@ -773,7 +825,7 @@ void save_time_ctrl_data(void)
 		for (j = 0; j < 4; j++)
 		{
 			time_ctrl_value[module_num - 1][i][j] = time_ctrl_value_buff[module_num - 1][i][j];
-			eeprom_write_word((uint16_t *)(TIME_CTRL_VALUE_EEADDR + ((module_num - 1)*32 + i*4 + j)*2), time_ctrl_value[module_num - 1][i][j]);
+			eeprom_write_word((uint16_t *)(TIME_CTRL_VALUE_EEADDR + ((module_num - 1) * 32 + i * 4 + j) * 2), time_ctrl_value[module_num - 1][i][j]);
 		}
 	}
 }
@@ -889,7 +941,7 @@ void update_alarm_page(uint8_t page_num)
 	}
 
 	/*
-	for (i = 0; i < 12; i++)
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
 	{
 		if (sensor_sta[i] >= 3)
 		{
@@ -1050,12 +1102,10 @@ void read_setting_data_all(void)
 {
 	uint8_t i, j; //i:°åºÅ   j£ºÍ¨µÀºÅ
 
-	ctrl_board_sta[0] = read_setting_data(1);
-	ctrl_board_sta[1] = read_setting_data(2);
-	ctrl_board_sta[2] = read_setting_data(3);
-
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < TEMP_CTRL_BOARD_QUANTITY; i++)
 	{
+		ctrl_board_sta[1] = read_setting_data(1);
+
 		if (ctrl_board_sta[i] == 0)
 		{
 			for (j = 0; j < 4; j++)
@@ -1128,7 +1178,7 @@ void get_setting_data(uint8_t addr)
 	all_sensor_type = usart1_rx_buff[12];
 	all_sensor_type_buff = all_sensor_type;
 
-	for (i = 0; i < 12; i++)
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
 	{
 		sensor_type[i] = all_sensor_type;
 	}
@@ -1258,11 +1308,11 @@ void clear_all_alarm_msg(void)
 
 	alarm_cnt = 0;
 
-	for(i=0; i<7; i++)
+	for (i = 0; i < 7; i++)
 	{
 		clear_alarm_msg(i);
 	}
-	
+
 	update_alarm_page(1);
 	eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, alarm_cnt);
 }
@@ -1290,44 +1340,44 @@ void alarm_monitor(void)
 {
 	uint8_t i, j;
 	uint16_t alarm_sta_mask = 0;
-	
-	for(i=0; i<12; i++)
+
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
 	{
-		if(sensor_sta[i] != pre_sensor_sta[i])
+		if (sensor_sta[i] != pre_sensor_sta[i])
 		{
 			pre_sensor_sta[i] = sensor_sta[i];
-			
-			if(sensor_sta[i] >= 3)
+
+			if (sensor_sta[i] >= 3)
 			{
 				ALARM_ON;
-				
-				if(alarm_cnt >= MAX_ALARM_HISTORY - 1)
+
+				if (alarm_cnt >= MAX_ALARM_HISTORY - 1)
 				{
 					alarm_cnt = MAX_ALARM_HISTORY - 1;
-					for(j=0; j < alarm_cnt; j++)
+					for (j = 0; j < alarm_cnt; j++)
 					{
-						alarm_history[j] = alarm_history[j+1];
+						alarm_history[j] = alarm_history[j + 1];
 					}
 				}
 				alarm_history[alarm_cnt].alarm_type = sensor_sta[i] - 3;
 				alarm_history[alarm_cnt].alarm_device_num = i;
 
 				eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2 + 1),
-				alarm_history[alarm_cnt].alarm_type);
+								  alarm_history[alarm_cnt].alarm_type);
 				eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2),
-				alarm_history[alarm_cnt].alarm_device_num);
+								  alarm_history[alarm_cnt].alarm_device_num);
 				eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, ++alarm_cnt);
 			}
 		}
-		
-		if(sensor_sta[i] <= 2)
+
+		if (sensor_sta[i] <= 2)
 		{
 			alarm_sta_mask |= 1 << i;
 		}
 	}
-	
+
 	/*Èç¹ûÎÞ¸æ¾¯ Ôò×Ô¶¯¹Ø±Õ±¨¾¯Æ÷*/
-	if(alarm_sta_mask == 0x0FFF)
+	if (alarm_sta_mask == 0x0FFF)
 	{
 		ALARM_OFF;
 	}

@@ -14,16 +14,22 @@
 #include "gpio.h"
 #include "timer.h"
 
+/*最大主页面数和每页能显示多少通道 可根据这两个宏定义确定通道数*/
+#define MAX_PAGE_QUANTITY 4
+#define IQR_QUANTITY_PER_PAGE 6
+#define MAX_IQR_QUANTITY (MAX_PAGE_QUANTITY * IQR_QUANTITY_PER_PAGE)
+#define TEMP_CTRL_BOARD_QUANTITY	(MAX_IQR_QUANTITY/4)
+
 #define EN_INTERRUPT SREG |= 0x80
 #define DISEN_INTERRUPT SREG &= 0x7F
 
 #define OPEN_CURVE(count)   \
-    do                      \
-    {                       \
-        timer2_ovf = count; \
-        TCNT2 = 0xB2;       \
-        TCCR2 |= 0x05;      \
-    } while (0)
+	do                      \
+	{                       \
+		timer2_ovf = count; \
+		TCNT2 = 0xB2;       \
+		TCCR2 |= 0x05;      \
+	} while (0)
 #define CLOSE_CURVE TCCR2 &= 0xF8
 
 //宏定义串口1发送命令
@@ -151,20 +157,20 @@
 #define MAIN_NAME6_ADDR 0x0228
 
 /* 主界面传感器状态图标显示槽  0：关闭  1：开启  2：跟随  3：告警*/
-#define MAIN_STA1_ADDR	0x0270
-#define MAIN_STA2_ADDR	0x0274
-#define MAIN_STA3_ADDR	0x0278
-#define MAIN_STA4_ADDR	0x027C
-#define MAIN_STA5_ADDR	0x0280
-#define MAIN_STA6_ADDR	0x0284
+#define MAIN_STA1_ADDR 0x0270
+#define MAIN_STA2_ADDR 0x0274
+#define MAIN_STA3_ADDR 0x0278
+#define MAIN_STA4_ADDR 0x027C
+#define MAIN_STA5_ADDR 0x0280
+#define MAIN_STA6_ADDR 0x0284
 
 /* 主界面告警类型图标显示槽 2：正常 3：热电偶断开 4：温度过高 5温度过低 6热电偶短路 7：热电偶接反 8加热器断开 9： 加热器短路*/
-#define MAIN_ALARM1_ADDR	0x0240
-#define MAIN_ALARM2_ADDR	0x0248
-#define MAIN_ALARM3_ADDR	0x0250
-#define MAIN_ALARM4_ADDR	0x0258
-#define MAIN_ALARM5_ADDR	0x0260
-#define MAIN_ALARM6_ADDR	0x0268
+#define MAIN_ALARM1_ADDR 0x0240
+#define MAIN_ALARM2_ADDR 0x0248
+#define MAIN_ALARM3_ADDR 0x0250
+#define MAIN_ALARM4_ADDR 0x0258
+#define MAIN_ALARM5_ADDR 0x0260
+#define MAIN_ALARM6_ADDR 0x0268
 
 //告警界面序号显示槽位地址
 #define ALARM_PAGE_NUM1_ADDR 0x0044
@@ -179,17 +185,17 @@
 
 #define ALAEM_MSG1_ADDR 0x02B0 //02B0-02BF
 
-#define SINGLE_NAME_ADDR 0x0288       //单独设定界面名称显示地址低
+#define SINGLE_NAME_ADDR 0x0288		  //单独设定界面名称显示地址低
 #define SINGLE_SENSORTYPE_ADDR 0x0290 //单独设定界面传感器类型地址
-#define SINGLE_NUM_ADDR 0x0030        //单独设定界面序号显示地址
-#define SINGLE_RUNTEMP_ADDR 0x0032    //单独设定界面运行温度显示地址
-#define SINGLE_SETTEMP_ADDR 0x0034    //单独设定界面设定温度显示地址
+#define SINGLE_NUM_ADDR 0x0030		  //单独设定界面序号显示地址
+#define SINGLE_RUNTEMP_ADDR 0x0032	//单独设定界面运行温度显示地址
+#define SINGLE_SETTEMP_ADDR 0x0034	//单独设定界面设定温度显示地址
 
-#define CURVE_PAGE_NUM_ADDR 0x003C        //曲线界面序号显示地址
-#define CURVE_PAGE_NAME_ADDR 0x0298       //曲线界面名称显示地址
-#define CURVE_PAGE_RUNTEMP_ADDR 0x003E    //曲线界面运行温度显示地址
-#define CURVE_PAGE_SETTEMP_ADDR 0x0040    //曲线界面设定温度显示地址
-#define CURVE_PAGE_OUTRATE_ADDR 0x0042    //曲线界面输出比例显示地址
+#define CURVE_PAGE_NUM_ADDR 0x003C		  //曲线界面序号显示地址
+#define CURVE_PAGE_NAME_ADDR 0x0298		  //曲线界面名称显示地址
+#define CURVE_PAGE_RUNTEMP_ADDR 0x003E	//曲线界面运行温度显示地址
+#define CURVE_PAGE_SETTEMP_ADDR 0x0040	//曲线界面设定温度显示地址
+#define CURVE_PAGE_OUTRATE_ADDR 0x0042	//曲线界面输出比例显示地址
 #define CURVE_PAGE_SENSORTYPE_ADDR 0x02A0 //曲线界面传感器类型显示地址
 
 #define PID_P_ADDR 0x0036 //pid设置界面P参数显示地址
@@ -197,19 +203,18 @@
 #define PID_D_ADDR 0x003A //pid设置界面D参数显示地址
 
 #define MODULE_STATUS_ADDR 0x0070 //射胶控制模块状态图标显示地址    0：停止		1：开启
-#define MODULE_NUM_ADDR 0x0072    //射胶控制模块号码显示地址
+#define MODULE_NUM_ADDR 0x0072	//射胶控制模块号码显示地址
 
-#define TEMP_UINT_ADDR 0x023C       //温度单位显示地址
+#define TEMP_UINT_ADDR 0x023C		//温度单位显示地址
 #define ALL_SENSOR_TYPE_ADDR 0x0294 //全局传感器类型显示地址
 
 #define CURVE_TIMELINE_ADDR 0x0052 //曲线时间轴显示地址 2byte 共十个 0x0052-0x0065
 
 #define MAX_ALARM_HISTORY 70
 
-
 #define FIRST_START_ADDR 0x0000 //检测是否为第一次启动地址
 
-#define PRE_LANGUAGE_EEADDR 0x0001      //当前语言设置EEPROM存储地址		0:中文		1:英文
+#define PRE_LANGUAGE_EEADDR 0x0001 //当前语言设置EEPROM存储地址		0:中文		1:英文
 // #define ALL_SENSORTYPE_EEADDR 0x0001    //全局设定传感器类型EEPROM存储地址	0:TYPE_J	1:TYPE_K
 // #define TEMP_UNIT_EEADDR 0x0002         //温度单位EEPROM存储地址			0:C			1:F
 // #define ALL_SETTEMP_EEADDR 0x0003       //全局温度EEPROM存储地址	 双字节 0x0003 - 0x0004
@@ -225,30 +230,26 @@
 // #define TIME_CTRL_T2_EEADDR 0x00BE
 // #define TIME_CTRL_T3_EEADDR 0x00CE
 // #define TIME_CTRL_T4_EEADDR 0x00DE
-#define ALARM_CNT_EEADDR        0x0002      //告警数量
-#define ALARM_HISTORY_EEADDR    0x0003      //告警记录EEPROM地址 双字节 高：告警类型 低：告警设备号0～12 共70条记录 占140字节 0x0003~0x8E
-#define TIME_CTRL_VALUE_EEADDR	0x008F		//射胶阀控制时间参数EEPROM地址 双字节 共256bytes  0x008F ~ 0x018E
-
+#define ALARM_CNT_EEADDR 0x0002		  //告警数量
+#define ALARM_HISTORY_EEADDR 0x0003   //告警记录EEPROM地址 双字节 高：告警类型 低：告警设备号0～12 共70条记录 占140字节 0x0003~0x8E
+#define TIME_CTRL_VALUE_EEADDR 0x008F //射胶阀控制时间参数EEPROM地址 双字节 共256bytes  0x008F ~ 0x018E
 
 typedef enum
 {
 	thermocouple_disconnected,
-	temp_too_high,	
+	temp_too_high,
 	temp_too_low,
 	thermocouple_short_circuit,
 	thermocouple_reversed,
 	heater_disconnected,
 	heater_short_circuit
-}
-alarm_typedef;
+} alarm_typedef;
 
 typedef struct
 {
 	alarm_typedef alarm_type;
-	uint8_t alarm_device_num;	
-}
-alarm_struct_typedef;
-
+	uint8_t alarm_device_num;
+} alarm_struct_typedef;
 
 //////////////////
 extern uint8_t run_temp_page;
@@ -261,26 +262,26 @@ extern uint8_t set_num;
 extern uint8_t set_pid_channel;
 extern int8_t curve_page_num;
 
-extern uint16_t p_value[12]; //发送
-extern uint16_t i_value[12]; //发送
-extern uint16_t d_value[12]; //发送
+extern uint16_t p_value[MAX_IQR_QUANTITY]; //发送
+extern uint16_t i_value[MAX_IQR_QUANTITY]; //发送
+extern uint16_t d_value[MAX_IQR_QUANTITY]; //发送
 
-extern uint8_t output_rate[12];
-extern int16_t run_temp[12];
-extern int16_t set_temp[12];
-extern uint16_t sensor_type[12];
-extern uint16_t switch_sensor[12];
-extern uint8_t follow_sta[12];
-extern uint8_t follow_sta_buff[12];
+extern uint8_t output_rate[MAX_IQR_QUANTITY];
+extern int16_t run_temp[MAX_IQR_QUANTITY];
+extern int16_t set_temp[MAX_IQR_QUANTITY];
+extern uint16_t sensor_type[MAX_IQR_QUANTITY];
+extern uint16_t switch_sensor[MAX_IQR_QUANTITY];
+extern uint8_t follow_sta[MAX_IQR_QUANTITY];
+extern uint8_t follow_sta_buff[MAX_IQR_QUANTITY];
 
-extern uint8_t sensor_sta[12];
-extern uint8_t pre_sensor_sta[12];
+extern uint8_t sensor_sta[MAX_IQR_QUANTITY];
+extern uint8_t pre_sensor_sta[MAX_IQR_QUANTITY];
 
 extern uint16_t preheat_time;
 extern uint16_t all_temp;
 extern uint16_t all_sensor_type;
 extern uint16_t temp_unit;
-extern uint32_t set_name[12];
+extern uint32_t set_name[MAX_IQR_QUANTITY];
 
 extern uint8_t module_num;
 extern uint16_t time_ctrl_value[4][8][4];
@@ -288,7 +289,8 @@ extern uint16_t time_ctrl_value[4][8][4];
 extern uint8_t alarm_cnt;
 extern alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
 
-void init_time_ctrl_value(void);
+// void init_time_ctrl_value(void);
+void init_variable(void);
 void update_main_page(void);
 void update_single_set_page(void);
 void update_pid_page(uint8_t channel);
