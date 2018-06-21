@@ -111,16 +111,20 @@ void key_action(uint16_t key_code)
 {
 	static uint8_t alarm_page_num = 1;
 	uint8_t max_alarm_page_num;
-	
-	if(alarm_cnt % 7 == 0)
+
+	if (alarm_cnt == 0)
 	{
-		max_alarm_page_num = alarm_cnt/7;
+		max_alarm_page_num = 1;
+	}
+	else if (alarm_cnt % 7 == 0)
+	{
+		max_alarm_page_num = alarm_cnt / 7;
 	}
 	else
 	{
-		max_alarm_page_num = alarm_cnt/7 + 1;
+		max_alarm_page_num = alarm_cnt / 7 + 1;
 	}
-	
+
 	switch (key_code)
 	{
 	case SWITCH_LANGUAGE:
@@ -912,7 +916,7 @@ void switch_language(void)
 		change_page(1);
 	}
 
-	eeprom_write(PRE_LANGUAGE_EEADDR, pre_language);
+	eeprom_write_byte((uint8_t *)PRE_LANGUAGE_EEADDR, pre_language);
 }
 
 void change_page(uint8_t page_num)
@@ -1249,7 +1253,17 @@ void clear_alarm_msg(uint8_t msg_num)
 /*清除所有告警清单中的信息*/
 void clear_all_alarm_msg(void)
 {
+	uint8_t i;
+
 	alarm_cnt = 0;
+
+	for(i=0; i<7; i++)
+	{
+		clear_alarm_msg(i);
+	}
+	
+	update_alarm_page(1);
+	eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, alarm_cnt);
 }
 
 void clear_curve_buff(uint8_t channel)
@@ -1297,11 +1311,11 @@ void alarm_monitor(void)
 				alarm_history[alarm_cnt].alarm_type = sensor_sta[i] - 3;
 				alarm_history[alarm_cnt].alarm_device_num = i;
 
-				eeprom_write(ALARM_HISTORY_EEADDR + alarm_cnt * 2 + 1, 
-							 alarm_history[alarm_cnt].alarm_type);
-				eeprom_write(ALARM_HISTORY_EEADDR + alarm_cnt * 2, 
-							 alarm_history[alarm_cnt].alarm_device_num);
-				alarm_cnt++;
+				eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2 + 1),
+				alarm_history[alarm_cnt].alarm_type);
+				eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2),
+				alarm_history[alarm_cnt].alarm_device_num);
+				eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, ++alarm_cnt);
 			}
 		}
 		

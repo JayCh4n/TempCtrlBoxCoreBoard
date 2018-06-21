@@ -6,13 +6,15 @@
 */
 
 #include <avr/io.h>
+#include <avr/eeprom.h>
 #include "delay.h"
 #include "usart.h"
 #include "timer.h"
 #include "dgus.h"
 #include "gpio.h"
-#include "eeprom.h"
 
+
+extern void read_eeprom_data(void);
 void system_init(void);
 
 int main(void)
@@ -23,7 +25,7 @@ int main(void)
 	EN_INTERRUPT;
 	read_eeprom_data();
 
-	_delay_ms(300);
+	_delay_ms(100);
 	
 	read_setting_data_all(); //开机从主控板读取设定数据
 

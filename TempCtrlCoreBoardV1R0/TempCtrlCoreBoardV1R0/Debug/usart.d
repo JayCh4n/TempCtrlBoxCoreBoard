@@ -11,7 +11,10 @@ usart.d usart.o: .././usart.c .././usart.h \
  d:\atmelstudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\fuse.h \
  d:\atmelstudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\lock.h \
  d:\atmelstudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
- .././dgus.h .././gpio.h .././eeprom.h .././timer.h .././delay.h
+ .././dgus.h \
+ d:\atmelstudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\eeprom.h \
+ d:\atmelstudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
+ .././gpio.h .././timer.h .././delay.h
 
 .././usart.h:
 
@@ -41,9 +44,11 @@ d:\atmelstudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.
 
 .././dgus.h:
 
-.././gpio.h:
+d:\atmelstudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\eeprom.h:
 
-.././eeprom.h:
+d:\atmelstudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h:
+
+.././gpio.h:
 
 .././timer.h:
 

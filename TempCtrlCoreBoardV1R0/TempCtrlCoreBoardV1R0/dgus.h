@@ -9,9 +9,9 @@
 #define DGUS_H_
 
 #include <avr/io.h>
+#include <avr/eeprom.h>
 #include "usart.h"
 #include "gpio.h"
-#include "eeprom.h"
 #include "timer.h"
 
 #define EN_INTERRUPT SREG |= 0x80
@@ -206,6 +206,30 @@
 
 #define MAX_ALARM_HISTORY 70
 
+
+#define FIRST_START_ADDR 0x0000 //检测是否为第一次启动地址
+
+#define PRE_LANGUAGE_EEADDR 0x0001      //当前语言设置EEPROM存储地址		0:中文		1:英文
+// #define ALL_SENSORTYPE_EEADDR 0x0001    //全局设定传感器类型EEPROM存储地址	0:TYPE_J	1:TYPE_K
+// #define TEMP_UNIT_EEADDR 0x0002         //温度单位EEPROM存储地址			0:C			1:F
+// #define ALL_SETTEMP_EEADDR 0x0003       //全局温度EEPROM存储地址	 双字节 0x0003 - 0x0004
+// #define SINGLE_SETTEMP_EEADDR 0x0005    //单独设定温度EEPROM地址  12个	 双字节 0x0005 - 0x001C
+// #define SINGLE_SENSORTYPE_EEADDR 0x001D //单独设定传感器类型EEPROME地址	12个  单字节  0x001D - 0x0028
+// #define PREHEAT_TIME_EEADDR 0x00FE      //预热时间EEPROM存储地址
+// #define PID_P_EEADDR 0x002A             //0x002A - 0x0041
+// #define PID_I_EEADDR 0x0042             //0x0042 - 0x0059
+// #define PID_D_EEADDR 0x005A             //0x005A - 0x0071
+// #define SINGLE_SWSENSOR_EEADDR 0x0072   //单独设定传感器开启或关闭EEPROM地址 0:关闭 1:开启  单字节  0x0072 - 0x007D
+// #define SET_NAME_EEADDR 0x007E          //设定名称EEprome地址		0x007E-0x00AD
+// #define TIME_CTRL_T1_EEADDR 0x00AE
+// #define TIME_CTRL_T2_EEADDR 0x00BE
+// #define TIME_CTRL_T3_EEADDR 0x00CE
+// #define TIME_CTRL_T4_EEADDR 0x00DE
+#define ALARM_CNT_EEADDR        0x0002      //告警数量
+#define ALARM_HISTORY_EEADDR    0x0003      //告警记录EEPROM地址 双字节 高：告警类型 低：告警设备号0～12 共70条记录 占140字节 0x0003~0x8E
+
+
+
 typedef enum
 {
 	thermocouple_disconnected,
@@ -260,6 +284,9 @@ extern uint32_t set_name[12];
 
 extern uint8_t module_num;
 
+extern uint8_t alarm_cnt;
+extern alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
+
 void init_time_ctrl_value(void);
 void update_main_page(void);
 void update_single_set_page(void);
@@ -285,6 +312,7 @@ void single_set_ok(void);
 void all_set_ok(void);
 void pid_set_ok(void);
 void clear_alarm_msg(uint8_t msg_num);
+void clear_all_alarm_msg(void);
 void update_alarm_page(uint8_t page_num);
 void single_set_back(void);
 void all_set_back(void);
