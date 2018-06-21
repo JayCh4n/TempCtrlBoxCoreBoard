@@ -1,0 +1,58 @@
+/*
+* gpioc.c
+*
+* Created: 2018-04-04 12:59:22
+*  Author: chenlong
+*/
+#include <avr/io.h>
+#include "gpio.h"
+
+/*
+*初始化gpio
+*/
+void gpio_init()
+{
+	/* LED相关IO口初始化 */
+	LED1_PIN_OUTPUT;
+	LED2_PIN_OUTPUT;
+	LED3_PIN_OUTPUT;
+	LED4_PIN_OUTPUT;
+	LED5_PIN_OUTPUT;
+	LED6_PIN_OUTPUT;
+	LED7_PIN_OUTPUT;
+
+	LED1_OFF;
+	LED2_OFF;
+	LED3_OFF;
+	LED4_OFF;
+	LED5_ON;
+	LED6_OFF;
+	LED7_ON;
+
+	/*
+	IQR0_PIN_OUTPUT;
+	IQR1_PIN_OUTPUT;
+	IQR2_PIN_OUTPUT;
+	IQR3_PIN_OUTPUT;
+	IQR4_PIN_OUTPUT;
+	IQR5_PIN_OUTPUT;
+	IQR6_PIN_OUTPUT;
+	IQR7_PIN_OUTPUT;
+	
+	IQR0_CLOSE;
+	IQR1_CLOSE;
+	IQR2_CLOSE;
+	IQR3_CLOSE;
+	IQR4_CLOSE;
+	IQR5_CLOSE;
+	IQR6_CLOSE;
+	IQR7_CLOSE;
+	*/
+
+	/* 继电器相关IO口初始化 */
+	ALARM_PIN_OUTPUT;
+	ACCON_PIN_OUTPUT;
+
+	ALARM_OFF;
+	ACCON_ON;
+}
