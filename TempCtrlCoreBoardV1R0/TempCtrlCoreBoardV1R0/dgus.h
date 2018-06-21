@@ -227,7 +227,7 @@
 // #define TIME_CTRL_T4_EEADDR 0x00DE
 #define ALARM_CNT_EEADDR        0x0002      //告警数量
 #define ALARM_HISTORY_EEADDR    0x0003      //告警记录EEPROM地址 双字节 高：告警类型 低：告警设备号0～12 共70条记录 占140字节 0x0003~0x8E
-
+#define TIME_CTRL_VALUE_EEADDR	0x008F		//射胶阀控制时间参数EEPROM地址 双字节 共256bytes  0x008F ~ 0x018E
 
 
 typedef enum
@@ -283,6 +283,7 @@ extern uint16_t temp_unit;
 extern uint32_t set_name[12];
 
 extern uint8_t module_num;
+extern uint16_t time_ctrl_value[4][8][4];
 
 extern uint8_t alarm_cnt;
 extern alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];

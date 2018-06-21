@@ -773,6 +773,7 @@ void save_time_ctrl_data(void)
 		for (j = 0; j < 4; j++)
 		{
 			time_ctrl_value[module_num - 1][i][j] = time_ctrl_value_buff[module_num - 1][i][j];
+			eeprom_write_word((uint16_t *)(TIME_CTRL_VALUE_EEADDR + ((module_num - 1)*32 + i*4 + j)*2), time_ctrl_value[module_num - 1][i][j]);
 		}
 	}
 }
