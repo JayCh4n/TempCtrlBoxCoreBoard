@@ -54,10 +54,10 @@ int main(void)
 			usart1_rx_end = 0;
 		}
 
-// 		if (in_main_page) //
-// 		{
-// 			update_main_page();
-// 		}
+		// 		if (in_main_page) //
+		// 		{
+		// 			update_main_page();
+		// 		}
 		
 		/*500ms发送一次请求获取主控板卡运行数据*/
 		if (ctrl_command == READ_DATA_ALL)

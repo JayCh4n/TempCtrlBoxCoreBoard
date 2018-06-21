@@ -1084,23 +1084,23 @@ END GROUP
  .debug_frame   0x00000638      0x158 timer.o
  .debug_frame   0x00000790      0x17c usart.o
 
-.debug_str      0x00000000      0xd79
+.debug_str      0x00000000      0xd5e
  *(.debug_str)
  .debug_str     0x00000000      0x27e D:/AtmelStudio7/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega64a/avr5/crtatmega64a.o
- .debug_str     0x0000027e      0x184 delay.o
-                                0x1be (size before relaxing)
- .debug_str     0x00000402      0x6f4 dgus.o
-                                0x925 (size before relaxing)
- .debug_str     0x00000af6       0x41 eeprom.o
-                                0x309 (size before relaxing)
- .debug_str     0x00000b37       0x16 gpio.o
-                                0x190 (size before relaxing)
- .debug_str     0x00000b4d       0xa9 main.o
-                                0x356 (size before relaxing)
- .debug_str     0x00000bf6       0xf0 timer.o
-                                0x401 (size before relaxing)
- .debug_str     0x00000ce6       0x93 usart.o
-                                0x490 (size before relaxing)
+ .debug_str     0x0000027e      0x169 delay.o
+                                0x1a3 (size before relaxing)
+ .debug_str     0x000003e7      0x6f4 dgus.o
+                                0x90a (size before relaxing)
+ .debug_str     0x00000adb       0x41 eeprom.o
+                                0x2ee (size before relaxing)
+ .debug_str     0x00000b1c       0x16 gpio.o
+                                0x175 (size before relaxing)
+ .debug_str     0x00000b32       0xa9 main.o
+                                0x33b (size before relaxing)
+ .debug_str     0x00000bdb       0xf0 timer.o
+                                0x3e6 (size before relaxing)
+ .debug_str     0x00000ccb       0x93 usart.o
+                                0x475 (size before relaxing)
 
 .debug_loc      0x00000000     0x25e5
  *(.debug_loc)
@@ -1141,5 +1141,5 @@ END GROUP
 
 .debug_macro
  *(.debug_macro)
-OUTPUT(TempCtrlCoreBoardV1R0.elf elf32-avr)
+OUTPUT(TempCtrlBoxCoreBoard.elf elf32-avr)
 LOAD linker stubs

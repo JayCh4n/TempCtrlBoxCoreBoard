@@ -1,5 +1,5 @@
 
-TempCtrlCoreBoardV1R0.elf:     file format elf32-avr
+TempCtrlBoxCoreBoard.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
@@ -23,11 +23,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   9 .debug_frame  0000090c  00000000  00000000  00009e8c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000d79  00000000  00000000  0000a798  2**0
+ 10 .debug_str    00000d5e  00000000  00000000  0000a798  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000025e5  00000000  00000000  0000b511  2**0
+ 11 .debug_loc    000025e5  00000000  00000000  0000b4f6  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000240  00000000  00000000  0000daf6  2**0
+ 12 .debug_ranges 00000240  00000000  00000000  0000dadb  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -5611,9 +5611,9 @@ int main(void)
     1ff8:	0e 94 68 12 	call	0x24d0	; 0x24d0 <usart1_deal>
 			usart1_rx_end = 0;
     1ffc:	10 92 ee 03 	sts	0x03EE, r1	; 0x8003ee <usart1_rx_end>
-// 		{
-// 			update_main_page();
-// 		}
+		// 		{
+		// 			update_main_page();
+		// 		}
 		
 		/*500ms发送一次请求获取主控板卡运行数据*/
 		if (ctrl_command == READ_DATA_ALL)

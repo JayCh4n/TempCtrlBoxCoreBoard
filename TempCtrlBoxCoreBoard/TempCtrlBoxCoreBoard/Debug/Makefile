@@ -88,9 +88,9 @@ main.d \
 timer.d \
 usart.d
 
-OUTPUT_FILE_PATH +=TempCtrlCoreBoardV1R0.elf
+OUTPUT_FILE_PATH +=TempCtrlBoxCoreBoard.elf
 
-OUTPUT_FILE_PATH_AS_ARGS +=TempCtrlCoreBoardV1R0.elf
+OUTPUT_FILE_PATH_AS_ARGS +=TempCtrlBoxCoreBoard.elf
 
 ADDITIONAL_DEPENDENCIES:=
 
@@ -149,13 +149,13 @@ all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
 $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP) $(LIB_DEP) $(LINKER_SCRIPT_DEP)
 	@echo Building target: $@
 	@echo Invoking: AVR/GNU Linker : 5.4.0
-	$(QUOTE)D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -Wl,-Map="TempCtrlCoreBoardV1R0.map" -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mmcu=atmega64a -B "D:\AtmelStudio7\7.0\Packs\atmel\ATmega_DFP\1.2.150\gcc\dev\atmega64a"  
+	$(QUOTE)D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -Wl,-Map="TempCtrlBoxCoreBoard.map" -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mmcu=atmega64a -B "D:\AtmelStudio7\7.0\Packs\atmel\ATmega_DFP\1.2.150\gcc\dev\atmega64a"  
 	@echo Finished building target: $@
-	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures  "TempCtrlCoreBoardV1R0.elf" "TempCtrlCoreBoardV1R0.hex"
-	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objcopy.exe" -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "TempCtrlCoreBoardV1R0.elf" "TempCtrlCoreBoardV1R0.eep" || exit 0
-	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objdump.exe" -h -S "TempCtrlCoreBoardV1R0.elf" > "TempCtrlCoreBoardV1R0.lss"
-	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures "TempCtrlCoreBoardV1R0.elf" "TempCtrlCoreBoardV1R0.srec"
-	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-size.exe" "TempCtrlCoreBoardV1R0.elf"
+	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures  "TempCtrlBoxCoreBoard.elf" "TempCtrlBoxCoreBoard.hex"
+	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objcopy.exe" -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "TempCtrlBoxCoreBoard.elf" "TempCtrlBoxCoreBoard.eep" || exit 0
+	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objdump.exe" -h -S "TempCtrlBoxCoreBoard.elf" > "TempCtrlBoxCoreBoard.lss"
+	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures "TempCtrlBoxCoreBoard.elf" "TempCtrlBoxCoreBoard.srec"
+	"D:\AtmelStudio7\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-size.exe" "TempCtrlBoxCoreBoard.elf"
 	
 	
 
@@ -167,5 +167,5 @@ $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP) $(LIB_DEP) $(LINKER
 clean:
 	-$(RM) $(OBJS_AS_ARGS) $(EXECUTABLES)  
 	-$(RM) $(C_DEPS_AS_ARGS)   
-	rm -rf "TempCtrlCoreBoardV1R0.elf" "TempCtrlCoreBoardV1R0.a" "TempCtrlCoreBoardV1R0.hex" "TempCtrlCoreBoardV1R0.lss" "TempCtrlCoreBoardV1R0.eep" "TempCtrlCoreBoardV1R0.map" "TempCtrlCoreBoardV1R0.srec" "TempCtrlCoreBoardV1R0.usersignatures"
+	rm -rf "TempCtrlBoxCoreBoard.elf" "TempCtrlBoxCoreBoard.a" "TempCtrlBoxCoreBoard.hex" "TempCtrlBoxCoreBoard.lss" "TempCtrlBoxCoreBoard.eep" "TempCtrlBoxCoreBoard.map" "TempCtrlBoxCoreBoard.srec" "TempCtrlBoxCoreBoard.usersignatures"
 	
