@@ -139,9 +139,9 @@ int usart0_deal(void)
 			send_variables(TEMP_UINT_ADDR,
 						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
 			break;
-		case PID_CHANNEL:
-			update_pid_page(variable);	//更改屏幕最大为24来改变最大通道数（最好改为按键返回）
-			break;
+//		case PID_CHANNEL:
+//			update_pid_page(variable);	//更改屏幕最大为24来改变最大通道数（最好改为按键返回）
+//			break;
 		case PID_P:
 			p_value_buff = variable;
 			break;

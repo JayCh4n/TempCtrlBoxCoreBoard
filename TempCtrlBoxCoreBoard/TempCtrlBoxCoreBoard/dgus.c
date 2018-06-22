@@ -11,14 +11,16 @@ uint8_t run_temp_page = 0;
 uint8_t update_run_temp_flag = 0;
 uint8_t in_main_page = 1;	//当前是否在主界面，刷新主页面数据标志位 0：否 1：是
 uint8_t pre_language = 0;	//当前语言
-uint8_t pre_main_page = 0;   //当前主页面页号码
+int8_t pre_main_page = 0;   //当前主页面页号码
 uint16_t pre_system_sta = 0; //当前系统状态
 uint8_t set_num = 0;		 //单独设定键传感器位号
 uint8_t set_pid_channel = 0;
 int8_t curve_page_num = 0;   //曲线界面号
 int8_t curve_time_level = 0; //曲线时间轴大小
+uint8_t pid_page_num = 0;	//pid页面号
 
-uint8_t ctrl_board_sta[4] = {0}; //控制板卡状态  0:断线 1:连接
+
+uint8_t ctrl_board_sta[TEMP_CTRL_BOARD_QUANTITY] = {0}; //控制板卡状态  0:断线 1:连接
 
 uint8_t output_rate[MAX_IQR_QUANTITY] = {0};	//获取
 uint8_t sensor_sta[MAX_IQR_QUANTITY] = {0};		//获取
@@ -63,7 +65,7 @@ uint8_t alarm_msg[7][16] = {
 void init_variable(void)
 {
 	uint8_t i, j, k;
-	uint8_t name1, name2, name3;
+	uint8_t name1=0, name2=0, name3=0;
 
 	for (i = 0; i < 4; i++)
 	{
@@ -87,21 +89,21 @@ void init_variable(void)
 
 		if (i < 9)
 		{
-			name3 = (i + 1) % 10;
+			name3 = (i + 1) % 10 + 0x30;
 			name2 = 0;
 			name1 = 0;
 		}
 		else if (i >= 9 && i < 99)
 		{
-			name3 = (i + 1) / 10;
-			name2 = (i + 1) % 10;
+			name3 = (i + 1) / 10 + 0x30;
+			name2 = (i + 1) % 10 + 0x30;
 			name1 = 0;
 		}
 		else if (i >= 99 && i < 199)
 		{
-			name3 = (i + 1) / 100;
-			name2 = (i + 1) / 10;
-			name1 = (i + 1) % 10;
+			name3 = (i + 1) / 100 + 0x30;
+			name2 = (i + 1) / 10 + 0x30;
+			name1 = (i + 1) % 10 + 0x30;
 		}
 		set_name[i] |= 0x23;		//固定前面显示#
 		set_name[i] = (set_name[i] << 8) | name3;
@@ -185,13 +187,13 @@ void key_action(uint16_t key_code)
 		ALARM_OFF;
 		break;
 	case MAIN_PAGE_UP:
-		if (++pre_main_page >= MAX_PAGE_QUANTITY)
-			pre_main_page = MAX_PAGE_QUANTITY;
+		if (--pre_main_page <= 0)
+			pre_main_page = 0;
 		update_main_page();
 		break;
 	case MAIN_PAGE_DOWN:
-		if (++pre_main_page <= 0)
-			pre_main_page = 1;
+		if (++pre_main_page >= MAX_PAGE_QUANTITY-1)
+			pre_main_page = MAX_PAGE_QUANTITY-1;
 		update_main_page();
 		break;
 	case MAIN_SENSOR1_SET:
@@ -226,6 +228,20 @@ void key_action(uint16_t key_code)
 		break;
 	case PID_SET_OK:
 		pid_set_ok();
+		break;
+	case PID_PAGE_ENTER:
+		pid_page_num = 1;
+		update_pid_page(pid_page_num);
+		break;
+	case PID_PAGE_UP:
+		if(--pid_page_num < 1)
+			pid_page_num = MAX_IQR_QUANTITY;
+		update_pid_page(pid_page_num);
+		break;
+	case PID_PAGE_DOWN:
+		if(++pid_page_num > MAX_IQR_QUANTITY)
+			pid_page_num = 1;
+		update_pid_page(pid_page_num);
 		break;
 	case CURVE_ZOOM_OUT:
 		curve_time_level--;
@@ -262,10 +278,8 @@ void key_action(uint16_t key_code)
 	case ALL_SET_BACK:
 		all_set_back();
 		break;
-	case PID_PAGE_ENTER:
-		update_pid_page(1);
-		break;
 	case ALARM_PAGE_ENTER:
+		alarm_page_num = 1;
 		update_alarm_page(1);
 		break;
 	case CURVE_PAGE_ENTER:
@@ -718,10 +732,7 @@ void update_pid_page(uint8_t channel)
 {
 	set_pid_channel = channel;
 
-	if (channel == 1)
-	{
-		send_variables(PID_CHANNEL, 1);
-	}
+	send_variables(PID_CHANNEL, channel);
 
 	send_variables(PID_P_ADDR, p_value[channel - 1]);
 	send_variables(PID_I_ADDR, i_value[channel - 1]);
@@ -1104,7 +1115,7 @@ void read_setting_data_all(void)
 
 	for (i = 0; i < TEMP_CTRL_BOARD_QUANTITY; i++)
 	{
-		ctrl_board_sta[1] = read_setting_data(1);
+		ctrl_board_sta[i] = read_setting_data(i+1);
 
 		if (ctrl_board_sta[i] == 0)
 		{
@@ -1350,7 +1361,7 @@ void alarm_monitor(void)
 			if (sensor_sta[i] >= 3)
 			{
 				ALARM_ON;
-
+				LED6_ON;
 				if (alarm_cnt >= MAX_ALARM_HISTORY - 1)
 				{
 					alarm_cnt = MAX_ALARM_HISTORY - 1;
@@ -1380,6 +1391,7 @@ void alarm_monitor(void)
 	if (alarm_sta_mask == 0x0FFF)
 	{
 		ALARM_OFF;
+		LED6_OFF;
 	}
 	alarm_sta_mask = 0;
 }

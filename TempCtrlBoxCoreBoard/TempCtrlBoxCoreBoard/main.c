@@ -66,7 +66,7 @@ int main(void)
 			{
 				send_request_all(slave_num);
 				
-				if(++slave_num >=4)
+				if(++slave_num >=TEMP_CTRL_BOARD_QUANTITY+1)
 				{
 					slave_num = 1;
 				}
@@ -90,7 +90,7 @@ int main(void)
 void system_init()
 {
 	gpio_init();
-	usart0_init(MYUBRR(9600));
+	usart0_init(MYUBRR(38400));
 	usart1_init(MYUBRR(8928));
 	usart2_init(9600);
 

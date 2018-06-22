@@ -15,10 +15,10 @@
 #include "timer.h"
 
 /*最大主页面数和每页能显示多少通道 可根据这两个宏定义确定通道数*/
-#define MAX_PAGE_QUANTITY 4
-#define IQR_QUANTITY_PER_PAGE 6
-#define MAX_IQR_QUANTITY (MAX_PAGE_QUANTITY * IQR_QUANTITY_PER_PAGE)
-#define TEMP_CTRL_BOARD_QUANTITY	(MAX_IQR_QUANTITY/4)
+#define MAX_PAGE_QUANTITY			4
+#define IQR_QUANTITY_PER_PAGE		6
+#define MAX_IQR_QUANTITY			(MAX_PAGE_QUANTITY * IQR_QUANTITY_PER_PAGE)
+#define TEMP_CTRL_BOARD_QUANTITY	(MAX_IQR_QUANTITY / 4)
 
 #define EN_INTERRUPT SREG |= 0x80
 #define DISEN_INTERRUPT SREG &= 0x7F
@@ -94,6 +94,8 @@
 #define IQR6_TEST 0x0026
 #define IQR7_TEST 0x0027
 #define IQR8_TEST 0x0028
+#define PID_PAGE_UP	0x0029
+#define PID_PAGE_DOWN 0x002A
 
 //曲线通道号
 #define CHANNEL0 0x01
@@ -256,7 +258,7 @@ extern uint8_t run_temp_page;
 extern uint8_t update_run_temp_flag;
 extern uint8_t in_main_page;
 extern uint8_t pre_language;
-extern uint8_t pre_main_page;
+extern int8_t pre_main_page;
 extern uint16_t pre_system_sta;
 extern uint8_t set_num;
 extern uint8_t set_pid_channel;
