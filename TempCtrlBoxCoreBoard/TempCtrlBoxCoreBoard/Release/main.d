@@ -14,7 +14,7 @@ main.d main.o: .././main.c \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
  .././delay.h .././usart.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
- .././dgus.h .././gpio.h .././timer.h .././at24c128c.h .././twi.h
+ .././dgus.h .././gpio.h .././timer.h .././twi.h
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -53,7 +53,5 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 .././gpio.h:
 
 .././timer.h:
-
-.././at24c128c.h:
 
 .././twi.h:

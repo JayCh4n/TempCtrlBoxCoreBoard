@@ -241,7 +241,7 @@ void key_action(uint16_t key_code)
 	case PID_PAGE_DOWN:
 		if(++pid_page_num > MAX_IQR_QUANTITY)
 			pid_page_num = 1;
-		update_pid_page(pid_page_num);
+		update_pid_page(pid_page_num); 
 		break;
 	case CURVE_ZOOM_OUT:
 		curve_time_level--;
@@ -280,7 +280,7 @@ void key_action(uint16_t key_code)
 		break;
 	case ALARM_PAGE_ENTER:
 		alarm_page_num = 1;
-		update_alarm_page(1);
+		update_alarm_page(alarm_page_num);
 		break;
 	case CURVE_PAGE_ENTER:
 		update_curve_page();
@@ -1161,7 +1161,7 @@ uint8_t read_setting_data(uint8_t addr)
 				usart1_deal();
 				usart1_rx_end = 0;
 
-				if (usart1_rx_buff[4] == (addr << 4) + i)
+				if (usart1_rx_buff[4] == ((addr << 4) + i))
 				{
 					board_sta = 1;
 				}
@@ -1361,7 +1361,7 @@ void alarm_monitor(void)
 			if (sensor_sta[i] >= 3)
 			{
 				ALARM_ON;
-				LED6_ON;
+
 				if (alarm_cnt >= MAX_ALARM_HISTORY - 1)
 				{
 					alarm_cnt = MAX_ALARM_HISTORY - 1;
@@ -1391,7 +1391,6 @@ void alarm_monitor(void)
 	if (alarm_sta_mask == 0x0FFF)
 	{
 		ALARM_OFF;
-		LED6_OFF;
 	}
 	alarm_sta_mask = 0;
 }

@@ -2,8 +2,6 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-at24c128c.c
-
 delay.c
 
 dgus.c

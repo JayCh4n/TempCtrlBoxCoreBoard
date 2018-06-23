@@ -12,20 +12,34 @@
 #include "timer.h"
 #include "dgus.h"
 #include "gpio.h"
-
+#include "at24c128c.h"
 
 extern void read_eeprom_data(void);
 void system_init(void);
 
+uint8_t test1[10] = {0,1,2,3,4,5,6,7,8,9};
+uint8_t test2[10] = {0};
+
 int main(void)
 {
 	uint8_t slave_num = 1;
+	uint8_t i;
 	
 	system_init();
 	EN_INTERRUPT;
 	read_eeprom_data();
 
-	_delay_ms(100);
+	_delay_ms(50);
+	
+	for(i=0;i<10;i++)
+	{
+		at24c128c_write_byte(i, test1[i]);
+	}
+	
+	for(i=0;i<10;i++)
+	{
+		test2[i] = at24c128c_read_byte(i);
+	}
 	
 	read_setting_data_all(); //开机从主控板读取设定数据
 
@@ -66,7 +80,7 @@ int main(void)
 			{
 				send_request_all(slave_num);
 				
-				if(++slave_num >=TEMP_CTRL_BOARD_QUANTITY+1)
+				if(++slave_num >= TEMP_CTRL_BOARD_QUANTITY + 1)
 				{
 					slave_num = 1;
 				}
@@ -83,7 +97,6 @@ int main(void)
 			alarm_monitor_overtime_mask = 0;
 		}
 	}
-
 	return 0;
 }
 
@@ -97,5 +110,8 @@ void system_init()
 	timer0_init();
 	timer2_init();
 	timer1_init();
+	
+	twi_init(100);
+	
 	init_variable();
 }
