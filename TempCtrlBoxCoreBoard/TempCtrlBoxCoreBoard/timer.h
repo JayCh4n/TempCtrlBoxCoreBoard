@@ -18,8 +18,12 @@
 #define SINGLE 1
 
 extern uint8_t timer2_ovf;
-extern uint8_t ctrl_command;
-extern uint8_t global;
+// extern uint8_t ctrl_command;
+extern uint8_t ctrl_command[100];
+extern uint8_t ctrl_index;
+extern uint8_t all_set_flag;
+extern uint8_t all_set_cnt;
+// extern uint8_t global;
 /*extern uint8_t all_senser_sta;*/
 extern uint8_t read_setting_data_mask;
 extern uint8_t read_setting_data_cnt;

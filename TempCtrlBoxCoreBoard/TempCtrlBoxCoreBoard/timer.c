@@ -7,8 +7,12 @@
 #include "timer.h"
 
 uint8_t timer2_ovf = 0;
-uint8_t ctrl_command = READ_DATA_ALL; //命令
-uint8_t global;						  //是否为全局设定
+// uint8_t ctrl_command = READ_DATA_ALL; //命令
+uint8_t ctrl_command[100];
+uint8_t ctrl_index = 0;
+uint8_t all_set_flag = 0;
+uint8_t all_set_cnt = 0;
+// uint8_t global;						  //是否为全局设定
 /*uint8_t all_senser_sta;*/
 uint8_t read_setting_data_mask = 0;
 uint8_t read_setting_data_cnt = 0;

@@ -104,7 +104,10 @@ int usart0_deal(void)
 			key_action(variable);
 			break; //如果变量地址为按键变量地址  执行按键动作
 		case MASTER_SWITCH:
-			switch_all_sensor(variable);
+			pre_system_sta = variable;
+			all_set_flag = 1;
+			ctrl_command[ctrl_index++] = SWITCH_SENSOR;
+			// switch_all_sensor(variable);
 			break;
 		case SINGLE_SET_FOLLOW:
 			follow_sta_buff[set_num] = variable;
@@ -139,9 +142,9 @@ int usart0_deal(void)
 			send_variables(TEMP_UINT_ADDR,
 						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
 			break;
-//		case PID_CHANNEL:
-//			update_pid_page(variable);	//更改屏幕最大为24来改变最大通道数（最好改为按键返回）
-//			break;
+			//		case PID_CHANNEL:
+			//			update_pid_page(variable);	//更改屏幕最大为24来改变最大通道数（最好改为按键返回）
+			//			break;
 		case PID_P:
 			p_value_buff = variable;
 			break;
@@ -282,11 +285,11 @@ int usart1_deal(void)
 		return 0;
 	}
 
-// 	if (crc_data != crc_check(usart1_rx_buff, usart1_rx_lenth))
-// 	{
-// 		usart1_rx_end = 0;
-// 		return 0;
-// 	}
+	// 	if (crc_data != crc_check(usart1_rx_buff, usart1_rx_lenth))
+	// 	{
+	// 		usart1_rx_end = 0;
+	// 		return 0;
+	// 	}
 
 	if (RX1_COMMAND == READ_DATA_ALL)
 	{
