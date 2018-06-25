@@ -52,6 +52,9 @@ uint16_t time_ctrl_value[4][8][4]; //Éä½ºÊ±¼ä¿ØÖÆÊý¾Ý   ¹²ËÄ¸öÄ£¿é  Ã¿¸öÄ£¿é8¸öÍ
 uint8_t alarm_cnt = 0;
 alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
 
+uint8_t template_cnt = 0;
+template_struct_typedef template;
+
 uint8_t alarm_msg[7][16] = {
 	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCF, 0xBF, 0xAA}, //ÈÈµçÅ¼¶Ï¿ª
 	{0xCE, 0xC2, 0xB6, 0xC8, 0xB9, 0xFD, 0xB8, 0xDF},			  //ÎÂ¶È¹ý¸ß
@@ -338,6 +341,9 @@ void key_action(uint16_t key_code)
 		time_ctrl_test(module_num, IQR8_TEST);
 		break;
 	default:
+		break;
+	case TEMPLATE_PAGE_ENTER:
+		update_template_page(1);
 		break;
 	}
 }
@@ -1361,6 +1367,7 @@ void alarm_monitor(void)
 			if (sensor_sta[i] >= 3)
 			{
 				ALARM_ON;
+				LED6_ON;
 
 				if (alarm_cnt >= MAX_ALARM_HISTORY - 1)
 				{
@@ -1391,6 +1398,37 @@ void alarm_monitor(void)
 	if (alarm_sta_mask == 0x0FFF)
 	{
 		ALARM_OFF;
+		LED6_OFF;
 	}
 	alarm_sta_mask = 0;
+}
+
+void update_template_page(uint8_t page_num)
+{
+	uint8_t i;
+	
+	for(i=0;i<6;i++)
+	{
+		send_variables(TEMPLATE_NUM1 + i*2, page_num * 6 + i + 1);
+	}
+	
+	for(i=0; i < template_cnt; i++)
+	{
+		//´ÓÍâ²¿eeprom¶ÁÈ¡²ÎÊý
+	}
+
+	for(; i < 6; i++)
+	{
+		send_variables(TEMPLATE_NUM1 + i*2, 0);			//Çå³ýÃû×Ö
+	}
+}
+
+void read_template_from_eeprom(uint8_t templale_num)
+{
+	
+}
+
+void read_template_sta_from_eeprom(uint8_t template_num)
+{
+
 }

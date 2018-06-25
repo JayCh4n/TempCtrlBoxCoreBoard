@@ -14,7 +14,7 @@ usart.d usart.o: .././usart.c .././usart.h \
  .././dgus.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\eeprom.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
- .././gpio.h .././timer.h .././delay.h
+ .././gpio.h .././timer.h .././at24c128c.h .././twi.h .././delay.h
 
 .././usart.h:
 
@@ -51,5 +51,9 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\
 .././gpio.h:
 
 .././timer.h:
+
+.././at24c128c.h:
+
+.././twi.h:
 
 .././delay.h:

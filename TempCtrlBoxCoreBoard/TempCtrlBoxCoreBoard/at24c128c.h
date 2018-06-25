@@ -10,6 +10,7 @@
 #define AT24C128C_H_
 
 #include "twi.h"
+#include "dgus.h"
 
 #define AT24C128C_ADDR 0x50
 

@@ -13,12 +13,14 @@
 #include "usart.h"
 #include "gpio.h"
 #include "timer.h"
+#include "at24c128c.h"
 
 /*最大主页面数和每页能显示多少通道 可根据这两个宏定义确定通道数*/
 #define MAX_PAGE_QUANTITY			4
 #define IQR_QUANTITY_PER_PAGE		6
 #define MAX_IQR_QUANTITY			(MAX_PAGE_QUANTITY * IQR_QUANTITY_PER_PAGE)
 #define TEMP_CTRL_BOARD_QUANTITY	(MAX_IQR_QUANTITY / 4)
+#define MAX_TEMPLATE_QUANTITY		50
 
 #define EN_INTERRUPT SREG |= 0x80
 #define DISEN_INTERRUPT SREG &= 0x7F
@@ -96,6 +98,35 @@
 #define IQR8_TEST 0x0028
 #define PID_PAGE_UP	0x0029
 #define PID_PAGE_DOWN 0x002A
+#define TEMPLATE_PAGE_ENTER	0x002B
+#define TEMPLATE_PAGE_UP	0x002C
+#define TEMPLATE_PAGE_DOWN	0x002D
+#define TEMPLATE_PRESET_VIEW	0x002E		//温度时间模板页当前设定查看
+#define TEMPLATE_PRESET_SAVE	0x002F		//温度时间模板页当前设定保存
+#define TEMPLATE_NUM1_VIEW		0x0030
+#define TEMPLATE_NUM2_VIEW		0x0031
+#define TEMPLATE_NUM3_VIEW		0x0032
+#define TEMPLATE_NUM4_VIEW		0x0033
+#define TEMPLATE_NUM5_VIEW		0x0034
+#define TEMPLATE_NUM6_VIEW		0x0035
+#define TEMPLATE_NUM1_APPLY		0x0036
+#define TEMPLATE_NUM2_APPLY		0x0037
+#define TEMPLATE_NUM3_APPLY		0x0038
+#define TEMPLATE_NUM4_APPLY		0x0039
+#define TEMPLATE_NUM5_APPLY		0x003A
+#define TEMPLATE_NUM6_APPLY		0x003B
+#define TEMPLATE_NUM1_DEL		0x003C
+#define TEMPLATE_NUM2_DEL		0x003D
+#define TEMPLATE_NUM3_DEL		0x003E
+#define TEMPLATE_NUM4_DEL		0x003F
+#define TEMPLATE_NUM5_DEL		0x0040
+#define TEMPLATE_NUM6_DEL		0x0041
+#define TEMP_VIEW_TOTIME		0x0042
+#define TEMP_VIEW_PAGE_UP		0x0043
+#define TEMP_VIEW_PAGE_DOWN		0x0044
+#define TIME_VIEW_TOTEMP		0x0045
+#define TIME_VIEW_PAGE_UP		0x0046
+#define TIME_VIEW_PAGE_DOWN		0x0047
 
 //曲线通道号
 #define CHANNEL0 0x01
@@ -183,9 +214,9 @@
 #define ALARM_PAGE_NUM6_ADDR 0x004E
 #define ALARM_PAGE_NUM7_ADDR 0x0050
 
-#define ALARM_DEVICE_NUM1_ADDR 0x0078
+#define ALARM_DEVICE_NUM1_ADDR 0x0320 // - 0X033C   //告警列表器件号  7个  每个4个字节
 
-#define ALAEM_MSG1_ADDR 0x02B0 //02B0-02BF
+#define ALAEM_MSG1_ADDR 0x02B0 //02B0-02BF    每页共7个告警 地址 02B0 -  0x031F
 
 #define SINGLE_NAME_ADDR 0x0288		  //单独设定界面名称显示地址低
 #define SINGLE_SENSORTYPE_ADDR 0x0290 //单独设定界面传感器类型地址
@@ -211,6 +242,98 @@
 #define ALL_SENSOR_TYPE_ADDR 0x0294 //全局传感器类型显示地址
 
 #define CURVE_TIMELINE_ADDR 0x0052 //曲线时间轴显示地址 2byte 共十个 0x0052-0x0065
+
+#define TEMPLATE_NUM1	0x0078	//模板序号1 0x0078 - 0x0079
+#define TEMPLATE_NUM2	0x007A	//模板序号1 0x007A - 0x007B
+#define TEMPLATE_NUM3	0x007C	//模板序号1 0x007C - 0x007D
+#define TEMPLATE_NUM4	0x007E	//模板序号1 0x007E - 0x007F
+#define TEMPLATE_NUM5	0x0080	//模板序号1 0x0080 - 0x0081
+#define TEMPLATE_NUM6	0x0082	//模板序号1 0x0082 - 0x0083
+
+#define TEMPLATE_STATUS1	0x0084	//模板状态图标1 0x0084 - 0x0085
+#define TEMPLATE_STATUS2	0x0086	//模板状态图标1 0x0086 - 0x0087
+#define TEMPLATE_STATUS3	0x0088	//模板状态图标1 0x0088 - 0x0089
+#define TEMPLATE_STATUS4	0x008A	//模板状态图标1 0x008A - 0x008B
+#define TEMPLATE_STATUS5	0x008C	//模板状态图标1 0x008C - 0x008D
+#define TEMPLATE_STATUS6	0x008E	//模板状态图标1 0x008E - 0x008F
+
+#define TEMP_VIEW_UNIT	0x0090	//温度模板查看界面温度单位图标 0x0090-0x0091
+
+#define TEMP_VIEW_NUM1 	0x0092	//温度模板查看界面通道号1 0x0092 - 0x0093
+#define TEMP_VIEW_NUM2 	0x0094	//温度模板查看界面通道号2 0x0094 - 0x0095
+#define TEMP_VIEW_NUM3 	0x0096	//温度模板查看界面通道号3 0x0096 - 0x0097
+#define TEMP_VIEW_NUM4 	0x0098	//温度模板查看界面通道号4 0x0098 - 0x0099
+#define TEMP_VIEW_NUM5 	0x009A	//温度模板查看界面通道号5 0x009A - 0x009B
+#define TEMP_VIEW_NUM6 	0x009C	//温度模板查看界面通道号6 0x009C - 0x009D
+#define TEMP_VIEW_NUM7 	0x009E	//温度模板查看界面通道号7 0x009E - 0x009F
+#define TEMP_VIEW_NUM8 	0x00A0	//温度模板查看界面通道号8 0x00A0 - 0x00A1
+#define TEMP_VIEW_NUM9 	0x00A2	//温度模板查看界面通道号9 0x00A2 - 0x00A3
+#define TEMP_VIEW_NUM10	0x00A4	//温度模板查看界面通道号10 0x00A4 - 0x00A5
+#define TEMP_VIEW_NUM11	0x00A6	//温度模板查看界面通道号11 0x00A6 - 0x00A7
+#define TEMP_VIEW_NUM12	0x00A8	//温度模板查看界面通道号12 0x00A8 - 0x00A9
+
+#define TEMP_VIEW_SETTEMP1 	0x00AA	//温度模板查看界面温度数值1  0x00AA - 0x00AB
+#define TEMP_VIEW_SETTEMP2 	0x00AC	//温度模板查看界面温度数值2  0x00AC - 0x00AD
+#define TEMP_VIEW_SETTEMP3 	0x00AE	//温度模板查看界面温度数值3  0x00AE - 0x00AF
+#define TEMP_VIEW_SETTEMP4 	0x00B0	//温度模板查看界面温度数值4  0x00B0 - 0x00B1
+#define TEMP_VIEW_SETTEMP5 	0x00B2	//温度模板查看界面温度数值5  0x00B2 - 0x00B3
+#define TEMP_VIEW_SETTEMP6 	0x00B4	//温度模板查看界面温度数值6  0x00B4 - 0x00B5
+#define TEMP_VIEW_SETTEMP7 	0x00B6	//温度模板查看界面温度数值7  0x00B6 - 0x00B7
+#define TEMP_VIEW_SETTEMP8 	0x00B8	//温度模板查看界面温度数值8  0x00B8 - 0x00B9
+#define TEMP_VIEW_SETTEMP9 	0x00BA	//温度模板查看界面温度数值9  0x00BA - 0x00BB
+#define TEMP_VIEW_SETTEMP10	0x00BC	//温度模板查看界面温度数值10 0x00BC - 0x00BD
+#define TEMP_VIEW_SETTEMP11	0x00BE	//温度模板查看界面温度数值11 0x00BE - 0x00BF
+#define TEMP_VIEW_SETTEMP12	0x00C0	//温度模板查看界面温度数值12 0x00C0 - 0x00C1
+
+#define TIME_VIEW_IQR1_T1	0x00C2
+#define TIME_VIEW_IQR1_T2	0x00C4
+#define TIME_VIEW_IQR1_T3	0x00C6
+#define TIME_VIEW_IQR1_T4	0x00C8
+
+#define TIME_VIEW_IQR2_T1	0x00CA
+#define TIME_VIEW_IQR2_T2	0x00CC
+#define TIME_VIEW_IQR2_T3	0x00CE
+#define TIME_VIEW_IQR2_T4	0x00D0
+
+#define TIME_VIEW_IQR3_T1	0x00D2
+#define TIME_VIEW_IQR3_T2	0x00D4
+#define TIME_VIEW_IQR3_T3	0x00D6
+#define TIME_VIEW_IQR3_T4	0x00D8
+
+#define TIME_VIEW_IQR4_T1	0x00DA
+#define TIME_VIEW_IQR4_T2	0x00DC
+#define TIME_VIEW_IQR4_T3	0x00DE
+#define TIME_VIEW_IQR4_T4	0x00E0
+
+#define TIME_VIEW_IQR5_T1	0x00E2
+#define TIME_VIEW_IQR5_T2	0x00E4
+#define TIME_VIEW_IQR5_T3	0x00E6
+#define TIME_VIEW_IQR5_T4	0x00E8
+
+#define TIME_VIEW_IQR6_T1	0x00EA
+#define TIME_VIEW_IQR6_T2	0x00EC
+#define TIME_VIEW_IQR6_T3	0x00EE
+#define TIME_VIEW_IQR6_T4	0x00F0
+
+#define TIME_VIEW_IQR7_T1	0x00F2
+#define TIME_VIEW_IQR7_T2	0x00F4
+#define TIME_VIEW_IQR7_T3	0x00F6
+#define TIME_VIEW_IQR7_T4	0x00F8
+
+#define TIME_VIEW_IQR8_T1	0x00FA
+#define TIME_VIEW_IQR8_T2	0x00FC
+#define TIME_VIEW_IQR8_T3	0x00FE
+#define TIME_VIEW_IQR8_T4	0x0100
+
+#define TIME_VIEW_MOUDEL_NUM 0x0102  // - 0X0103
+
+#define TEMPLATE_NAME1	0x01A2	//模板名称槽1 0x01A2 - 0x01A5
+#define TEMPLATE_NAME2	0x01A6	//模板名称槽1 0x01A6 - 0x01A9
+#define TEMPLATE_NAME3	0x01AA	//模板名称槽1 0x01AA - 0x01AD
+#define TEMPLATE_NAME4	0x01AE	//模板名称槽1 0x01AE - 0x01B1
+#define TEMPLATE_NAME5	0x01B2	//模板名称槽1 0x01B2 - 0x01B5
+#define TEMPLATE_NAME6	0x01B6	//模板名称槽1 0x01B6 - 0x01B9
+
 
 #define MAX_ALARM_HISTORY 70
 
@@ -253,6 +376,14 @@ typedef struct
 	uint8_t alarm_device_num;
 } alarm_struct_typedef;
 
+typedef struct
+{
+	uint8_t sta;
+	uint32_t name;
+	uint16_t set_temp[MAX_IQR_QUANTITY];
+	uint16_t ctrl_time[4][8][4];
+} template_struct_typedef;
+
 //////////////////
 extern uint8_t run_temp_page;
 extern uint8_t update_run_temp_flag;
@@ -290,6 +421,8 @@ extern uint16_t time_ctrl_value[4][8][4];
 
 extern uint8_t alarm_cnt;
 extern alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
+extern uint8_t template_cnt;
+extern template_struct_typedef template;
 
 // void init_time_ctrl_value(void);
 void init_variable(void);
@@ -331,5 +464,6 @@ uint8_t read_setting_data(uint8_t addr);
 void read_setting_data_all(void);
 void get_setting_data(uint8_t addr);
 void alarm_monitor(void);
+void update_template_page(uint8_t num);
 
 #endif /* DGUS_H_ */

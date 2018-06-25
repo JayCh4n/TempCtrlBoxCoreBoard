@@ -23,7 +23,7 @@ uint8_t test2[10] = {0};
 int main(void)
 {
 	uint8_t slave_num = 1;
-	uint8_t i;
+//	uint8_t i;
 	
 	system_init();
 	EN_INTERRUPT;
@@ -31,15 +31,15 @@ int main(void)
 
 	_delay_ms(50);
 	
-	for(i=0;i<10;i++)
-	{
-		at24c128c_write_byte(i, test1[i]);
-	}
+//	for(i=0;i<10;i++)
+//	{
+//		at24c128c_write_byte(i, test1[i]);
+//	}
 	
-	for(i=0;i<10;i++)
-	{
-		test2[i] = at24c128c_read_byte(i);
-	}
+//	for(i=0;i<10;i++)
+//	{
+//		test2[i] = at24c128c_read_byte(i);
+//	}
 	
 	read_setting_data_all(); //开机从主控板读取设定数据
 

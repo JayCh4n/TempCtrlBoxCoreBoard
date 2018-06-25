@@ -14,7 +14,7 @@ dgus.d dgus.o: .././dgus.c .././dgus.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
  .././usart.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
- .././timer.h .././gpio.h .././delay.h
+ .././timer.h .././gpio.h .././delay.h .././at24c128c.h .././twi.h
 
 .././dgus.h:
 
@@ -53,3 +53,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 .././gpio.h:
 
 .././delay.h:
+
+.././at24c128c.h:
+
+.././twi.h:

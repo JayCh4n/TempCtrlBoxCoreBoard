@@ -14,7 +14,7 @@ timer.d timer.o: .././timer.c .././timer.h \
  .././usart.h .././dgus.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\eeprom.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
- .././gpio.h .././delay.h
+ .././gpio.h .././at24c128c.h .././twi.h .././delay.h
 
 .././timer.h:
 
@@ -51,5 +51,9 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h:
 
 .././gpio.h:
+
+.././at24c128c.h:
+
+.././twi.h:
 
 .././delay.h:
