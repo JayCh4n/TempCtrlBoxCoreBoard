@@ -9635,11 +9635,10 @@ ISR(TIMER2_OVF_vect)
     4124:	22 eb       	ldi	r18, 0xB2	; 178
     4126:	dc 01       	movw	r26, r24
     4128:	2c 93       	st	X, r18
+
 	// temp_differ = (run_temp[curve_page_num] - set_temp[curve_page_num]) + 100;
 
-	/*温度转换 计算不同单位下的温度数值  run_temp[] 存储的是摄氏度 
-	**set_temp[]存储的是设定温度数值，与温度单位无关 发送温度设定时需转换成相应单位的数值进行发送
-	*/
+	/*温度转换 计算不同单位下的温度数值  run_temp[] set_temp[] 存储的是摄氏度 */
 	temp_differ = (run_temp[curve_page_num]
     412a:	80 91 a0 01 	lds	r24, 0x01A0	; 0x8001a0 <curve_page_num>
     412e:	08 2e       	mov	r0, r24
@@ -9744,11 +9743,11 @@ ISR(TIMER2_OVF_vect)
     4202:	cf 01       	movw	r24, r30
     4204:	8c 59       	subi	r24, 0x9C	; 156
     4206:	9f 4f       	sbci	r25, 0xFF	; 255
+	TCNT2 = 0xB2;
+
 	// temp_differ = (run_temp[curve_page_num] - set_temp[curve_page_num]) + 100;
 
-	/*温度转换 计算不同单位下的温度数值  run_temp[] 存储的是摄氏度 
-	**set_temp[]存储的是设定温度数值，与温度单位无关 发送温度设定时需转换成相应单位的数值进行发送
-	*/
+	/*温度转换 计算不同单位下的温度数值  run_temp[] set_temp[] 存储的是摄氏度 */
 	temp_differ = (run_temp[curve_page_num]
     4208:	9a 83       	std	Y+2, r25	; 0x02
     420a:	89 83       	std	Y+1, r24	; 0x01
@@ -9799,6 +9798,7 @@ ISR(TIMER2_OVF_vect)
     425e:	18 95       	reti
 
 00004260 <__vector_26>:
+
 /*IO口模拟usart发送*/
 ISR(TIMER3_COMPA_vect)
 {

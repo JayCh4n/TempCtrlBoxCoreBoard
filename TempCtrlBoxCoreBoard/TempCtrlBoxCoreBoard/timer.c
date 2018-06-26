@@ -247,9 +247,7 @@ ISR(TIMER2_OVF_vect)
 
 	// temp_differ = (run_temp[curve_page_num] - set_temp[curve_page_num]) + 100;
 
-	/*温度转换 计算不同单位下的温度数值  run_temp[] 存储的是摄氏度 
-	**set_temp[]存储的是设定温度数值，与温度单位无关 发送温度设定时需转换成相应单位的数值进行发送
-	*/
+	/*温度转换 计算不同单位下的温度数值  run_temp[] set_temp[] 存储的是摄氏度 */
 	temp_differ = (run_temp[curve_page_num]
 				+ temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32))
 				- (set_temp[curve_page_num] + temp_unit * (set_temp[curve_page_num] * 8 / 10 + 32)) + 100;
