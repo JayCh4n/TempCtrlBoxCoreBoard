@@ -17,9 +17,6 @@
 extern void read_eeprom_data(void);
 void system_init(void);
 
-uint8_t test1[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-uint8_t test2[10] = {0};
-
 int main(void)
 {
 	uint8_t slave_num = 1;
@@ -30,16 +27,6 @@ int main(void)
 	read_eeprom_data();
 
 	_delay_ms(50);
-
-	//	for(i=0;i<10;i++)
-	//	{
-	//		at24c128c_write_byte(i, test1[i]);
-	//	}
-
-	//	for(i=0;i<10;i++)
-	//	{
-	//		test2[i] = at24c128c_read_byte(i);
-	//	}
 
 	read_setting_data_all(); //开机从主控板读取设定数据
 
@@ -113,9 +100,9 @@ int main(void)
 				case TEMP:
 					if (all_set_flag)
 					{
-						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY + 1)
+						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
 						{
-							all_set(TEMP, all_set(TEMP, all_temp));
+							all_set(TEMP, all_temp);
 						}
 						else
 						{
@@ -124,7 +111,7 @@ int main(void)
 							ctrl_index--;
 						}
 					}
-					esle
+					else
 					{
 						single_set(TEMP, set_temp[set_num]);
 						ctrl_index--;
@@ -132,7 +119,7 @@ int main(void)
 					break;
 
 				case PREHEAT_TIME:
-					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY + 1)
+					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
 					{
 						all_set(PREHEAT_TIME, preheat_time);
 					}
@@ -144,7 +131,7 @@ int main(void)
 					break;
 
 				case SENSOR_TYPE:
-					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY + 1)
+					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
 					{
 						all_set(SENSOR_TYPE, all_sensor_type);
 					}
@@ -158,7 +145,7 @@ int main(void)
 				case SWITCH_SENSOR:
 					if (all_set_flag)
 					{
-						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY + 1)
+						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
 						{
 							switch_all_sensor(pre_system_sta);
 						}
@@ -178,9 +165,9 @@ int main(void)
 
 				case SET_FOLLOW:
 					single_set(SET_FOLLOW, follow_sta[set_num]);
-					index--;
+					ctrl_index--;
 					break;
-				case default;
+				default: break;
 				}
 			}
 

@@ -141,7 +141,8 @@ void update_main_page(void)
 		send_variables(MAIN_OUTRATE1_ADDR + (i * 2), output_rate[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]); //传感器输出比例
 		send_variables(MAIN_RUNTEMP1_ADDR + (i * 2), run_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] +
 														 temp_unit * (run_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] * 8 / 10 + 32)); //运行温度
-		send_variables(MAIN_SETTEMP1_ADDR + (i * 2), set_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);								 //设定温度
+		send_variables(MAIN_SETTEMP1_ADDR + (i * 2), set_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] + 
+														 temp_unit*(set_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]*8/10+32));				//设定温度
 		send_variables(MAIN_SENSOR1_TYPE_ADDR + (i * 2), TYPE_J + (sensor_type[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]) * TYPE_K);
 
 		send_name(MAIN_NAME1_ADDR + (i * 8), set_name[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);
@@ -292,6 +293,8 @@ void key_action(uint16_t key_code)
 		update_run_temp_flag = 0;
 		break;
 	case MENU_PAGE_ENTER:
+ 		send_variables(ALL_SET_TEMP, all_temp +
+ 					   temp_unit * (all_temp * 8 / 10 + 32));
 		in_main_page = 0;
 		break;
 	case TIME_CTRL_ENTER:
@@ -432,11 +435,10 @@ void all_set_ok(void)
 
 	update_main_page();
 
-	all_set_flag = 1;
-
 	ctrl_command[ctrl_index++] = PREHEAT_TIME;
 	ctrl_command[ctrl_index++] = SENSOR_TYPE;
 	ctrl_command[ctrl_index++] = TEMP;
+	all_set_flag = 1;
 	// all_set(TEMP, all_temp);
 	// all_set(PREHEAT_TIME, preheat_time);
 	// all_set(SENSOR_TYPE, all_sensor_type);
@@ -492,7 +494,7 @@ void pid_set_ok(void)
 	send_variables(PID_D_ADDR, d_value[set_pid_channel - 1]);
 
 	// set_pid();
-	ctrl_command[ctel_index++] = PID;
+	ctrl_command[ctrl_index++] = PID;
 }
 
 /*
@@ -526,8 +528,6 @@ void set_pid(void)
 
 	usart1_tx_buff[11] = crc & 0x00FF;
 	usart1_tx_buff[12] = crc >> 8;
-
-	ctrl_command = PID;
 
 	// while (usart1_tx_overtime_mask != 1)
 	// 	;
@@ -652,10 +652,10 @@ void single_set(uint8_t command, uint16_t value)
 
 	// ctrl_command = 0; // 不是READ_DATA_ALL 就OK
 
-	if (temp_unit == 1)
-	{
-		value = ((value - 32) * 10 / 18);
-	}
+// 	if (temp_unit == 1)
+// 	{
+// 		value = ((value - 32) * 10 / 18);
+// 	}
 
 	addr = (set_num / 4) + 1;
 	addr = (addr << 4) | ((set_num % 4) + 1);
@@ -690,13 +690,13 @@ void all_set(uint8_t command, uint16_t value)
 
 	// ctrl_command = 0; //不是READ_DATA_ALL 就ok
 
-	if (command == TEMP)
-	{
-		if (temp_unit_buff == 1)
-		{
-			value = ((value - 32) * 10 / 18);
-		}
-	}
+// 	if (command == TEMP)
+// 	{
+// 		if (temp_unit_buff == 1)
+// 		{
+// 			value = ((value - 32) * 10 / 18);
+// 		}
+// 	}
 
 	usart1_tx_buff[0] = 0xA5;
 	usart1_tx_buff[1] = 0x5A;
@@ -737,12 +737,13 @@ void update_single_set_page(void)
 	run_temp_page = 1;
 
 	send_variables(SINGLE_NUM_ADDR, set_num + 1);															  //序号显示
-	send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num] + temp_unit * ((run_temp[set_num] * 8 / 10) + 32)); //运行温度显示
-	send_variables(SINGLE_SETTEMP_ADDR, set_temp[set_num]);													  //设定温度显示
-	send_variables(SINGLE_SET_TEMP, set_temp[set_num]);														  //温度设定输入框显示
+	send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num] + temp_unit * (run_temp[set_num] * 8 / 10 + 32)); //运行温度显示
+	send_variables(SINGLE_SETTEMP_ADDR, set_temp[set_num] + temp_unit * (set_temp[set_num] * 8 / 10 + 32));  //设定温度显示
+	send_variables(SINGLE_SET_TEMP, set_temp[set_num] + temp_unit * (set_temp[set_num] * 8 / 10 + 32));	 //温度设定输入框显示
 	send_variables(SINGLE_SET_SWITCH, switch_sensor[set_num]);												  //传感器开启/关闭状态
 	send_variables(SINGLE_SENSORTYPE_ADDR, TYPE_J + (sensor_type[set_num] * TYPE_K));						  //DANDUPAGE传感器类型选择显示
-
+	send_variables(SINGLE_SET_FOLLOW, follow_sta[set_num]);
+	
 	send_name(SINGLE_NAME_ADDR, set_name[set_num]);
 
 	send_name(SINGLE_SET_NAME, set_name[set_num]);
@@ -809,8 +810,9 @@ void update_curve_page(void)
 
 	send_variables(CURVE_PAGE_NUM_ADDR, curve_page_num + 1);
 	send_variables(CURVE_PAGE_RUNTEMP_ADDR, run_temp[curve_page_num] +
-												temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)); //运行温度
-	send_variables(CURVE_PAGE_SETTEMP_ADDR, set_temp[curve_page_num]);								   //设定温度
+												temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32));	//运行温度
+	send_variables(CURVE_PAGE_SETTEMP_ADDR, set_temp[curve_page_num] + 
+												temp_unit * (set_temp[curve_page_num] * 8 / 10 + 32));		   //设定温度
 	send_variables(CURVE_PAGE_OUTRATE_ADDR, output_rate[curve_page_num]);
 	send_variables(CURVE_PAGE_SENSORTYPE_ADDR, TYPE_J + (sensor_type[curve_page_num] * TYPE_K));
 	send_name(CURVE_PAGE_NAME_ADDR, set_name[curve_page_num]);

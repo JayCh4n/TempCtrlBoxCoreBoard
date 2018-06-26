@@ -121,12 +121,20 @@ int usart0_deal(void)
 			switch_sensor_buff[set_num] = variable;
 			break;
 		case SINGLE_SET_TEMP:
+			if(temp_unit_buff)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
 			set_temp_buff[set_num] = variable;
 			break;
 		case SINGLE_SET_NAME:
 			get_set_name();
 			break;
 		case ALL_SET_TEMP:
+			if (temp_unit_buff)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
 			all_temp_buff = variable;
 			break;
 		case SET_PREHEAT_TIME:
@@ -141,6 +149,15 @@ int usart0_deal(void)
 			temp_unit_buff = variable;
 			send_variables(TEMP_UINT_ADDR,
 						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
+
+			if(temp_unit_buff == 1)
+			{
+ 				send_variables(ALL_SET_TEMP, all_temp + temp_unit_buff * (all_temp * 8 / 10 + 32));
+			}
+			else
+			{
+				send_variables(ALL_SET_TEMP, all_temp);
+			}
 			break;
 			//		case PID_CHANNEL:
 			//			update_pid_page(variable);	//更改屏幕最大为24来改变最大通道数（最好改为按键返回）

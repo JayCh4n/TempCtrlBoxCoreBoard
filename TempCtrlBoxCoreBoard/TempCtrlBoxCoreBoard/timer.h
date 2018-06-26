@@ -19,7 +19,7 @@
 
 extern uint8_t timer2_ovf;
 // extern uint8_t ctrl_command;
-extern uint8_t ctrl_command[100];
+extern uint8_t ctrl_command[20];
 extern uint8_t ctrl_index;
 extern uint8_t all_set_flag;
 extern uint8_t all_set_cnt;
