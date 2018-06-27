@@ -7,6 +7,31 @@
 
 #include "at24c128c.h"
 
+void write_template_to_eeprom(uint8_t *template_point, uint8_t template_num)
+{
+	uint16_t i;
+	
+	uint16_t ee_begin_addr = (template_num - 1) * TEMPLATE_SIZE;
+//	uint16_t ee_end_addr = (template_num - 1) * TEMPLATE_SIZE + TEMPLATE_SIZE - 1;
+	
+	for (i = 0; i < TEMPLATE_SIZE; i++)
+	{
+		at24c128c_write_byte(i + ee_begin_addr, *(template_point+i));
+	}
+}
+
+void read_template_from_eeprom(uint8_t *template_point, uint8_t template_num)
+{
+	uint16_t i;
+	
+	uint16_t ee_begin_addr = (template_num - 1) * TEMPLATE_SIZE;
+	
+	for (i = 0; i < TEMPLATE_SIZE; i++)
+	{
+		*(template_point + i) = at24c128c_read_byte(i + ee_begin_addr);
+	}
+}
+
 /*at24c128c写字节 返回值：0失败 1成功*/
 uint8_t at24c128c_write_byte(uint16_t addr, uint8_t data)
 {
@@ -62,6 +87,7 @@ uint8_t at24c128c_write_byte(uint16_t addr, uint8_t data)
 	}
 	
 	twi_stop();
+/*	_delay_us(60);*/
 	return 1;
 }
 

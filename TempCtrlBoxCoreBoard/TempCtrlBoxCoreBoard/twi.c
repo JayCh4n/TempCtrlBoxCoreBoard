@@ -112,5 +112,5 @@ void twi_init(uint16_t kbs)
     TWSR &= ~(1 << TWPS1);
 
     /* 根据速率计算TWBR值 */
-    TWBR = (F_CPU - kbs * 16) / kbs / 2;
+    TWBR = (F_CPU / (kbs*1000) - 16) / 2;
 }

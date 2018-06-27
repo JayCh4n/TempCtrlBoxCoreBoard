@@ -4,8 +4,6 @@
 
 at24c128c.c
 
-delay.c
-
 dgus.c
 
 eeprom.c

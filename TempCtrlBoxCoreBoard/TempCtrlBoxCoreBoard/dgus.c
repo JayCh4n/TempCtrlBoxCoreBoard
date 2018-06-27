@@ -1440,11 +1440,3 @@ void update_template_page(uint8_t page_num)
 		send_variables(TEMPLATE_NUM1 + i * 2, 0); //Çå³ıÃû×Ö
 	}
 }
-
-void read_template_from_eeprom(uint8_t templale_num)
-{
-}
-
-void read_template_sta_from_eeprom(uint8_t template_num)
-{
-}

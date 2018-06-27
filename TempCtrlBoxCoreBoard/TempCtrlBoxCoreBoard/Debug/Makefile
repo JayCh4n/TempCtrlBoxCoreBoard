@@ -38,7 +38,6 @@ SUBDIRS :=
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../at24c128c.c \
-../delay.c \
 ../dgus.c \
 ../eeprom.c \
 ../gpio.c \
@@ -56,7 +55,6 @@ ASM_SRCS +=
 
 OBJS +=  \
 at24c128c.o \
-delay.o \
 dgus.o \
 eeprom.o \
 gpio.o \
@@ -67,7 +65,6 @@ usart.o
 
 OBJS_AS_ARGS +=  \
 at24c128c.o \
-delay.o \
 dgus.o \
 eeprom.o \
 gpio.o \
@@ -78,7 +75,6 @@ usart.o
 
 C_DEPS +=  \
 at24c128c.d \
-delay.d \
 dgus.d \
 eeprom.d \
 gpio.d \
@@ -89,7 +85,6 @@ usart.d
 
 C_DEPS_AS_ARGS +=  \
 at24c128c.d \
-delay.d \
 dgus.d \
 eeprom.d \
 gpio.d \
@@ -113,13 +108,6 @@ LINKER_SCRIPT_DEP+=
 
 # AVR32/GNU C Compiler
 ./at24c128c.o: .././at24c128c.c
-	@echo Building file: $<
-	@echo Invoking: AVR/GNU C Compiler : 5.4.0
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\include"  -O0 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega64a -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\gcc\dev\atmega64a" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
-	@echo Finished building: $<
-	
-
-./delay.o: .././delay.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\include"  -O0 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega64a -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.209\gcc\dev\atmega64a" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

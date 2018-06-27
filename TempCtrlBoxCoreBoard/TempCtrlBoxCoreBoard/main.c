@@ -7,12 +7,13 @@
 
 #include <avr/io.h>
 #include <avr/eeprom.h>
-#include "delay.h"
+/*#include "delay.h"*/
 #include "usart.h"
 #include "timer.h"
 #include "dgus.h"
 #include "gpio.h"
 #include "at24c128c.h"
+#include <util/delay.h>
 
 extern void read_eeprom_data(void);
 void system_init(void);
@@ -20,14 +21,30 @@ void system_init(void);
 int main(void)
 {
 	uint8_t slave_num = 1;
-	//	uint8_t i;
-
+ 	template_struct_typedef t1;
+ 	template_struct_typedef t2;
+// 	uint8_t i;
+//  	uint8_t t1[100];
+//  	uint8_t t2[100];
+// 	
+// 	for(i=0;i<100;i++)
+// 	{
+// 		t1[i] = i;
+// 	}
+	
 	system_init();
 	EN_INTERRUPT;
 	read_eeprom_data();
 
-	_delay_ms(50);
+	_delay_ms(3000);
 
+ 	t1.sta = 5;
+ 	t1.name = 23;
+	t1.ctrl_time[2][5][2] = 80;
+	 	write_template_to_eeprom((uint8_t *)&t1, 1);
+	 	read_template_from_eeprom((uint8_t *)&t2, 1);
+
+	
 	read_setting_data_all(); //开机从主控板读取设定数据
 
 	//	send_variables(MASTER_SWITCH, pre_system_sta);	//默认系统为关闭状态 调节屏幕状态图标为关闭
@@ -92,12 +109,12 @@ int main(void)
 			{
 				switch (ctrl_command[ctrl_index - 1])
 				{
-				case PID:
+					case PID:
 					set_pid();
 					ctrl_index--;
 					break;
 
-				case TEMP:
+					case TEMP:
 					if (all_set_flag)
 					{
 						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
@@ -118,7 +135,7 @@ int main(void)
 					}
 					break;
 
-				case PREHEAT_TIME:
+					case PREHEAT_TIME:
 					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
 					{
 						all_set(PREHEAT_TIME, preheat_time);
@@ -130,7 +147,7 @@ int main(void)
 					}
 					break;
 
-				case SENSOR_TYPE:
+					case SENSOR_TYPE:
 					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
 					{
 						all_set(SENSOR_TYPE, all_sensor_type);
@@ -142,7 +159,7 @@ int main(void)
 					}
 					break;
 
-				case SWITCH_SENSOR:
+					case SWITCH_SENSOR:
 					if (all_set_flag)
 					{
 						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
@@ -163,11 +180,11 @@ int main(void)
 					}
 					break;
 
-				case SET_FOLLOW:
+					case SET_FOLLOW:
 					single_set(SET_FOLLOW, follow_sta[set_num]);
 					ctrl_index--;
 					break;
-				default: break;
+					default: break;
 				}
 			}
 
@@ -196,7 +213,7 @@ void system_init()
 	timer2_init();
 	timer1_init();
 
-	twi_init(100);
+	twi_init(400);
 
 	init_variable();
 }

@@ -2,7 +2,8 @@
 #define TWI_H_
 
 #include <avr/io.h>
-#include "delay.h"
+/*#include "delay.h"*/
+#include <util/delay.h>
 
 #define READ    1
 #define WRITE   0

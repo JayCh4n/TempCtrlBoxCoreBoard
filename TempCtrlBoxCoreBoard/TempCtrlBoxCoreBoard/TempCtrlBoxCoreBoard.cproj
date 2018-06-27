@@ -162,12 +162,6 @@
     <Compile Include="at24c128c.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="delay.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="delay.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="dgus.c">
       <SubType>compile</SubType>
     </Compile>

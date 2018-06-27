@@ -381,6 +381,7 @@ typedef struct
 	uint8_t sta;
 	uint32_t name;
 	uint16_t set_temp[MAX_IQR_QUANTITY];
+	uint16_t sensor_type[MAX_IQR_QUANTITY];
 	uint16_t ctrl_time[4][8][4];
 } template_struct_typedef;
 

@@ -13,7 +13,8 @@
 #include "dgus.h"
 #include "timer.h"
 #include "gpio.h"
-#include "delay.h"
+/*#include "delay.h"*/
+#include <util/delay.h>
 
 #define MYUBRR(baud) ((F_CPU) / (baud * 16UL) - 1)
 
