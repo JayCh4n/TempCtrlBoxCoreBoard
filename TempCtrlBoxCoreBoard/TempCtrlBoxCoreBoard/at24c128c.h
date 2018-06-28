@@ -18,9 +18,14 @@
 
 #define AT24C128C_ADDR 0x50
 
+extern uint16_t template_eeaddr[30];
+
 uint8_t at24c128c_write_byte(uint16_t addr, uint8_t data);
 uint16_t at24c128c_read_byte(uint16_t addr);
+uint8_t read_sta_from_eeprom(uint8_t template_num);
+uint32_t read_name_from_eeprom(uint8_t template_num);
 void write_template_to_eeprom(uint8_t *template_point, uint8_t template_num);
 void read_template_from_eeprom(uint8_t *template_point, uint8_t template_num);
+void save_preset_to_template(uint8_t template_num);
 
 #endif /* AT24C128C_H_ */

@@ -9,6 +9,7 @@
 #include <avr/io.h>
 #include "dgus.h"
 #include "usart.h"
+#include "at24c128c.h"
 
 /*当前语言 告警 射胶阀控制时间参数*/
 void read_eeprom_data(void)
@@ -29,9 +30,14 @@ void read_eeprom_data(void)
 					eeprom_write_word((uint16_t *)(TIME_CTRL_VALUE_EEADDR + (i * 32 + j * 4 + k) * 2), time_ctrl_value[i][j][k]);
 				}
 			}
-				
 		}
 		
+		for(i=0; i<MAX_TEMPLATE_QUANTITY; i++)
+		{
+			template_eeaddr[i] = i * TEMPLATE_SIZE;
+			eeprom_write_word((uint16_t *)(TEMPLATE_EEADDR + i * 2), template_eeaddr[i]);
+		}
+
 		eeprom_write_byte((uint8_t *)FIRST_START_ADDR, 'y');
 	}
 	else
@@ -44,7 +50,12 @@ void read_eeprom_data(void)
 			alarm_history[i].alarm_type = eeprom_read_byte((uint8_t *)(ALARM_HISTORY_EEADDR + i * 2 + 1));
 			alarm_history[i].alarm_device_num = eeprom_read_byte((uint8_t *)(ALARM_HISTORY_EEADDR + i * 2));
 		}
-		
+
+		for (i = 0; i < MAX_TEMPLATE_QUANTITY; i++)
+		{
+			template_eeaddr[i] = eeprom_read_word((uint16_t *)(TEMPLATE_EEADDR + i * 2));
+		}
+
 		for(i=0;i<4;i++)
 		{
 			for(j=0;j<8;j++)

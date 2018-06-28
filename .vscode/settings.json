@@ -14,6 +14,7 @@
         "system_error": "c",
         "tuple": "c",
         "type_traits": "c",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "at24c128c.h": "c"
     }
 }

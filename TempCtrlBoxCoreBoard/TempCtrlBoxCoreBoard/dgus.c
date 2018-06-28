@@ -51,8 +51,11 @@ uint16_t time_ctrl_value[4][8][4]; //Éä½ºÊ±¼ä¿ØÖÆÊý¾Ý   ¹²ËÄ¸öÄ£¿é  Ã¿¸öÄ£¿é8¸öÍ
 uint8_t alarm_cnt = 0;
 alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
 
-uint8_t template_cnt = 0;
-template_struct_typedef template;
+uint8_t template_cnt = 3;
+uint8_t pre_first_tpnum = 1;	//µ±Ç°Ä£°å½çÃæµÚÒ»ÐÐÏÔÊ¾µÄÄ£°åºÅÂë
+uint32_t tp_find_name;			//Ä£°åËÑË÷Ãû³Æ
+template_struct_typedef template_structure;
+
 
 uint8_t alarm_msg[7][16] = {
 	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCF, 0xBF, 0xAA}, //ÈÈµçÅ¼¶Ï¿ª
@@ -342,11 +345,18 @@ void key_action(uint16_t key_code)
 	case IQR8_TEST:
 		time_ctrl_test(module_num, IQR8_TEST);
 		break;
-	default:
-		break;
 	case TEMPLATE_PAGE_ENTER:
-		update_template_page(1);
+		update_template_page(pre_first_tpnum);
 		break;
+	case TEMPLATE_PAGE_BACK:
+		pre_first_tpnum = 1;
+		tp_find_name = 0;
+		break;
+	case TEMPLATE_PRESET_SAVE:
+		save_preset_to_template(++template_cnt); 
+		break;
+
+	default: break;
 	}
 }
 
@@ -637,12 +647,16 @@ void switch_all_sensor(uint16_t sta)
 	}
 }
 
-void get_set_name(void)
+uint32_t get_name(void)
 {
-	set_name_buff = usart0_rx_buff[7];
-	set_name_buff = (set_name_buff << 8) | usart0_rx_buff[8];
-	set_name_buff = (set_name_buff << 8) | usart0_rx_buff[9];
-	set_name_buff = (set_name_buff << 8) | usart0_rx_buff[10];
+	uint32_t name;
+	
+	name = usart0_rx_buff[7];
+	name = (name << 8) | usart0_rx_buff[8];
+	name = (name << 8) | usart0_rx_buff[9];
+	name = (name << 8) | usart0_rx_buff[10];
+	
+	return name;
 }
 
 void single_set(uint8_t command, uint16_t value)
@@ -1421,22 +1435,33 @@ void alarm_monitor(void)
 	alarm_sta_mask = 0;
 }
 
-void update_template_page(uint8_t page_num)
+void update_template_page(uint8_t first_tpnum)
 {
 	uint8_t i;
-
-	for (i = 0; i < 6; i++)
+ 	uint8_t sta;
+ 	uint32_t name;
+	
+	send_name(TEMPLATE_FIND_NAME, tp_find_name);
+	
+	for (i = 0; i < 5; i++)
 	{
-		send_variables(TEMPLATE_NUM1 + i * 2, page_num * 6 + i + 1);
-	}
-
-	for (i = 0; i < template_cnt; i++)
-	{
-		//´ÓÍâ²¿eeprom¶ÁÈ¡²ÎÊý
-	}
-
-	for (; i < 6; i++)
-	{
-		send_variables(TEMPLATE_NUM1 + i * 2, 0); //Çå³ýÃû×Ö
+		if(first_tpnum > template_cnt)
+		{
+			send_variables(TEMPLATE_NUM1 + i * 2, 0);		//±àºÅÐ´0
+			send_name(TEMPLATE_NAME1 + i * 4, 0);			//Çå³ýÃû³Æ
+			send_variables(TEMPLATE_STATUS1 + i * 2, 4);	//Çå³ýÍ¼±ê
+		}
+		else
+		{
+			send_variables(TEMPLATE_NUM1 + i * 2, first_tpnum);	
+			
+			sta = read_sta_from_eeprom(first_tpnum + i);
+			send_variables(TEMPLATE_STATUS1 + i * 2, sta);
+						
+			name = read_name_from_eeprom(first_tpnum + i);
+			send_name(TEMPLATE_NAME1 + i * 4, name);
+		}
+		
+		first_tpnum++;
 	}
 }

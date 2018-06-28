@@ -128,7 +128,7 @@ int usart0_deal(void)
 			set_temp_buff[set_num] = variable;
 			break;
 		case SINGLE_SET_NAME:
-			get_set_name();
+			set_name_buff = get_name();
 			break;
 		case ALL_SET_TEMP:
 			if (temp_unit_buff)
@@ -274,6 +274,9 @@ int usart0_deal(void)
 			break;
 		case IQR8_T4:
 			time_ctrl_value_buff[module_num - 1][7][3] = variable;
+			break;
+		case TEMPLATE_FIND_NAME:
+			tp_find_name = get_name();	
 			break;
 		default:
 			break;

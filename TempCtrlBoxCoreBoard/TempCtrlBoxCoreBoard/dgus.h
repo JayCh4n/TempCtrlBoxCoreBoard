@@ -20,7 +20,7 @@
 #define IQR_QUANTITY_PER_PAGE		6
 #define MAX_IQR_QUANTITY			(MAX_PAGE_QUANTITY * IQR_QUANTITY_PER_PAGE)
 #define TEMP_CTRL_BOARD_QUANTITY	(MAX_IQR_QUANTITY / 4)
-#define MAX_TEMPLATE_QUANTITY		50
+#define MAX_TEMPLATE_QUANTITY		30
 
 #define EN_INTERRUPT SREG |= 0x80
 #define DISEN_INTERRUPT SREG &= 0x7F
@@ -108,25 +108,27 @@
 #define TEMPLATE_NUM3_VIEW		0x0032
 #define TEMPLATE_NUM4_VIEW		0x0033
 #define TEMPLATE_NUM5_VIEW		0x0034
-#define TEMPLATE_NUM6_VIEW		0x0035
+/*#define TEMPLATE_NUM6_VIEW		0x0035*/
 #define TEMPLATE_NUM1_APPLY		0x0036
 #define TEMPLATE_NUM2_APPLY		0x0037
 #define TEMPLATE_NUM3_APPLY		0x0038
 #define TEMPLATE_NUM4_APPLY		0x0039
 #define TEMPLATE_NUM5_APPLY		0x003A
-#define TEMPLATE_NUM6_APPLY		0x003B
+/*#define TEMPLATE_NUM6_APPLY		0x003B*/
 #define TEMPLATE_NUM1_DEL		0x003C
 #define TEMPLATE_NUM2_DEL		0x003D
 #define TEMPLATE_NUM3_DEL		0x003E
 #define TEMPLATE_NUM4_DEL		0x003F
 #define TEMPLATE_NUM5_DEL		0x0040
-#define TEMPLATE_NUM6_DEL		0x0041
+/*#define TEMPLATE_NUM6_DEL		0x0041*/
 #define TEMP_VIEW_TOTIME		0x0042
 #define TEMP_VIEW_PAGE_UP		0x0043
 #define TEMP_VIEW_PAGE_DOWN		0x0044
 #define TIME_VIEW_TOTEMP		0x0045
 #define TIME_VIEW_PAGE_UP		0x0046
 #define TIME_VIEW_PAGE_DOWN		0x0047
+#define TEMPLATE_FIND			0x0048
+#define TEMPLATE_PAGE_BACK		0x0049
 
 //曲线通道号
 #define CHANNEL0 0x01
@@ -248,14 +250,15 @@
 #define TEMPLATE_NUM3	0x007C	//模板序号1 0x007C - 0x007D
 #define TEMPLATE_NUM4	0x007E	//模板序号1 0x007E - 0x007F
 #define TEMPLATE_NUM5	0x0080	//模板序号1 0x0080 - 0x0081
-#define TEMPLATE_NUM6	0x0082	//模板序号1 0x0082 - 0x0083
+/*#define TEMPLATE_NUM6	0x0082	//模板序号1 0x0082 - 0x0083*/
 
 #define TEMPLATE_STATUS1	0x0084	//模板状态图标1 0x0084 - 0x0085
 #define TEMPLATE_STATUS2	0x0086	//模板状态图标1 0x0086 - 0x0087
 #define TEMPLATE_STATUS3	0x0088	//模板状态图标1 0x0088 - 0x0089
 #define TEMPLATE_STATUS4	0x008A	//模板状态图标1 0x008A - 0x008B
 #define TEMPLATE_STATUS5	0x008C	//模板状态图标1 0x008C - 0x008D
-#define TEMPLATE_STATUS6	0x008E	//模板状态图标1 0x008E - 0x008F
+
+#define TEMPLATE_TIP_MAG	0x008E	//模板界面提示信息图标 0x008E - 0x008F
 
 #define TEMP_VIEW_UNIT	0x0090	//温度模板查看界面温度单位图标 0x0090-0x0091
 
@@ -332,7 +335,7 @@
 #define TEMPLATE_NAME3	0x01AA	//模板名称槽1 0x01AA - 0x01AD
 #define TEMPLATE_NAME4	0x01AE	//模板名称槽1 0x01AE - 0x01B1
 #define TEMPLATE_NAME5	0x01B2	//模板名称槽1 0x01B2 - 0x01B5
-#define TEMPLATE_NAME6	0x01B6	//模板名称槽1 0x01B6 - 0x01B9
+#define TEMPLATE_FIND_NAME	0x01B6	//模板搜索名称输入 0x01B6 - 0x01B9*/
 
 
 #define MAX_ALARM_HISTORY 70
@@ -358,6 +361,7 @@
 #define ALARM_CNT_EEADDR 0x0002		  //告警数量
 #define ALARM_HISTORY_EEADDR 0x0003   //告警记录EEPROM地址 双字节 高：告警类型 低：告警设备号0～12 共70条记录 占140字节 0x0003~0x8E
 #define TIME_CTRL_VALUE_EEADDR 0x008F //射胶阀控制时间参数EEPROM地址 双字节 共256bytes  0x008F ~ 0x018E
+#define TEMPLATE_EEADDR	0x0090		  //模板存储在外部EEPROM中的地址 双字节 30个模板60bytes 0x0090 ~ 0x00EF
 
 typedef enum
 {
@@ -416,6 +420,7 @@ extern uint16_t all_temp;
 extern uint16_t all_sensor_type;
 extern uint16_t temp_unit;
 extern uint32_t set_name[MAX_IQR_QUANTITY];
+extern uint32_t set_name_buff;
 
 extern uint8_t module_num;
 extern uint16_t time_ctrl_value[4][8][4];
@@ -423,7 +428,9 @@ extern uint16_t time_ctrl_value[4][8][4];
 extern uint8_t alarm_cnt;
 extern alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
 extern uint8_t template_cnt;
-extern template_struct_typedef template;
+uint8_t pre_first_tpnum;
+extern uint32_t tp_find_name;
+extern template_struct_typedef template_structure;
 
 // void init_time_ctrl_value(void);
 void init_variable(void);
@@ -457,7 +464,7 @@ void single_set_back(void);
 void all_set_back(void);
 
 void switch_all_sensor(uint16_t sta);
-void get_set_name(void);
+uint32_t get_name(void);
 void single_set(uint8_t command, uint16_t value);
 void all_set(uint8_t command, uint16_t value);
 void set_pid(void);
