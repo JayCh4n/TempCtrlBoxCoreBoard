@@ -20,7 +20,7 @@
 #define IQR_QUANTITY_PER_PAGE		6
 #define MAX_IQR_QUANTITY			(MAX_PAGE_QUANTITY * IQR_QUANTITY_PER_PAGE)
 #define TEMP_CTRL_BOARD_QUANTITY	(MAX_IQR_QUANTITY / 4)
-#define MAX_TEMPLATE_QUANTITY		30
+#define MAX_TEMPLATE_QUANTITY		44
 
 #define EN_INTERRUPT SREG |= 0x80
 #define DISEN_INTERRUPT SREG &= 0x7F
@@ -44,7 +44,19 @@
 #define READ_SETTING_DATA 0x07
 #define SET_FOLLOW 0x08
 
-#define ALL_SET_CMD 0x07 //菜单里全局设定OK键标志 用来轮询发送获取控制板卡数据
+#define ALL_SET_CMD 0x07	//菜单里全局设定OK键标志 用来轮询发送获取控制板卡数据
+
+/*模板界面信息提示图标定义*/
+#define ICON_NONE	0		//空白图标
+#define ICON_SAVED	1		//已保存
+#define ICON_FINDED	2		//搜索成功
+#define ICON_NFIND	3		//搜索失败
+#define ICON_APPLIED	4	//已应用
+#define	ICON_DELED		5	//已删除
+#define ICON_NSAVE		6	//保存失败
+#define ICON_NTP		7	//无此模板
+#define ICON_SAVE_RENAME	8	//名称已存在
+#define ICON_SAVE_OVER		9	//模板存满
 
 //温度单位
 #define CELSIUS 0x4300
@@ -101,7 +113,7 @@
 #define TEMPLATE_PAGE_ENTER	0x002B
 #define TEMPLATE_PAGE_UP	0x002C
 #define TEMPLATE_PAGE_DOWN	0x002D
-#define TEMPLATE_PRESET_VIEW	0x002E		//温度时间模板页当前设定查看
+/*#define TEMPLATE_PRESET_VIEW	0x002E		//温度时间模板页当前设定查看*/
 #define TEMPLATE_PRESET_SAVE	0x002F		//温度时间模板页当前设定保存
 #define TEMPLATE_NUM1_VIEW		0x0030
 #define TEMPLATE_NUM2_VIEW		0x0031
@@ -336,6 +348,7 @@
 #define TEMPLATE_NAME4	0x01AE	//模板名称槽1 0x01AE - 0x01B1
 #define TEMPLATE_NAME5	0x01B2	//模板名称槽1 0x01B2 - 0x01B5
 #define TEMPLATE_FIND_NAME	0x01B6	//模板搜索名称输入 0x01B6 - 0x01B9*/
+#define TEMPLATE_SAVE_NAME	0x01BC  //模板保存名字	0x01BC-0x01BF
 
 
 #define MAX_ALARM_HISTORY 70
@@ -361,7 +374,9 @@
 #define ALARM_CNT_EEADDR 0x0002		  //告警数量
 #define ALARM_HISTORY_EEADDR 0x0003   //告警记录EEPROM地址 双字节 高：告警类型 低：告警设备号0～12 共70条记录 占140字节 0x0003~0x8E
 #define TIME_CTRL_VALUE_EEADDR 0x008F //射胶阀控制时间参数EEPROM地址 双字节 共256bytes  0x008F ~ 0x018E
-#define TEMPLATE_EEADDR	0x0090		  //模板存储在外部EEPROM中的地址 双字节 30个模板60bytes 0x0090 ~ 0x00EF
+#define TEMPLATE_EEADDR	0x00190		  //模板存储在外部EEPROM中的地址 双字节 30个模板60bytes 0x0190 ~ 0x01CB   50个模板就是100bytes 0x00190 - 0x01F3 
+#define TEMPLATE_CNT_EEADDR	0x01FF
+
 
 typedef enum
 {
@@ -428,8 +443,10 @@ extern uint16_t time_ctrl_value[4][8][4];
 extern uint8_t alarm_cnt;
 extern alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
 extern uint8_t template_cnt;
-uint8_t pre_first_tpnum;
+extern uint8_t template_tip_msg;
+extern uint8_t pre_first_tpnum;
 extern uint32_t tp_find_name;
+extern uint32_t tp_save_name;
 extern template_struct_typedef template_structure;
 
 // void init_time_ctrl_value(void);
@@ -473,5 +490,7 @@ void read_setting_data_all(void);
 void get_setting_data(uint8_t addr);
 void alarm_monitor(void);
 void update_template_page(uint8_t num);
+void update_tp_temp(uint8_t page_num);
+void update_tp_time(uint8_t page_num);
 
 #endif /* DGUS_H_ */

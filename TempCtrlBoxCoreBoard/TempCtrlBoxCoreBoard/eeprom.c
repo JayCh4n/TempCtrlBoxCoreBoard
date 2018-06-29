@@ -19,7 +19,8 @@ void read_eeprom_data(void)
 	if (eeprom_read_byte((uint8_t *)FIRST_START_ADDR) != 'y')
 	{
 		eeprom_write_byte((uint8_t *)PRE_LANGUAGE_EEADDR, 0); //当前语言 与开机时切换到的界面有关
-		eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, 0);	//告警清单数量
+		eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, 0);		//告警清单数量
+		eeprom_write_byte((uint8_t*)TEMPLATE_CNT_EEADDR, 0);	//模板数量
 		
 		for(i=0;i<4;i++)
 		{
@@ -44,7 +45,8 @@ void read_eeprom_data(void)
 	{
 		pre_language = eeprom_read_byte((uint8_t *)PRE_LANGUAGE_EEADDR);
 		alarm_cnt = eeprom_read_byte((uint8_t *)ALARM_CNT_EEADDR);
-
+		template_cnt = eeprom_read_byte((uint8_t*)TEMPLATE_CNT_EEADDR);
+		
 		for (i = 0; i < alarm_cnt; i++)
 		{
 			alarm_history[i].alarm_type = eeprom_read_byte((uint8_t *)(ALARM_HISTORY_EEADDR + i * 2 + 1));

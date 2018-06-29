@@ -278,6 +278,24 @@ int usart0_deal(void)
 		case TEMPLATE_FIND_NAME:
 			tp_find_name = get_name();	
 			break;
+		case TEMPLATE_SAVE_NAME:
+			tp_save_name = get_name();
+			break;
+		case TEMPLATE_NAME1:
+			set_template_name(pre_first_tpnum, get_name());
+			break;
+		case TEMPLATE_NAME2:
+			set_template_name(pre_first_tpnum+1, get_name());
+			break;
+		case TEMPLATE_NAME3:
+			set_template_name(pre_first_tpnum+2, get_name());
+			break;
+		case TEMPLATE_NAME4:
+			set_template_name(pre_first_tpnum+3, get_name());
+			break;
+		case TEMPLATE_NAME5:
+			set_template_name(pre_first_tpnum+4, get_name());
+			break;
 		default:
 			break;
 		}

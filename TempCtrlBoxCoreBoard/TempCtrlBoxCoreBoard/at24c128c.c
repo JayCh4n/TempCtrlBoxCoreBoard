@@ -7,28 +7,109 @@
 
 #include "at24c128c.h"
 
-uint16_t template_eeaddr[30];
+uint16_t template_eeaddr[MAX_TEMPLATE_QUANTITY];
+
+void apply_template(uint8_t template_num)
+{
+	uint8_t i,j,k;
+	
+	read_template_from_eeprom((uint8_t *)&template_structure, template_num);
+	
+	for (i=0; i<MAX_IQR_QUANTITY; i++)
+	{
+		set_temp[i] = template_structure.set_temp[i];
+		set_temp_buff[i] = set_temp[i];
+		sensor_type[i] = template_structure.sensor_type[i];
+		sensor_type_buff[i] = sensor_type[i];
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		for (j = 0; j < 8; j++)
+		{
+			for (k = 0; k < 4; k++)
+			{
+				time_ctrl_value[i][j][k] = template_structure.ctrl_time[i][j][k];
+				time_ctrl_value_buff[i][j][k] = time_ctrl_value[i][j][k];
+				eeprom_write_word((uint16_t *)(TIME_CTRL_VALUE_EEADDR + (i * 32 + j * 4 + k) * 2), time_ctrl_value[i][j][k]);
+			}
+		}
+	}	
+}
+
+/*搜索模板 返回值为第几个模板 0：未搜索到模板*/
+uint8_t find_template(uint32_t name)
+{
+	uint8_t tp_num;
+	
+	for(tp_num = 1; tp_num <= template_cnt; tp_num++)
+	{
+		if(name == read_name_from_eeprom(tp_num))
+		{
+			return tp_num;
+		}
+	}
+	
+	return 0;
+}
+
+void set_template_name(uint8_t template_num, uint32_t name)
+{
+	if (template_num <= template_cnt)
+	{
+		write_name_to_eeprom(template_num, name);
+	}
+	update_template_page(pre_first_tpnum);
+}
+
+void template_del(uint8_t template_num)
+{
+	uint8_t i;
+	uint16_t addr_temp;
+	
+	if (template_num <= template_cnt)
+	{
+		template_tip_msg = ICON_DELED;
+		addr_temp = template_eeaddr[template_num-1];
+		
+		for(i = template_num; i<template_cnt; i++)
+		{
+			template_eeaddr[i-1] = template_eeaddr[i];
+		}
+		
+		template_eeaddr[template_cnt-1] = addr_temp;
+		template_cnt--;
+		if(template_cnt < pre_first_tpnum)
+		{
+			if(template_cnt <= 5)
+			{
+				pre_first_tpnum = 1;
+			}
+			else
+			{
+				pre_first_tpnum = template_cnt - 4;
+			}
+		}
+		update_template_page(pre_first_tpnum);
+	}
+	
+	for (i = 0; i < MAX_TEMPLATE_QUANTITY; i++)
+	{
+		eeprom_write_word((uint16_t *)(TEMPLATE_EEADDR + i * 2), template_eeaddr[i]);
+	}
+	
+	eeprom_write_byte((uint8_t*)TEMPLATE_CNT_EEADDR, template_cnt);	
+}
 
 void save_preset_to_template(uint8_t template_num)
 {
-	uint8_t i, j, k;
-	uint8_t name1;
-	uint16_t name2;
+	int8_t i, j, k;
 	uint16_t addr_temp;
-
-	if (template_num < 9)
-	{
-		name2 = template_num % 10 + 0x30;
-		name1 = 0;
-	}
-	else if (template_num >= 9 && template_num < 99)
-	{
-		name2 = template_num / 10 + 0x30;
-		name1 = template_num % 10 + 0x30;
-	}
+	
+	template_tip_msg = ICON_SAVED;
 
 	template_structure.sta = 0;
-	template_structure.name = 0x54500000 | (name2 << 8) | name1;
+	template_structure.name = tp_save_name;
 
 	for (i = 0; i < MAX_IQR_QUANTITY; i++)
 	{
@@ -46,26 +127,36 @@ void save_preset_to_template(uint8_t template_num)
 			}
 		}
 	}
-
+	
 	addr_temp = template_eeaddr[MAX_TEMPLATE_QUANTITY - 1];
-
-	for (i = MAX_TEMPLATE_QUANTITY - 1; i <= 0; i++)
+	
+	for (i = MAX_TEMPLATE_QUANTITY - 2; i >= 0; i--)
 	{
-		template_eeaddr[i] = template_eeaddr[i + 1];
+		template_eeaddr[i + 1] = template_eeaddr[i];
 	}
 
 	template_eeaddr[0] = addr_temp;
-
-	for (i = 0; i < MAX_TEMPLATE_QUANTITY; i++)
-	{
-		eeprom_write_word((uint16_t *)(TEMPLATE_EEADDR + i * 2), template_eeaddr[i]);
-	}
-
+	
 	write_template_to_eeprom((uint8_t *)&template_structure, 1);
 	
 	pre_first_tpnum = 1;
 	update_template_page(pre_first_tpnum);
+	
+	for (i = 0; i < MAX_TEMPLATE_QUANTITY; i++)
+	{
+		eeprom_write_word((uint16_t *)(TEMPLATE_EEADDR + i * 2), template_eeaddr[i]);
+	}
+	
+	eeprom_write_byte((uint8_t*)TEMPLATE_CNT_EEADDR, template_num);
+}
 
+void write_sta_to_eeprom(uint8_t template_num, uint8_t sta)
+{
+	uint8_t addr;
+	
+	addr = template_eeaddr[template_num-1];
+	
+	at24c128c_write_byte(addr,sta);
 }
 
 uint8_t read_sta_from_eeprom(uint8_t template_num)
@@ -77,6 +168,18 @@ uint8_t read_sta_from_eeprom(uint8_t template_num)
 	sta = at24c128c_read_byte(addr);
 
 	return sta;
+}
+
+void write_name_to_eeprom(uint8_t template_num, uint32_t name)
+{
+	uint16_t addr;
+	
+	addr = template_eeaddr[template_num-1]+4;
+	
+	at24c128c_write_byte(addr, name>>24);
+	at24c128c_write_byte(addr-1, name>>16);
+	at24c128c_write_byte(addr-2, name>>8);
+	at24c128c_write_byte(addr-3, name);
 }
 
 uint32_t read_name_from_eeprom(uint8_t template_num)

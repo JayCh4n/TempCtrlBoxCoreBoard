@@ -21,10 +21,10 @@ void system_init(void);
 int main(void)
 {
 	uint8_t slave_num = 1;
-  	template_struct_typedef t1;
-  	template_struct_typedef t2;
-	uint8_t sta;
-	uint32_t name;
+//   	template_struct_typedef t1;
+//   	template_struct_typedef t2;
+// 	uint8_t sta;
+/*	uint32_t name1,name2,name3,name4;*/
 	
 // 	uint8_t t1[100];
 // 	uint8_t t2[100];
@@ -35,16 +35,19 @@ int main(void)
 
 	_delay_ms(1000);
 	
-	t1.sta = 0;
-	t1.name = set_name[3];
+// 	t1.sta = 0;
+// 	t1.name = set_name[3];
 	
 // 	write_template_to_eeprom(t1, 1);
 // 	read_template_from_eeprom(t2, 1);
 	
-	write_template_to_eeprom((uint8_t *)&t1, 1);
-	read_template_from_eeprom((uint8_t *)&t2, 1);
-	sta = read_sta_from_eeprom(1);
-	name = read_name_from_eeprom(1);	
+// 	write_template_to_eeprom((uint8_t *)&t1, 1);
+// 	read_template_from_eeprom((uint8_t *)&t2, 2);
+/*	sta = read_sta_from_eeprom(1);*/
+// 	name1 = read_name_from_eeprom(1);	
+// 	name2 = read_name_from_eeprom(2);
+// 	name3 = read_name_from_eeprom(3);
+// 	name4 = read_name_from_eeprom(4);
 	read_setting_data_all(); //开机从主控板读取设定数据
 
 	//	send_variables(MASTER_SWITCH, pre_system_sta);	//默认系统为关闭状态 调节屏幕状态图标为关闭
@@ -98,12 +101,15 @@ int main(void)
 		{
 			if (ctrl_index == 0)
 			{
-				send_request_all(slave_num);
-
-				if (++slave_num >= TEMP_CTRL_BOARD_QUANTITY + 1)
-				{
-					slave_num = 1;
-				}
+//				if (in_main_page)
+//				{
+					send_request_all(slave_num);
+	
+					if (++slave_num >= TEMP_CTRL_BOARD_QUANTITY + 1)
+					{
+						slave_num = 1;
+					}
+//				}
 			}
 			else
 			{

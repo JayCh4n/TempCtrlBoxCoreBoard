@@ -51,11 +51,15 @@ uint16_t time_ctrl_value[4][8][4]; //Éä½ºÊ±¼ä¿ØÖÆÊý¾Ý   ¹²ËÄ¸öÄ£¿é  Ã¿¸öÄ£¿é8¸öÍ
 uint8_t alarm_cnt = 0;
 alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
 
-uint8_t template_cnt = 3;
+uint8_t view_tp_num = 0;
+uint8_t temp_view_page_num = 0;
+uint8_t time_view_page_num = 0;
+uint8_t template_cnt = 0;
+uint8_t template_tip_msg = ICON_NONE;	//Ä£°å½çÃæÌáÊ¾ÐÅÏ¢Í¼±ê±äÁ¿
 uint8_t pre_first_tpnum = 1;	//µ±Ç°Ä£°å½çÃæµÚÒ»ÐÐÏÔÊ¾µÄÄ£°åºÅÂë
-uint32_t tp_find_name;			//Ä£°åËÑË÷Ãû³Æ
+uint32_t tp_find_name = 0;			//Ä£°åËÑË÷Ãû³Æ
+uint32_t tp_save_name = 0;			//Ä£°å±£´æÃû³Æ
 template_struct_typedef template_structure;
-
 
 uint8_t alarm_msg[7][16] = {
 	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCF, 0xBF, 0xAA}, //ÈÈµçÅ¼¶Ï¿ª
@@ -169,7 +173,8 @@ void key_action(uint16_t key_code)
 {
 	static uint8_t alarm_page_num = 1;
 	uint8_t max_alarm_page_num;
-
+	uint8_t first_tpnum_buff;
+	
 	if (alarm_cnt == 0)
 	{
 		max_alarm_page_num = 1;
@@ -283,6 +288,7 @@ void key_action(uint16_t key_code)
 		break;
 	case ALL_SET_BACK:
 		all_set_back();
+		update_main_page();
 		break;
 	case ALARM_PAGE_ENTER:
 		alarm_page_num = 1;
@@ -351,11 +357,264 @@ void key_action(uint16_t key_code)
 	case TEMPLATE_PAGE_BACK:
 		pre_first_tpnum = 1;
 		tp_find_name = 0;
+		tp_save_name = 0;
+		template_tip_msg = ICON_NONE;
 		break;
 	case TEMPLATE_PRESET_SAVE:
-		save_preset_to_template(++template_cnt); 
+		if (!tp_save_name)
+		{
+			template_tip_msg = ICON_NSAVE;
+			update_template_page(pre_first_tpnum);
+			break;
+		}
+		if(find_template(tp_save_name))
+		{
+			template_tip_msg = ICON_SAVE_RENAME;
+			update_template_page(pre_first_tpnum);
+			break;
+		}
+		if(++template_cnt > MAX_TEMPLATE_QUANTITY)
+		{
+			template_cnt = MAX_TEMPLATE_QUANTITY;
+			template_tip_msg = ICON_SAVE_OVER;
+			update_template_page(pre_first_tpnum);
+			break;
+		}
+		save_preset_to_template(template_cnt);
 		break;
-
+	case TEMPLATE_PAGE_UP:
+		if (pre_first_tpnum - 5 <= 0)
+		{
+			pre_first_tpnum = 1;
+		}
+		else
+		{
+			pre_first_tpnum -= 5; 
+		}
+		update_template_page(pre_first_tpnum);
+		break;
+	case TEMPLATE_PAGE_DOWN:
+		if (pre_first_tpnum + 5 <= template_cnt)
+		{
+			pre_first_tpnum += 5;
+			update_template_page(pre_first_tpnum);
+		}
+		else if(template_cnt <= 5)
+		{
+			pre_first_tpnum = 1;
+			update_template_page(pre_first_tpnum);
+		}
+		break;
+	case TEMPLATE_NUM1_DEL:
+		template_del(pre_first_tpnum);
+		break;
+	case TEMPLATE_NUM2_DEL:
+		template_del(pre_first_tpnum+1);
+		break;		
+	case TEMPLATE_NUM3_DEL:
+		template_del(pre_first_tpnum+2);
+		break;	
+	case TEMPLATE_NUM4_DEL:
+		template_del(pre_first_tpnum+3);
+		break;
+	case TEMPLATE_NUM5_DEL:
+		template_del(pre_first_tpnum+4);
+		break;
+	case TEMPLATE_FIND:
+		first_tpnum_buff = find_template(tp_find_name);
+		if (first_tpnum_buff)
+		{
+			pre_first_tpnum = first_tpnum_buff;
+			template_tip_msg = ICON_FINDED;
+		}
+		else
+		{
+			template_tip_msg = ICON_NFIND;
+		}
+		update_template_page(pre_first_tpnum);
+		break;
+	case TEMPLATE_NUM1_VIEW:
+		view_tp_num = pre_first_tpnum;
+		temp_view_page_num = 1;
+		if (view_tp_num > template_cnt)
+		{
+			template_tip_msg = 7;
+			update_template_page(pre_first_tpnum);
+			break;
+		}
+		else
+		{
+			change_page(21);
+			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
+			update_tp_temp(temp_view_page_num);
+		}
+		break;
+	case TEMPLATE_NUM2_VIEW:
+		view_tp_num = pre_first_tpnum+1;
+		temp_view_page_num = 1;
+		if (view_tp_num > template_cnt)
+		{
+			template_tip_msg = 7;
+			update_template_page(pre_first_tpnum);
+			break;
+		}
+		else
+		{
+			change_page(21);
+			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
+			update_tp_temp(temp_view_page_num);
+		}
+		break;
+	case TEMPLATE_NUM3_VIEW:
+		view_tp_num = pre_first_tpnum+2;
+		temp_view_page_num = 1;
+		if (view_tp_num > template_cnt)
+		{
+			template_tip_msg = 7;
+			update_template_page(pre_first_tpnum);
+			break;
+		}
+		else
+		{
+			change_page(21);
+			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
+			update_tp_temp(temp_view_page_num);
+		}
+		break;
+	case TEMPLATE_NUM4_VIEW:
+		view_tp_num = pre_first_tpnum+3;
+		temp_view_page_num = 1;
+		if (view_tp_num > template_cnt)
+		{
+			template_tip_msg = 7;
+			update_template_page(pre_first_tpnum);
+			break;
+		}
+		else
+		{
+			change_page(21);
+			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
+			update_tp_temp(temp_view_page_num);
+		}
+		break;
+	case TEMPLATE_NUM5_VIEW:
+		view_tp_num = pre_first_tpnum+4;
+		temp_view_page_num = 1;
+		if (view_tp_num > template_cnt)
+		{
+			template_tip_msg = 7;
+			update_template_page(pre_first_tpnum);
+			break;
+		}
+		else
+		{
+			change_page(21);
+			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
+			update_tp_temp(temp_view_page_num);
+		}
+		break;
+		case TEMP_VIEW_PAGE_UP:
+			if(--temp_view_page_num <= 0)
+			{
+				temp_view_page_num = 1;
+			}
+			update_tp_temp(temp_view_page_num);
+			break;
+		case TEMP_VIEW_PAGE_DOWN:
+			if(++temp_view_page_num >= MAX_IQR_QUANTITY/12)
+			{
+				temp_view_page_num = MAX_IQR_QUANTITY/12;
+			}
+			update_tp_temp(temp_view_page_num);
+			break;
+		case TEMP_VIEW_TOTIME:
+			time_view_page_num = 1;
+			update_tp_time(time_view_page_num);
+			break;
+		case TIME_VIEW_PAGE_UP:
+			if (--time_view_page_num <= 0)
+			{
+				time_view_page_num = 1;
+			}
+			update_tp_time(time_view_page_num);
+			break;
+		case TIME_VIEW_PAGE_DOWN:
+			if (++time_view_page_num >= 4)
+			{
+				time_view_page_num = 4;
+			}
+			update_tp_time(time_view_page_num);
+			break;
+		case TEMPLATE_NUM1_APPLY:
+			if (pre_first_tpnum > template_cnt)
+			{
+				template_tip_msg = ICON_NTP;
+				update_template_page(pre_first_tpnum);
+				break;
+			}
+			else
+			{
+				apply_template(pre_first_tpnum);
+				template_tip_msg = ICON_APPLIED;
+				update_template_page(pre_first_tpnum);
+			}
+			break;
+		case TEMPLATE_NUM2_APPLY:
+			if (pre_first_tpnum+1 > template_cnt)
+			{
+				template_tip_msg = ICON_NTP;
+				update_template_page(pre_first_tpnum);
+				break;
+			}
+			else
+			{
+				apply_template(pre_first_tpnum+1);
+				template_tip_msg = ICON_APPLIED;
+				update_template_page(pre_first_tpnum);
+			}
+			break;
+		case TEMPLATE_NUM3_APPLY:
+			if (pre_first_tpnum+2 > template_cnt)
+			{
+				template_tip_msg = ICON_NTP;
+				update_template_page(pre_first_tpnum);
+				break;
+			}
+			else
+			{
+				apply_template(pre_first_tpnum+2);
+				template_tip_msg = ICON_APPLIED;
+				update_template_page(pre_first_tpnum);
+			}
+			break;
+		case TEMPLATE_NUM4_APPLY:
+			if (pre_first_tpnum+3 > template_cnt)
+			{
+				template_tip_msg = ICON_NTP;
+				update_template_page(pre_first_tpnum);
+				break;
+			}
+			else
+			{
+				apply_template(pre_first_tpnum+3);
+				template_tip_msg = ICON_APPLIED;
+				update_template_page(pre_first_tpnum);
+			}
+			break;
+		case TEMPLATE_NUM5_APPLY:
+			if (pre_first_tpnum+4 > template_cnt)
+			{
+				template_tip_msg = ICON_NTP;
+				update_template_page(pre_first_tpnum);
+				break;
+			}
+			else
+			{
+				apply_template(pre_first_tpnum+4);
+				template_tip_msg = ICON_APPLIED;
+				update_template_page(pre_first_tpnum);
+			}
+			break;
 	default: break;
 	}
 }
@@ -1441,27 +1700,60 @@ void update_template_page(uint8_t first_tpnum)
  	uint8_t sta;
  	uint32_t name;
 	
-	send_name(TEMPLATE_FIND_NAME, tp_find_name);
+	send_name(TEMPLATE_SAVE_NAME, tp_save_name);
+	send_name(TEMPLATE_FIND_NAME, tp_find_name);		//·¢ËÍËÑË÷¿òÃû³Æ
+	send_variables(TEMPLATE_TIP_MAG, template_tip_msg);
 	
 	for (i = 0; i < 5; i++)
 	{
-		if(first_tpnum > template_cnt)
+		send_variables(TEMPLATE_NUM1 + i * 2, first_tpnum + i);
+			
+		if(first_tpnum + i > template_cnt)
 		{
-			send_variables(TEMPLATE_NUM1 + i * 2, 0);		//±àºÅÐ´0
 			send_name(TEMPLATE_NAME1 + i * 4, 0);			//Çå³ýÃû³Æ
 			send_variables(TEMPLATE_STATUS1 + i * 2, 4);	//Çå³ýÍ¼±ê
 		}
 		else
 		{
-			send_variables(TEMPLATE_NUM1 + i * 2, first_tpnum);	
-			
 			sta = read_sta_from_eeprom(first_tpnum + i);
 			send_variables(TEMPLATE_STATUS1 + i * 2, sta);
 						
 			name = read_name_from_eeprom(first_tpnum + i);
 			send_name(TEMPLATE_NAME1 + i * 4, name);
 		}
-		
-		first_tpnum++;
+	}
+	
+	template_tip_msg = ICON_NONE;
+}
+
+void update_tp_temp(uint8_t page_num)
+{
+	uint8_t i,iqr_num;
+	
+	send_variables(TEMP_VIEW_UNIT, temp_unit);
+	
+	for(i=0;i<12;i++)
+	{	
+		iqr_num = (page_num - 1) * 12 + i + 1;
+		send_variables(TEMP_VIEW_NUM1+(i*2), iqr_num);
+		send_variables(TEMP_VIEW_SETTEMP1+(i*2), template_structure.set_temp[iqr_num-1] + 
+						temp_unit*(template_structure.set_temp[iqr_num-1]*8/10+32));
+	}
+}
+
+void update_tp_time(uint8_t page_num)
+{
+	uint8_t j, k;
+	uint8_t addr_offset = 0x00;
+	
+	send_variables(TIME_VIEW_MOUDEL_NUM, page_num);
+
+	for (j = 0; j < 8; j++)
+	{
+		for (k = 0; k < 4; k++)
+		{
+			send_variables(TIME_VIEW_IQR1_T1 + addr_offset, template_structure.ctrl_time[page_num - 1][j][k]);
+			addr_offset += 0x02;
+		}
 	}
 }

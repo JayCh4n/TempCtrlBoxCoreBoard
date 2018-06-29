@@ -13,6 +13,7 @@
 #include "dgus.h"
 #include "timer.h"
 #include "gpio.h"
+#include "at24c128c.h"
 /*#include "delay.h"*/
 #include <util/delay.h>
 
@@ -41,7 +42,7 @@
 #define SINGLE_SET_SWITCH 0x0144
 #define SINGLE_SET_TEMP 0x0146
 #define SINGLE_SET_NAME 0x0158 //~~!!!!!!!!!!!!!!z  0x0158 - 0x015F
-#define SINGLE_SET_FOLLOW	0x01A2	//¸úËæ
+#define SINGLE_SET_FOLLOW	0x01BA	//¸úËæ - 0x01B7
 #define ALL_SET_TEMP 0x0148
 #define SET_PREHEAT_TIME 0x014A
 #define ALL_SET_SENSOR_TYPE 0x014C
