@@ -111,88 +111,88 @@ int main(void)
 					}
 //				}
 			}
-			else
-			{
-				switch (ctrl_command[ctrl_index - 1])
-				{
-					case PID:
-					set_pid();
-					ctrl_index--;
-					break;
-
-					case TEMP:
-					if (all_set_flag)
-					{
-						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
-						{
-							all_set(TEMP, all_temp);
-						}
-						else
-						{
-							all_set_cnt = 0;
-							all_set_flag = 0;
-							ctrl_index--;
-						}
-					}
-					else
-					{
-						single_set(TEMP, set_temp[set_num]);
-						ctrl_index--;
-					}
-					break;
-
-					case PREHEAT_TIME:
-					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
-					{
-						all_set(PREHEAT_TIME, preheat_time);
-					}
-					else
-					{
-						all_set_cnt = 0;
-						ctrl_index--;
-					}
-					break;
-
-					case SENSOR_TYPE:
-					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
-					{
-						all_set(SENSOR_TYPE, all_sensor_type);
-					}
-					else
-					{
-						all_set_cnt = 0;
-						ctrl_index--;
-					}
-					break;
-
-					case SWITCH_SENSOR:
-					if (all_set_flag)
-					{
-						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
-						{
-							switch_all_sensor(pre_system_sta);
-						}
-						else
-						{
-							all_set_cnt = 0;
-							all_set_flag = 0;
-							ctrl_index--;
-						}
-					}
-					else
-					{
-						single_set(SWITCH_SENSOR, switch_sensor[set_num]);
-						ctrl_index--;
-					}
-					break;
-
-					case SET_FOLLOW:
-					single_set(SET_FOLLOW, follow_sta[set_num]);
-					ctrl_index--;
-					break;
-					default: break;
-				}
-			}
+// 			else
+// 			{
+// 				switch (ctrl_command[ctrl_index - 1])
+// 				{
+// 					case PID:
+// 					set_pid();
+// 					ctrl_index--;
+// 					break;
+// 
+// 					case TEMP:
+// 					if (all_set_flag)
+// 					{
+// 						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
+// 						{
+// 							all_set(TEMP, all_temp);
+// 						}
+// 						else
+// 						{
+// 							all_set_cnt = 0;
+// 							all_set_flag = 0;
+// 							ctrl_index--;
+// 						}
+// 					}
+// 					else
+// 					{
+// 						single_set(TEMP, set_temp[set_num]);
+// 						ctrl_index--;
+// 					}
+// 					break;
+// 
+// 					case PREHEAT_TIME:
+// 					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
+// 					{
+// 						all_set(PREHEAT_TIME, preheat_time);
+// 					}
+// 					else
+// 					{
+// 						all_set_cnt = 0;
+// 						ctrl_index--;
+// 					}
+// 					break;
+// 
+// 					case SENSOR_TYPE:
+// 					if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
+// 					{
+// 						all_set(SENSOR_TYPE, all_sensor_type);
+// 					}
+// 					else
+// 					{
+// 						all_set_cnt = 0;
+// 						ctrl_index--;
+// 					}
+// 					break;
+// 
+// 					case SWITCH_SENSOR:
+// 					if (all_set_flag)
+// 					{
+// 						if (++all_set_cnt <= TEMP_CTRL_BOARD_QUANTITY)
+// 						{
+// 							switch_all_sensor(pre_system_sta);
+// 						}
+// 						else
+// 						{
+// 							all_set_cnt = 0;
+// 							all_set_flag = 0;
+// 							ctrl_index--;
+// 						}
+// 					}
+// 					else
+// 					{
+// 						single_set(SWITCH_SENSOR, switch_sensor[set_num]);
+// 						ctrl_index--;
+// 					}
+// 					break;
+// 
+// 					case SET_FOLLOW:
+// 					single_set(SET_FOLLOW, follow_sta[set_num]);
+// 					ctrl_index--;
+// 					break;
+// 					default: break;
+// 				}
+// 			}
 
 			usart1_tx_overtime_mask = 0;
 			usart1_tx_timecnt = 0;

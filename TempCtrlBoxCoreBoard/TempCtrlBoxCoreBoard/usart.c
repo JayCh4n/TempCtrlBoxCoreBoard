@@ -105,8 +105,8 @@ int usart0_deal(void)
 			break; //如果变量地址为按键变量地址  执行按键动作
 		case MASTER_SWITCH:
 			pre_system_sta = variable;
-			all_set_flag = 1;
-			ctrl_command[ctrl_index++] = SWITCH_SENSOR;
+/*			all_set_flag = 1;*/
+/*			ctrl_command[ctrl_index++] = SWITCH_SENSOR;*/
 			// switch_all_sensor(variable);
 			break;
 		case SINGLE_SET_FOLLOW:
@@ -149,10 +149,9 @@ int usart0_deal(void)
 			temp_unit_buff = variable;
 			send_variables(TEMP_UINT_ADDR,
 						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
-
 			if(temp_unit_buff == 1)
 			{
- 				send_variables(ALL_SET_TEMP, all_temp + temp_unit_buff * (all_temp * 8 / 10 + 32));
+				send_variables(ALL_SET_TEMP, all_temp + temp_unit_buff * (all_temp * 8 / 10 + 32));
 			}
 			else
 			{

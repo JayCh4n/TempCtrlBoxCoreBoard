@@ -234,9 +234,36 @@ void key_action(uint16_t key_code)
 	case SINGLE_SET_OK:
 		single_set_ok();
 		break;
-	case ALL_SET_OK:
-		all_set_ok();
+	case MENU_TEMP_SET:
+		all_temp = all_temp_buff;
+		all_set(TEMP, all_temp);
+		update_menu_tip_icon(1, 1);
 		break;
+	case MENU_SENSOR_TYPE_SET:
+		all_sensor_type = all_sensor_type_buff;
+		all_set(SENSOR_TYPE, all_sensor_type);
+		update_menu_tip_icon(2,1);
+		break;
+	case MENU_TEMP_UNIT_SET:
+		temp_unit = temp_unit_buff;
+		if(temp_unit == 1)
+		{
+			send_variables(ALL_SET_TEMP, all_temp + temp_unit_buff * (all_temp * 8 / 10 + 32));
+		}
+		else
+		{
+			send_variables(ALL_SET_TEMP, all_temp);
+		}
+		update_menu_tip_icon(3,1);
+		break;
+	case MENU_PREHEAT_SET:
+		preheat_time = preheat_time_buff;
+		all_set(PREHEAT_TIME, preheat_time);
+		update_menu_tip_icon(4,1);
+		break;
+// 	case ALL_SET_OK:
+// 		all_set_ok();
+// 		break;
 	case PID_SET_OK:
 		pid_set_ok();
 		break;
@@ -302,6 +329,7 @@ void key_action(uint16_t key_code)
 		update_run_temp_flag = 0;
 		break;
 	case MENU_PAGE_ENTER:
+		clear_menu_tip_icon();
  		send_variables(ALL_SET_TEMP, all_temp +
  					   temp_unit * (all_temp * 8 / 10 + 32));
 		in_main_page = 0;
@@ -667,81 +695,81 @@ void single_set_ok(void)
 	update_run_temp_flag = 0;
 }
 
-void all_set_ok(void)
-{
-	uint8_t i = 0;
-
-	all_temp = all_temp_buff;
-
-	for (i = 0; i < MAX_IQR_QUANTITY; i++)
-	{
-		set_temp[i] = all_temp;
-		set_temp_buff[i] = all_temp;
-		// 		eeprom_write(SINGLE_SETTEMP_EEADDR + (i * 2), set_temp[i]);
-		// 		eeprom_write(SINGLE_SETTEMP_EEADDR + (i * 2) + 1, set_temp[i] >> 8);
-	}
-
-	// 	if (temp_unit_buff != temp_unit)
-	// 	{
-	temp_unit = temp_unit_buff;
-	// 		send_variables(TEMP_UINT_ADDR, (CELSIUS + temp_unit * FAHRENHEIT));
-	//
-	// 		//发送给控制板卡  保存数据
-	// 		/*		eeprom_write(TEMP_UNIT_EEADDR, temp_unit);*/
-	// 	}
-
-	preheat_time = preheat_time_buff;
-
-	all_sensor_type = all_sensor_type_buff;
-
-	for (i = 0; i < MAX_IQR_QUANTITY; i++)
-	{
-		sensor_type[i] = all_sensor_type;
-		sensor_type_buff[i] = all_sensor_type;
-		//			eeprom_write(SINGLE_SENSORTYPE_EEADDR + i, sensor_type[i]);
-	}
-	//	send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
-
-	update_main_page();
-
-	ctrl_command[ctrl_index++] = PREHEAT_TIME;
-	ctrl_command[ctrl_index++] = SENSOR_TYPE;
-	ctrl_command[ctrl_index++] = TEMP;
-	all_set_flag = 1;
-	// all_set(TEMP, all_temp);
-	// all_set(PREHEAT_TIME, preheat_time);
-	// all_set(SENSOR_TYPE, all_sensor_type);
-
-	// 	eeprom_write(ALL_SETTEMP_EEADDR, all_temp);
-	// 	eeprom_write(ALL_SETTEMP_EEADDR + 1, all_temp >> 8);
-
-	// 	if (preheat_time_buff != preheat_time)
-	// 	{
-	// 		preheat_time = preheat_time_buff;
-	//
-	// 		all_set(PREHEAT_TIME, preheat_time);
-	//
-	// // 		eeprom_write(PREHEAT_TIME_EEADDR, preheat_time);
-	// 	}
-	//
-	// 	if (all_sensor_type_buff != all_sensor_type)
-	// 	{
-	// 		all_sensor_type = all_sensor_type_buff;
-	//
-	// 		all_set(SENSOR_TYPE, all_sensor_type);
-	// //		eeprom_write(ALL_SENSORTYPE_EEADDR, all_sensor_type);
-	//
-	// 		for (i = 0; i < MAX_IQR_QUANTITY; i++)
-	// 		{
-	// 			sensor_type[i] = all_sensor_type;
-	// 			sensor_type_buff[i] = all_sensor_type;
-	// //			eeprom_write(SINGLE_SENSORTYPE_EEADDR + i, sensor_type[i]);
-	// 		}
-	// 		send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
-	// 	}
-	//
-	in_main_page = 1;
-}
+// void all_set_ok(void)
+// {
+// 	uint8_t i = 0;
+// 
+// 	all_temp = all_temp_buff;
+// 
+// 	for (i = 0; i < MAX_IQR_QUANTITY; i++)
+// 	{
+// 		set_temp[i] = all_temp;
+// 		set_temp_buff[i] = all_temp;
+// 		// 		eeprom_write(SINGLE_SETTEMP_EEADDR + (i * 2), set_temp[i]);
+// 		// 		eeprom_write(SINGLE_SETTEMP_EEADDR + (i * 2) + 1, set_temp[i] >> 8);
+// 	}
+// 
+// 	// 	if (temp_unit_buff != temp_unit)
+// 	// 	{
+// 	temp_unit = temp_unit_buff;
+// 	// 		send_variables(TEMP_UINT_ADDR, (CELSIUS + temp_unit * FAHRENHEIT));
+// 	//
+// 	// 		//发送给控制板卡  保存数据
+// 	// 		/*		eeprom_write(TEMP_UNIT_EEADDR, temp_unit);*/
+// 	// 	}
+// 
+// 	preheat_time = preheat_time_buff;
+// 
+// 	all_sensor_type = all_sensor_type_buff;
+// 
+// 	for (i = 0; i < MAX_IQR_QUANTITY; i++)
+// 	{
+// 		sensor_type[i] = all_sensor_type;
+// 		sensor_type_buff[i] = all_sensor_type;
+// 		//			eeprom_write(SINGLE_SENSORTYPE_EEADDR + i, sensor_type[i]);
+// 	}
+// 	//	send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
+// 
+// 	update_main_page();
+// 
+// 	ctrl_command[ctrl_index++] = PREHEAT_TIME;
+// 	ctrl_command[ctrl_index++] = SENSOR_TYPE;
+// 	ctrl_command[ctrl_index++] = TEMP;
+// 	all_set_flag = 1;
+// 	// all_set(TEMP, all_temp);
+// 	// all_set(PREHEAT_TIME, preheat_time);
+// 	// all_set(SENSOR_TYPE, all_sensor_type);
+// 
+// 	// 	eeprom_write(ALL_SETTEMP_EEADDR, all_temp);
+// 	// 	eeprom_write(ALL_SETTEMP_EEADDR + 1, all_temp >> 8);
+// 
+// 	// 	if (preheat_time_buff != preheat_time)
+// 	// 	{
+// 	// 		preheat_time = preheat_time_buff;
+// 	//
+// 	// 		all_set(PREHEAT_TIME, preheat_time);
+// 	//
+// 	// // 		eeprom_write(PREHEAT_TIME_EEADDR, preheat_time);
+// 	// 	}
+// 	//
+// 	// 	if (all_sensor_type_buff != all_sensor_type)
+// 	// 	{
+// 	// 		all_sensor_type = all_sensor_type_buff;
+// 	//
+// 	// 		all_set(SENSOR_TYPE, all_sensor_type);
+// 	// //		eeprom_write(ALL_SENSORTYPE_EEADDR, all_sensor_type);
+// 	//
+// 	// 		for (i = 0; i < MAX_IQR_QUANTITY; i++)
+// 	// 		{
+// 	// 			sensor_type[i] = all_sensor_type;
+// 	// 			sensor_type_buff[i] = all_sensor_type;
+// 	// //			eeprom_write(SINGLE_SENSORTYPE_EEADDR + i, sensor_type[i]);
+// 	// 		}
+// 	// 		send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
+// 	// 	}
+// 	//
+// 	in_main_page = 1;
+// }
 
 void pid_set_ok(void)
 {
@@ -956,6 +984,7 @@ void single_set(uint8_t command, uint16_t value)
 	// ctrl_command = READ_DATA_ALL;
 }
 
+/*
 void all_set(uint8_t command, uint16_t value)
 {
 	uint16_t crc = 0;
@@ -1000,6 +1029,18 @@ void all_set(uint8_t command, uint16_t value)
 		slave_num = 1;
 	}
 	// ctrl_command = READ_DATA_ALL;
+}
+*/
+
+void all_set(uint8_t command, uint16_t value)
+{
+	switch(command)
+	{
+		case TEMP: all_set_temp(value); break;
+		case SENSOR_TYPE: all_set_sensor_type(value); break;
+		
+		default: break;
+	}
 }
 
 void update_single_set_page(void)
@@ -1756,4 +1797,40 @@ void update_tp_time(uint8_t page_num)
 			addr_offset += 0x02;
 		}
 	}
+}
+
+void all_set_temp(uint16_t temp)
+{
+	uint8_t i;
+	
+	for (i=0; i<MAX_IQR_QUANTITY; i++)
+	{
+		set_temp[i] = temp; 
+	}
+}
+
+void all_set_sensor_type(uint16_t type)
+{
+	uint8_t i;
+	
+	for (i=0; i<MAX_IQR_QUANTITY; i++)
+	{
+		sensor_type[i] = type;
+	}
+}
+
+void clear_menu_tip_icon(void)
+{
+	uint8_t i;
+	
+	for (i=0;i<4;i++)
+	{
+		send_variables(MENU_SET_TIP_ICON1+i*2, 0);
+	}
+}
+
+void update_menu_tip_icon(uint8_t icon_num, uint8_t sta)
+{
+	clear_menu_tip_icon();
+	send_variables(MENU_SET_TIP_ICON1+(icon_num-1)*2, sta);
 }

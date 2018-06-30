@@ -78,7 +78,7 @@
 #define MAIN_SENSOR5_SET 0x0008
 #define MAIN_SENSOR6_SET 0x0009
 #define SINGLE_SET_OK 0x000A
-#define ALL_SET_OK 0x000B
+/*#define ALL_SET_OK 0x000B*/
 #define PID_SET_OK 0x000C
 #define CURVE_ZOOM_OUT 0x000D
 #define CURVE_ZOOM_IN 0x000E
@@ -141,6 +141,10 @@
 #define TIME_VIEW_PAGE_DOWN		0x0047
 #define TEMPLATE_FIND			0x0048
 #define TEMPLATE_PAGE_BACK		0x0049
+#define MENU_TEMP_SET			0x004A
+#define MENU_SENSOR_TYPE_SET	0x004B
+#define MENU_TEMP_UNIT_SET		0x004C
+#define MENU_PREHEAT_SET		0x004D
 
 //曲线通道号
 #define CHANNEL0 0x01
@@ -342,6 +346,11 @@
 
 #define TIME_VIEW_MOUDEL_NUM 0x0102  // - 0X0103
 
+#define MENU_SET_TIP_ICON1 0x0104	// - 0x0105
+#define MENU_SET_TIP_ICON2 0x0106	// - 0x0107
+#define MENU_SET_TIP_ICON3 0x0108	// - 0x0109
+#define MENU_SET_TIP_ICON4 0x010A	// - 0x010B
+
 #define TEMPLATE_NAME1	0x01A2	//模板名称槽1 0x01A2 - 0x01A5
 #define TEMPLATE_NAME2	0x01A6	//模板名称槽1 0x01A6 - 0x01A9
 #define TEMPLATE_NAME3	0x01AA	//模板名称槽1 0x01AA - 0x01AD
@@ -472,7 +481,7 @@ void get_data_all(void);
 void clear_curve_buff(uint8_t channel);
 
 void single_set_ok(void);
-void all_set_ok(void);
+/*void all_set_ok(void);*/
 void pid_set_ok(void);
 void clear_alarm_msg(uint8_t msg_num);
 void clear_all_alarm_msg(void);
@@ -492,5 +501,9 @@ void alarm_monitor(void);
 void update_template_page(uint8_t num);
 void update_tp_temp(uint8_t page_num);
 void update_tp_time(uint8_t page_num);
+void all_set_temp(uint16_t temp);
+void all_set_sensor_type(uint16_t type);
+void clear_menu_tip_icon(void);
+void update_menu_tip_icon(uint8_t icon_num, uint8_t sta);
 
 #endif /* DGUS_H_ */
