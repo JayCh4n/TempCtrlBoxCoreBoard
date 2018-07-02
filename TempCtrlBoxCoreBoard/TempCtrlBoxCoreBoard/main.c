@@ -99,18 +99,15 @@ int main(void)
 
 		if (usart1_tx_overtime_mask == 1)
 		{
-			if (ctrl_index == 0)
+			
+			//			if (in_main_page)
+			//			{
+			send_request_all(slave_num);
+			if (++slave_num >= TEMP_CTRL_BOARD_QUANTITY + 1)
 			{
-//				if (in_main_page)
-//				{
-					send_request_all(slave_num);
-	
-					if (++slave_num >= TEMP_CTRL_BOARD_QUANTITY + 1)
-					{
-						slave_num = 1;
-					}
-//				}
+				slave_num = 1;
 			}
+//						}
 // 			else
 // 			{
 // 				switch (ctrl_command[ctrl_index - 1])
@@ -193,7 +190,6 @@ int main(void)
 // 					default: break;
 // 				}
 // 			}
-
 			usart1_tx_overtime_mask = 0;
 			usart1_tx_timecnt = 0;
 		}

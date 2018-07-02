@@ -43,6 +43,7 @@
 #define SWITCH_SENSOR 0x06
 #define READ_SETTING_DATA 0x07
 #define SET_FOLLOW 0x08
+#define STANDBY	0x09
 
 #define ALL_SET_CMD 0x07	//菜单里全局设定OK键标志 用来轮询发送获取控制板卡数据
 
@@ -145,6 +146,11 @@
 #define MENU_SENSOR_TYPE_SET	0x004B
 #define MENU_TEMP_UNIT_SET		0x004C
 #define MENU_PREHEAT_SET		0x004D
+#define TEMP_CTRL_WORK			0x004E
+#define TEMP_CTRL_ALL_AUTO		0x004F
+#define TEMP_CTRL_ALL_WORK		0x0050
+#define TEMP_CTRL_ALL_STOP		0x0051
+#define STSTEM_STANDBY			0x0052
 
 //曲线通道号
 #define CHANNEL0 0x01
@@ -359,6 +365,18 @@
 #define TEMPLATE_FIND_NAME	0x01B6	//模板搜索名称输入 0x01B6 - 0x01B9*/
 #define TEMPLATE_SAVE_NAME	0x01BC  //模板保存名字	0x01BC-0x01BF
 
+#define TEMP_VIEW_SENSOR_TYPE1	0x010C	//模板温度查看界面传感器类型图标 -0x010D
+#define TEMP_VIEW_SENSOR_TYPE2	0x010E
+#define TEMP_VIEW_SENSOR_TYPE3	0x0110
+#define TEMP_VIEW_SENSOR_TYPE4	0x0112
+#define TEMP_VIEW_SENSOR_TYPE5	0x0114
+#define TEMP_VIEW_SENSOR_TYPE6	0x0116
+#define TEMP_VIEW_SENSOR_TYPE7	0x0118
+#define TEMP_VIEW_SENSOR_TYPE8	0x011A
+#define TEMP_VIEW_SENSOR_TYPE9	0x011C
+#define TEMP_VIEW_SENSOR_TYPE10	0x011E
+#define TEMP_VIEW_SENSOR_TYPE11	0x0120
+#define TEMP_VIEW_SENSOR_TYPE12	0x0122
 
 #define MAX_ALARM_HISTORY 70
 
@@ -457,6 +475,7 @@ extern uint8_t pre_first_tpnum;
 extern uint32_t tp_find_name;
 extern uint32_t tp_save_name;
 extern template_struct_typedef template_structure;
+extern uint8_t usart1_mutex_flag;
 
 // void init_time_ctrl_value(void);
 void init_variable(void);
@@ -466,8 +485,12 @@ void update_pid_page(uint8_t channel);
 void update_curve_page(void);
 void update_time_ctrl_page(void);
 void save_time_ctrl_data(void);
+void work_time_ctrl(uint8_t slave_num);
+void work_time_ctrl_all(void);
 void start_time_ctrl(uint8_t slave_num);
+void start_time_ctrl_all(void);
 void stop_time_ctrl(uint8_t slave_num);
+void stop_temp_ctrl_all(void);
 void time_ctrl_test(uint8_t slave_num, uint8_t command);
 void switch_language(void);
 void change_page(uint8_t page_num);
