@@ -61,7 +61,7 @@ uint32_t tp_find_name = 0;			//模板搜索名称
 uint32_t tp_save_name = 0;			//模板保存名称
 template_struct_typedef template_structure;
 
-uint8_t usart1_mutex_flag = 0;
+uint8_t standby_sta = 0;
 
 uint8_t alarm_msg[7][16] = {
 	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCF, 0xBF, 0xAA}, //热电偶断开
@@ -658,6 +658,8 @@ void key_action(uint16_t key_code)
 			stop_temp_ctrl_all();
 			break;
 		case STSTEM_STANDBY:
+			standby_sta ^= 0x01; 
+			all_set(STANDBY, standby_sta);
 			break;
 	default: break;
 	}
@@ -902,53 +904,53 @@ void all_set_back(void)
 	in_main_page = 1;
 }
 
-void switch_all_sensor(uint16_t sta)
-{
-	uint8_t i = 0;
-	uint16_t crc = 0;
-	static uint8_t slave_num = 1;
+// void switch_all_sensor(uint16_t sta)
+// {
+// 	uint8_t i = 0;
+// 	uint16_t crc = 0;
+// 	static uint8_t slave_num = 1;
 
-	// ctrl_command = 0; //不是READ_DATA_ALL 就ok
+// 	// ctrl_command = 0; //不是READ_DATA_ALL 就ok
 
-	usart1_tx_buff[0] = 0xA5;
-	usart1_tx_buff[1] = 0x5A;
-	usart1_tx_buff[2] = 0x04;
-	usart1_tx_buff[3] = 0x06;
-	usart1_tx_buff[5] = 0x00;
-	usart1_tx_buff[6] = sta;
+// 	usart1_tx_buff[0] = 0xA5;
+// 	usart1_tx_buff[1] = 0x5A;
+// 	usart1_tx_buff[2] = 0x04;
+// 	usart1_tx_buff[3] = 0x06;
+// 	usart1_tx_buff[5] = 0x00;
+// 	usart1_tx_buff[6] = sta;
 
-	if (slave_num == 1)
-	{
-		for (i = 0; i < MAX_IQR_QUANTITY; i++)
-		{
-			switch_sensor[i] = sta;
-			switch_sensor_buff[i] = sta;
-			// 		eeprom_write(SINGLE_SWSENSOR_EEADDR+i, switch_sensor[i]);
-		}
-	}
+// 	if (slave_num == 1)
+// 	{
+// 		for (i = 0; i < MAX_IQR_QUANTITY; i++)
+// 		{
+// 			switch_sensor[i] = sta;
+// 			switch_sensor_buff[i] = sta;
+// 			// 		eeprom_write(SINGLE_SWSENSOR_EEADDR+i, switch_sensor[i]);
+// 		}
+// 	}
 
-	// for (; slave_num <= TEMP_CTRL_BOARD_QUANTITY; slave_num++)
-	// {
-	usart1_tx_buff[4] = slave_num << 4;
+// 	// for (; slave_num <= TEMP_CTRL_BOARD_QUANTITY; slave_num++)
+// 	// {
+// 	usart1_tx_buff[4] = slave_num << 4;
 
-	crc = crc_check(usart1_tx_buff, 9);
+// 	crc = crc_check(usart1_tx_buff, 9);
 
-	usart1_tx_buff[7] = crc & 0x00FF;
-	usart1_tx_buff[8] = crc >> 8;
+// 	usart1_tx_buff[7] = crc & 0x00FF;
+// 	usart1_tx_buff[8] = crc >> 8;
 
-	// while (usart1_tx_overtime_mask != 1)
-	// 	;
-	// usart1_tx_overtime_mask = 0;
-	// usart1_tx_timecnt = 0;
+// 	// while (usart1_tx_overtime_mask != 1)
+// 	// 	;
+// 	// usart1_tx_overtime_mask = 0;
+// 	// usart1_tx_timecnt = 0;
 
-	usart1_send_str(usart1_tx_buff, 9);
-	// }
+// 	usart1_send_str(usart1_tx_buff, 9);
+// 	// }
 
-	if(++slave_num > TEMP_CTRL_BOARD_QUANTITY)
-	{
-		slave_num = 1;
-	}
-}
+// 	if(++slave_num > TEMP_CTRL_BOARD_QUANTITY)
+// 	{
+// 		slave_num = 1;
+// 	}
+// }
 
 uint32_t get_name(void)
 {
@@ -1052,7 +1054,9 @@ void all_set(uint8_t command, uint16_t value)
 	{
 		case TEMP: all_set_temp(value); break;
 		case SENSOR_TYPE: all_set_sensor_type(value); break;
-		case PREHEAT_TIME:
+		case PREHEAT_TIME: all_set_preheattime(value); break;
+		case SWITCH_SENSOR: all_set_switch_sensor(value); break;
+		case STANDBY: all_set_standby(value); break;
 		default: break;
 	}
 }
@@ -1915,6 +1919,83 @@ void all_set_sensor_type(uint16_t type)
 	usart1_tx_buff[4] = 0x00;		//全局
 	usart1_tx_buff[5] = (type >> 8);
 	usart1_tx_buff[6] = type;
+	
+	crc = crc_check(usart1_tx_buff, 9);
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+	usart1_tx_buff[8] = crc >> 8;
+	
+	while (usart1_tx_overtime_mask != 1)
+	;
+	
+	usart1_send_str(usart1_tx_buff, 9);
+	
+	usart1_tx_overtime_mask = 0;
+	usart1_tx_timecnt = 0;
+}
+void all_set_preheattime(uint8_t value)
+{
+	uint16_t crc;
+	
+	usart1_tx_buff[0] = 0xA5;
+	usart1_tx_buff[1] = 0x5A;
+	usart1_tx_buff[2] = 0x04;
+	usart1_tx_buff[3] = PREHEAT_TIME;
+	usart1_tx_buff[4] = 0x00;		//全局
+	usart1_tx_buff[5] = (value >> 8);
+	usart1_tx_buff[6] = value;
+	
+	crc = crc_check(usart1_tx_buff, 9);
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+	usart1_tx_buff[8] = crc >> 8;
+	
+	while (usart1_tx_overtime_mask != 1)
+	;
+	
+	usart1_send_str(usart1_tx_buff, 9);
+	
+	usart1_tx_overtime_mask = 0;
+	usart1_tx_timecnt = 0;
+}
+
+void all_set_switch_sensor(uint8_t value)
+{
+	uint16_t crc;
+	
+	usart1_tx_buff[0] = 0xA5;
+	usart1_tx_buff[1] = 0x5A;
+	usart1_tx_buff[2] = 0x04;
+	usart1_tx_buff[3] = SWITCH_SENSOR;
+	usart1_tx_buff[4] = 0x00;		//全局
+	usart1_tx_buff[5] = (value >> 8);
+	usart1_tx_buff[6] = value;
+	
+	crc = crc_check(usart1_tx_buff, 9);
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+	usart1_tx_buff[8] = crc >> 8;
+	
+	while (usart1_tx_overtime_mask != 1)
+	;
+	
+	usart1_send_str(usart1_tx_buff, 9);
+	
+	usart1_tx_overtime_mask = 0;
+	usart1_tx_timecnt = 0;
+}
+
+void all_set_standby(uint8_t sta)
+{
+	uint16_t crc;
+	
+	usart1_tx_buff[0] = 0xA5;
+	usart1_tx_buff[1] = 0x5A;
+	usart1_tx_buff[2] = 0x04;
+	usart1_tx_buff[3] = STANDBY;
+	usart1_tx_buff[4] = 0x00;		//全局
+	usart1_tx_buff[5] = (value >> 8);
+	usart1_tx_buff[6] = value;
 	
 	crc = crc_check(usart1_tx_buff, 9);
 

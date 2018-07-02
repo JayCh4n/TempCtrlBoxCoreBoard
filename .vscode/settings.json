@@ -15,6 +15,9 @@
         "tuple": "c",
         "type_traits": "c",
         "typeinfo": "cpp",
-        "at24c128c.h": "c"
+        "at24c128c.h": "c",
+        "__functional_base_03": "c",
+        "__tuple": "c",
+        "utility": "c"
     }
 }

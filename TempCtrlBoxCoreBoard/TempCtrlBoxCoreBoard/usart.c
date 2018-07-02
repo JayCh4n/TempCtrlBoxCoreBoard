@@ -105,6 +105,7 @@ int usart0_deal(void)
 			break; //如果变量地址为按键变量地址  执行按键动作
 		case MASTER_SWITCH:
 			pre_system_sta = variable;
+			all_set(SWITCH_SENSOR, variable);
 /*			all_set_flag = 1;*/
 /*			ctrl_command[ctrl_index++] = SWITCH_SENSOR;*/
 			// switch_all_sensor(variable);

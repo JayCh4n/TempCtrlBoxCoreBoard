@@ -475,7 +475,6 @@ extern uint8_t pre_first_tpnum;
 extern uint32_t tp_find_name;
 extern uint32_t tp_save_name;
 extern template_struct_typedef template_structure;
-extern uint8_t usart1_mutex_flag;
 
 // void init_time_ctrl_value(void);
 void init_variable(void);
@@ -512,7 +511,7 @@ void update_alarm_page(uint8_t page_num);
 void single_set_back(void);
 void all_set_back(void);
 
-void switch_all_sensor(uint16_t sta);
+// void switch_all_sensor(uint16_t sta);
 uint32_t get_name(void);
 void single_set(uint8_t command, uint16_t value);
 void all_set(uint8_t command, uint16_t value);
@@ -526,6 +525,9 @@ void update_tp_temp(uint8_t page_num);
 void update_tp_time(uint8_t page_num);
 void all_set_temp(uint16_t temp);
 void all_set_sensor_type(uint16_t type);
+void all_set_preheattime(uint8_t value);
+void all_set_switch_sensor(uint8_t value);
+void all_set_standby(uint8_t sta);
 void clear_menu_tip_icon(void);
 void update_menu_tip_icon(uint8_t icon_num, uint8_t sta);
 
