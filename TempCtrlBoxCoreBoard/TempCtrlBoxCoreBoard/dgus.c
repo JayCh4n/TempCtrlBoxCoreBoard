@@ -26,7 +26,7 @@ uint8_t sensor_sta[MAX_IQR_QUANTITY] = {0};		//获取
 uint8_t pre_sensor_sta[MAX_IQR_QUANTITY] = {0}; //上次监测时传感器状态 用来识别状态是否变化
 int16_t run_temp[MAX_IQR_QUANTITY] = {0};		//获取
 
-int16_t set_temp[MAX_IQR_QUANTITY]; //发送
+uint16_t set_temp[MAX_IQR_QUANTITY]; //发送
 uint16_t switch_sensor[MAX_IQR_QUANTITY] = {0};
 uint16_t sensor_type[MAX_IQR_QUANTITY] = {0};
 uint32_t set_name[MAX_IQR_QUANTITY];
@@ -44,9 +44,9 @@ uint16_t all_sensor_type = 0; //发送
 uint16_t temp_unit = 0;		  //
 uint16_t all_temp = 100;	  //发送
 
-uint8_t module_num = 1;			   //射胶模块号码
-uint8_t module_status[4] = {0};	//射胶模块运行状态
-uint16_t time_ctrl_value[4][8][4]; //射胶时间控制数据   共四个模块  每个模块8个通道  每个通道有 T1 T2 T3 T4 4个时间段
+uint8_t module_num = 1;				//射胶模块号码
+uint8_t module_status[4] = {0};		//射胶模块运行状态
+uint16_t time_ctrl_value[4][8][4];	//射胶时间控制数据   共四个模块  每个模块8个通道  每个通道有 T1 T2 T3 T4 4个时间段
 
 uint8_t alarm_cnt = 0;
 alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
@@ -63,7 +63,7 @@ template_struct_typedef template_structure;
 
 uint8_t standby_sta = 0;
 
-uint8_t alarm_msg[7][16] = {
+uint8_t alarm_msg[14][16] = {
 	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCF, 0xBF, 0xAA}, //热电偶断开
 	{0xCE, 0xC2, 0xB6, 0xC8, 0xB9, 0xFD, 0xB8, 0xDF},			  //温度过高
 	{0xCE, 0xC2, 0xB6, 0xC8, 0xB9, 0xFD, 0xB5, 0xCD},			  //温度过低
@@ -71,6 +71,13 @@ uint8_t alarm_msg[7][16] = {
 	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xBD, 0xD3, 0xB7, 0xB4}, //热电偶接反
 	{0xBC, 0xD3, 0xC8, 0xC8, 0xC6, 0xF7, 0xB6, 0xCF, 0xBF, 0xAA}, //加热器断开
 	{0xBC, 0xD3, 0xC8, 0xC8, 0xC6, 0xF7, 0xB6, 0xCC, 0xC2, 0xB7}, //加热器短路
+	{0x54, 0x68, 0x65, 0x72, 0x6D, 0x00, 0x64, 0x69, 0x73, 0x63, 0x6F, 0x6E, 0x6E, 0x65, 0x63, 0x74},		//Therm disconnect
+	{0x48, 0x69, 0x67, 0x68, 0x00, 0x74, 0x65, 0x6D, 0x70, 0x65, 0x72, 0x61, 0x74, 0x75, 0x72, 0x65},		//High temperature 
+	{0x4C, 0x6F, 0x77, 0x00, 0x74, 0x65, 0x6D, 0x70, 0x65, 0x72, 0x61, 0x74, 0x75, 0x72, 0x65},				//Low temperature
+	{0x54, 0x68, 0x65, 0x72, 0x6D, 0x00, 0x73, 0x2D, 0x63, 0x69, 0x72, 0x63, 0x75, 0x69, 0x74},				//Therm s-circuit
+	{0x54, 0x68, 0x65, 0x72, 0x6D, 0x00, 0x72, 0x65, 0x76, 0x65, 0x72, 0x73, 0x61, 0x6C},					//Therm reversal
+	{0x48, 0x65, 0x73, 0x61, 0x74, 0x65, 0x00, 0x64, 0x69, 0x73, 0x63, 0x6F, 0x6E, 0x65, 0x63, 0x74},		//Heater disconnect
+	{0x48, 0x65, 0x73, 0x61, 0x74, 0x65, 0x00, 0x73, 0x2D, 0x63, 0x69, 0x72, 0x63, 0x75, 0x69, 0x74}		//Heater s-circuit
 };
 
 void init_variable(void)
@@ -474,7 +481,7 @@ void key_action(uint16_t key_code)
 		}
 		else
 		{
-			change_page(21);
+			change_page(21+pre_language*23);
 			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
 			update_tp_temp(temp_view_page_num);
 		}
@@ -490,7 +497,7 @@ void key_action(uint16_t key_code)
 		}
 		else
 		{
-			change_page(21);
+			change_page(21+pre_language*23);
 			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
 			update_tp_temp(temp_view_page_num);
 		}
@@ -506,7 +513,7 @@ void key_action(uint16_t key_code)
 		}
 		else
 		{
-			change_page(21);
+			change_page(21+pre_language*23);
 			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
 			update_tp_temp(temp_view_page_num);
 		}
@@ -522,7 +529,7 @@ void key_action(uint16_t key_code)
 		}
 		else
 		{
-			change_page(21);
+			change_page(21+pre_language*23);
 			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
 			update_tp_temp(temp_view_page_num);
 		}
@@ -538,7 +545,7 @@ void key_action(uint16_t key_code)
 		}
 		else
 		{
-			change_page(21);
+			change_page(21+pre_language*23);
 			read_template_from_eeprom((uint8_t *)&template_structure, view_tp_num);
 			update_tp_temp(temp_view_page_num);
 		}
@@ -658,7 +665,7 @@ void key_action(uint16_t key_code)
 			stop_temp_ctrl_all();
 			break;
 		case STSTEM_STANDBY:
-			standby_sta ^= 0x01; 
+//			standby_sta ^= 0x01; 
 			all_set(STANDBY, standby_sta);
 			break;
 	default: break;
@@ -808,8 +815,8 @@ void pid_set_ok(void)
 	send_variables(PID_I_ADDR, i_value[set_pid_channel - 1]);
 	send_variables(PID_D_ADDR, d_value[set_pid_channel - 1]);
 
-	// set_pid();
-	ctrl_command[ctrl_index++] = PID;
+	set_pid();
+/*	ctrl_command[ctrl_index++] = PID;*/
 }
 
 /*
@@ -844,14 +851,11 @@ void set_pid(void)
 	usart1_tx_buff[11] = crc & 0x00FF;
 	usart1_tx_buff[12] = crc >> 8;
 
-	// while (usart1_tx_overtime_mask != 1)
-	// 	;
-	// usart1_tx_overtime_mask = 0;
-	// usart1_tx_timecnt = 0;
-
+	while (usart1_tx_overtime_mask != 1)
+		;
 	usart1_send_str(usart1_tx_buff, 13);
-
-	// ctrl_command = READ_DATA_ALL;
+	usart1_tx_overtime_mask = 0;
+	usart1_tx_timecnt = 0;
 }
 
 void single_set_back(void)
@@ -1381,7 +1385,7 @@ void switch_language(void)
 {
 	if (pre_language == 1)
 	{
-		change_page(3); //暂定英文页面为13
+		change_page(30); //暂定英文页面为13
 	}
 	else
 	{
@@ -1494,7 +1498,7 @@ void send_alarm_msg(uint8_t type, uint8_t msg_num, uint16_t sen_num)
 
 	for (i = 0; i < 16; i++)
 	{
-		usart0_tx_buff[i + 6] = alarm_msg[type][i];
+		usart0_tx_buff[i + 6] = alarm_msg[type+pre_language*7][i];
 	}
 
 	crc = crc_check(usart0_tx_buff, 24);
@@ -1961,7 +1965,15 @@ void all_set_preheattime(uint8_t value)
 
 void all_set_switch_sensor(uint8_t value)
 {
+	uint8_t i;
 	uint16_t crc;
+	
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
+	{
+		switch_sensor[i] = value;
+ 		switch_sensor_buff[i] = value;
+// 		eeprom_write(SINGLE_SWSENSOR_EEADDR+i, switch_sensor[i]);
+	}
 	
 	usart1_tx_buff[0] = 0xA5;
 	usart1_tx_buff[1] = 0x5A;
@@ -1994,8 +2006,8 @@ void all_set_standby(uint8_t sta)
 	usart1_tx_buff[2] = 0x04;
 	usart1_tx_buff[3] = STANDBY;
 	usart1_tx_buff[4] = 0x00;		//全局
-	usart1_tx_buff[5] = (value >> 8);
-	usart1_tx_buff[6] = value;
+	usart1_tx_buff[5] = (sta >> 8);
+	usart1_tx_buff[6] = sta;
 	
 	crc = crc_check(usart1_tx_buff, 9);
 
@@ -2003,9 +2015,41 @@ void all_set_standby(uint8_t sta)
 	usart1_tx_buff[8] = crc >> 8;
 	
 	while (usart1_tx_overtime_mask != 1)
-	;
-	
+		;
 	usart1_send_str(usart1_tx_buff, 9);
+	
+	usart1_tx_overtime_mask = 0;
+	usart1_tx_timecnt = 0;
+}
+
+/*所有通道的某一数据 例如温度、传感器类型  打包一起发过去 地址为 00*/
+void every_set(uint8_t command, uint16_t *value)
+{
+	uint8_t i, lenth;
+	uint16_t crc;
+	
+	lenth = MAX_IQR_QUANTITY*2 + 7;
+	
+	usart1_tx_buff[0] = 0xA5;
+	usart1_tx_buff[1] = 0x5A;
+	usart1_tx_buff[2] = lenth - 5;		//长度不包括 数据头 长度 和校验位
+	usart1_tx_buff[3] = command;
+	usart1_tx_buff[4] = 0x00;			//address
+	
+	for (i=0; i<MAX_IQR_QUANTITY; i++)
+	{
+		usart1_tx_buff[5+i*2] = value[i] >> 8;
+		usart1_tx_buff[6+i*2] = value[i];
+	}
+	
+	crc = crc_check(usart1_tx_buff, lenth);
+	
+	usart1_tx_buff[lenth - 2] = crc & 0x00FF;
+	usart1_tx_buff[lenth - 1] = crc >> 8;
+	
+	while (usart1_tx_overtime_mask != 1)
+		;
+	usart1_send_str(usart1_tx_buff, lenth);
 	
 	usart1_tx_overtime_mask = 0;
 	usart1_tx_timecnt = 0;

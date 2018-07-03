@@ -34,7 +34,9 @@ void apply_template(uint8_t template_num)
 				eeprom_write_word((uint16_t *)(TIME_CTRL_VALUE_EEADDR + (i * 32 + j * 4 + k) * 2), time_ctrl_value[i][j][k]);
 			}
 		}
-	}	
+	}
+	every_set(TEMP, set_temp);
+	every_set(SENSOR_TYPE, sensor_type);
 }
 
 /*搜索模板 返回值为第几个模板 0：未搜索到模板*/

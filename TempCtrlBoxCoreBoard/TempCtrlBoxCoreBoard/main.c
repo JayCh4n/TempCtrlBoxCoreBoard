@@ -99,15 +99,12 @@ int main(void)
 
 		if (usart1_tx_overtime_mask == 1)
 		{
-			
-			//			if (in_main_page)
-			//			{
 			send_request_all(slave_num);
 			if (++slave_num >= TEMP_CTRL_BOARD_QUANTITY + 1)
 			{
 				slave_num = 1;
 			}
-//						}
+			
 // 			else
 // 			{
 // 				switch (ctrl_command[ctrl_index - 1])
@@ -201,6 +198,7 @@ int main(void)
 			alarm_monitor_overtime_mask = 0;
 		}
 	}
+	
 	return 0;
 }
 

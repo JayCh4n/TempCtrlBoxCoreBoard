@@ -448,7 +448,7 @@ extern uint16_t d_value[MAX_IQR_QUANTITY]; //·¢ËÍ
 
 extern uint8_t output_rate[MAX_IQR_QUANTITY];
 extern int16_t run_temp[MAX_IQR_QUANTITY];
-extern int16_t set_temp[MAX_IQR_QUANTITY];
+extern uint16_t set_temp[MAX_IQR_QUANTITY];
 extern uint16_t sensor_type[MAX_IQR_QUANTITY];
 extern uint16_t switch_sensor[MAX_IQR_QUANTITY];
 extern uint8_t follow_sta[MAX_IQR_QUANTITY];
@@ -528,6 +528,7 @@ void all_set_sensor_type(uint16_t type);
 void all_set_preheattime(uint8_t value);
 void all_set_switch_sensor(uint8_t value);
 void all_set_standby(uint8_t sta);
+void every_set(uint8_t command, uint16_t *value);
 void clear_menu_tip_icon(void);
 void update_menu_tip_icon(uint8_t icon_num, uint8_t sta);
 
