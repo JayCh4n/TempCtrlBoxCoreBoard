@@ -1487,7 +1487,7 @@ void send_alarm_msg(uint8_t type, uint8_t msg_num, uint16_t sen_num)
 {
 	uint8_t i = 0;
 	uint16_t crc = 0;
-	uint16_t sensor_num = 0;
+//	uint16_t sensor_num = 0;
 
 	usart0_tx_buff[0] = 0xA5;
 	usart0_tx_buff[1] = 0x5A;
@@ -1508,16 +1508,19 @@ void send_alarm_msg(uint8_t type, uint8_t msg_num, uint16_t sen_num)
 
 	usart0_send_str(usart0_tx_buff, 24);
 
-	if (sen_num <= 8)
-	{
-		sensor_num = 0x2300 | (sen_num + 49);
-	}
-	else
-	{
-		sensor_num = 0x2300 | (sen_num + 56);
-	}
+// 	if (sen_num <= 8)
+// 	{
+// 		sensor_num = 0x2300 | (sen_num + 49);
+// 	}
+// 	else
+// 	{
+// 		sensor_num = 0x2300 | (sen_num + 56);
+// 	}
 
-	send_variables(ALARM_DEVICE_NUM1_ADDR + (msg_num * 2), sensor_num);
+/*	send_variables(ALARM_DEVICE_NUM1_ADDR + (msg_num * 2), sensor_num);*/
+	
+	send_variables(ALARM_DEVICE_NUM1_ADDR + (msg_num * 2), sen_num + 1);
+
 }
 
 /* 依次读取三块主控板设定数据 */
