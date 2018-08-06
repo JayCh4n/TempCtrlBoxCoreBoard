@@ -134,6 +134,16 @@ ISR(TIMER0_OVF_vect)
 */
 ISR(TIMER1_COMPA_vect)
 {
+// 	EN_INTERRUPT;
+// 	
+// 	if(init_complete)
+// 	{
+// 		if(++screen_protection_time_cnt >= 30000)
+// 		{
+// 			screen_protection_over_time_mask = 1;
+// 		}
+// 	}
+// 	
 	/*
 	uint8_t i = 0;
 

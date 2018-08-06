@@ -47,6 +47,7 @@ uint16_t all_temp = 100;	  //发送
 uint8_t module_num = 1;				//射胶模块号码
 uint8_t module_status[4] = {0};		//射胶模块运行状态
 uint16_t time_ctrl_value[4][8][4];	//射胶时间控制数据   共四个模块  每个模块8个通道  每个通道有 T1 T2 T3 T4 4个时间段
+uint8_t time_ctrl_mode = 'A';	//时间控制器控制模式  默认A模式
 
 uint8_t alarm_cnt = 0;
 alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
@@ -62,6 +63,11 @@ uint32_t tp_save_name = 0;			//模板保存名称
 template_struct_typedef template_structure;
 
 uint8_t standby_sta = 0;
+
+uint8_t alarm_monitor_enable_flag[MAX_IQR_QUANTITY] = {0};
+
+// uint16_t screen_protection_time_cnt = 0;
+// uint8_t screen_protection_over_time_mask = 0;
 
 uint8_t alarm_msg[14][16] = {
 	{0xC8, 0xC8, 0xB5, 0xE7, 0xC5, 0xBC, 0xB6, 0xCF, 0xBF, 0xAA}, //热电偶断开
@@ -165,15 +171,20 @@ void update_main_page(void)
 
 		/*更新传感状态图标 sensor_sta >= 4 时显示告警 0~3：关闭 开启 跟随 待机*/
 		/*更新告警类型图标 sensor_sta >= 4 时显示对应各种告警类型  0~3：显示运行正常*/
-		if (sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] >= 4)
+		if (sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] >= 4 && sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] <= 10)		//连接温控卡有告警
 		{
-			send_variables(MAIN_STA1_ADDR + (i * 4), 4);
-			send_variables(MAIN_ALARM1_ADDR + (i * 8), sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);
+			send_variables(MAIN_STA1_ADDR + (i * 4), 4);		//状态区域显示告警
+			send_variables(MAIN_ALARM1_ADDR + (i * 8), sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);	//告警区域显示相应告警类型
 		}
-		else
+		else if(sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] <= 3)			//连接温控卡无告警
 		{
-			send_variables(MAIN_STA1_ADDR + (i * 4), sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);
-			send_variables(MAIN_ALARM1_ADDR + (i * 8), 3);
+			send_variables(MAIN_STA1_ADDR + (i * 4), sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);	//状态区域显示相应状态
+			send_variables(MAIN_ALARM1_ADDR + (i * 8), 3);			//告警显示区域显示正常
+		}
+		else if(sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] == 15)	//未连接温控卡
+		{
+			send_variables(MAIN_STA1_ADDR + (i * 4), 15);	//显示空白图标
+			send_variables(MAIN_ALARM1_ADDR + (i * 8), 13);	//显示空白图标
 		}
 	}
 }
@@ -244,31 +255,31 @@ void key_action(uint16_t key_code)
 		single_set_ok();
 		break;
 	case MENU_TEMP_SET:
-		all_temp = all_temp_buff;
-		all_set(TEMP, all_temp);
-		update_menu_tip_icon(1, 1);
+// 		all_temp = all_temp_buff;
+// 		all_set(TEMP, all_temp);
+// 		update_menu_tip_icon(1, 1);
 		break;
 	case MENU_SENSOR_TYPE_SET:
-		all_sensor_type = all_sensor_type_buff;
-		all_set(SENSOR_TYPE, all_sensor_type);
-		update_menu_tip_icon(2,1);
+// 		all_sensor_type = all_sensor_type_buff;
+// 		all_set(SENSOR_TYPE, all_sensor_type);
+// 		update_menu_tip_icon(2,1);
 		break;
 	case MENU_TEMP_UNIT_SET:
-		temp_unit = temp_unit_buff;
-		if(temp_unit == 1)
-		{
-			send_variables(ALL_SET_TEMP, all_temp + temp_unit_buff * (all_temp * 8 / 10 + 32));
-		}
-		else
-		{
-			send_variables(ALL_SET_TEMP, all_temp);
-		}
-		update_menu_tip_icon(3,1);
+// 		temp_unit = temp_unit_buff;
+// 		if(temp_unit == 1)
+// 		{
+// 			send_variables(ALL_SET_TEMP, all_temp + temp_unit_buff * (all_temp * 8 / 10 + 32));
+// 		}
+// 		else
+// 		{
+// 			send_variables(ALL_SET_TEMP, all_temp);
+// 		}
+// 		update_menu_tip_icon(3,1);
 		break;
 	case MENU_PREHEAT_SET:
-		preheat_time = preheat_time_buff;
-		all_set(PREHEAT_TIME, preheat_time);
-		update_menu_tip_icon(4,1);
+// 		preheat_time = preheat_time_buff;
+// 		all_set(PREHEAT_TIME, preheat_time);
+// 		update_menu_tip_icon(4,1);
 		break;
 // 	case ALL_SET_OK:
 // 		all_set_ok();
@@ -323,7 +334,7 @@ void key_action(uint16_t key_code)
 		single_set_back();
 		break;
 	case ALL_SET_BACK:
-		all_set_back();
+//		all_set_back();
 		update_main_page();
 		break;
 	case ALARM_PAGE_ENTER:
@@ -338,7 +349,7 @@ void key_action(uint16_t key_code)
 		update_run_temp_flag = 0;
 		break;
 	case MENU_PAGE_ENTER:
-		clear_menu_tip_icon();
+//		clear_menu_tip_icon();
  		send_variables(ALL_SET_TEMP, all_temp +
  					   temp_unit * (all_temp * 8 / 10 + 32));
 		in_main_page = 0;
@@ -686,6 +697,7 @@ void single_set_ok(void)
 	if (switch_sensor_buff[set_num] != switch_sensor[set_num])
 	{
 		switch_sensor[set_num] = switch_sensor_buff[set_num];
+		alarm_monitor_enable_flag[set_num] = 1;
 /*		ctrl_command[ctrl_index++] = SWITCH_SENSOR;*/
 		single_set(SWITCH_SENSOR, switch_sensor[set_num]);
 		//		eeprom_write(SINGLE_SWSENSOR_EEADDR+set_num, switch_sensor[set_num]);	//开启默认关闭 不用写eeprom
@@ -1072,12 +1084,12 @@ void update_single_set_page(void)
 	update_run_temp_flag = 1;
 	run_temp_page = 1;
 
-	send_variables(SINGLE_NUM_ADDR, set_num + 1);															  //序号显示
-	send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num] + temp_unit * (run_temp[set_num] * 8 / 10 + 32)); //运行温度显示
-	send_variables(SINGLE_SETTEMP_ADDR, set_temp[set_num] + temp_unit * (set_temp[set_num] * 8 / 10 + 32));  //设定温度显示
-	send_variables(SINGLE_SET_TEMP, set_temp[set_num] + temp_unit * (set_temp[set_num] * 8 / 10 + 32));	 //温度设定输入框显示
-	send_variables(SINGLE_SET_SWITCH, switch_sensor[set_num]);												  //传感器开启/关闭状态
-	send_variables(SINGLE_SENSORTYPE_ADDR, TYPE_J + (sensor_type[set_num] * TYPE_K));						  //DANDUPAGE传感器类型选择显示
+	send_variables(SINGLE_NUM_ADDR, set_num + 1);																//序号显示
+	send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num] + temp_unit * (run_temp[set_num] * 8 / 10 + 32));		//运行温度显示
+	send_variables(SINGLE_SETTEMP_ADDR, set_temp[set_num] + temp_unit * (set_temp[set_num] * 8 / 10 + 32));		//设定温度显示
+	send_variables(SINGLE_SET_TEMP, set_temp[set_num] + temp_unit * (set_temp[set_num] * 8 / 10 + 32));			//温度设定输入框显示
+	send_variables(SINGLE_SET_SWITCH, switch_sensor[set_num]);													//传感器开启/关闭状态
+	send_variables(SINGLE_SENSORTYPE_ADDR, TYPE_J + (sensor_type[set_num] * TYPE_K));							//DANDUPAGE传感器类型选择显示
 	send_variables(SINGLE_SET_FOLLOW, follow_sta[set_num]);
 	
 	send_name(SINGLE_NAME_ADDR, set_name[set_num]);
@@ -1146,9 +1158,9 @@ void update_curve_page(void)
 
 	send_variables(CURVE_PAGE_NUM_ADDR, curve_page_num + 1);
 	send_variables(CURVE_PAGE_RUNTEMP_ADDR, run_temp[curve_page_num] +
-												temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32));	//运行温度
+												temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32));			//运行温度
 	send_variables(CURVE_PAGE_SETTEMP_ADDR, set_temp[curve_page_num] + 
-												temp_unit * (set_temp[curve_page_num] * 8 / 10 + 32));		   //设定温度
+												temp_unit * (set_temp[curve_page_num] * 8 / 10 + 32));			//设定温度
 	send_variables(CURVE_PAGE_OUTRATE_ADDR, output_rate[curve_page_num]);
 	send_variables(CURVE_PAGE_SENSORTYPE_ADDR, TYPE_J + (sensor_type[curve_page_num] * TYPE_K));
 	send_name(CURVE_PAGE_NAME_ADDR, set_name[curve_page_num]);
@@ -1341,6 +1353,24 @@ void stop_temp_ctrl_all(void)
 	stop_time_ctrl(3);
 	_delay_ms(3);
 	stop_time_ctrl(4);
+}
+
+void set_time_ctrl_mode(uint8_t mode)
+{
+	uint16_t crc = 0;
+
+	usart2_tx_buff[0] = 0xA5;
+	usart2_tx_buff[1] = 0x5A;
+	usart2_tx_buff[2] = 0x02;
+	usart2_tx_buff[3] = TIME_CTRL_MODE;
+	usart2_tx_buff[4] = mode;
+
+	crc = crc_check(usart2_tx_buff, 7);
+
+	usart2_tx_buff[5] = crc & 0x00FF;
+	usart2_tx_buff[6] = crc >> 8;
+
+	usart2_send_str(usart2_tx_buff, 7);
 }
 
 void update_alarm_page(uint8_t page_num)
@@ -1536,7 +1566,7 @@ void read_setting_data_all(void)
 		{
 			for (j = 0; j < 4; j++)
 			{
-				sensor_sta[i * 4 + j] = 4;
+				sensor_sta[i * 4 + j] = 15;		//断线状态    状态显示区域显示空白
 			}
 		}
 	}
@@ -1612,7 +1642,7 @@ void get_setting_data(uint8_t addr)
 	follow_sta[iqr_num] = usart1_rx_buff[14];
 	follow_sta_buff[iqr_num] = follow_sta[iqr_num];
 
-	if (usart1_rx_buff[16] <= 2) //通道状态： 0：关闭  1：开启  2:跟随 3~n：告警类型
+	if (usart1_rx_buff[16] <= 2) //通道状态： 0：关闭  1：开启  2:跟随 3:待机 4~n：告警类型
 	{
 		switch_sensor[iqr_num] = usart1_rx_buff[16] & 0x01; //0：关闭  1：开启 （跟随归属到开启）
 		switch_sensor_buff[iqr_num] = switch_sensor[iqr_num];
@@ -1765,46 +1795,51 @@ void clear_curve_buff(uint8_t channel)
 void alarm_monitor(void)
 {
 	uint8_t i, j;
-	uint16_t alarm_sta_mask = 0;
+	uint32_t alarm_sta_mask = 0;		//告警掩码   0-0x00FFFFFF 24位 每一位代表一个通道的状态  0：有告警 1：无告警	 
 
 	for (i = 0; i < MAX_IQR_QUANTITY; i++)
 	{
-		if (sensor_sta[i] != pre_sensor_sta[i])
+		if (alarm_monitor_enable_flag[i] == 1)		//如果开启了该通道 再进行该通道的告警处理
 		{
-			pre_sensor_sta[i] = sensor_sta[i];
-
-			if (sensor_sta[i] >= 4)
-			{
-				ALARM_ON;
-				LED6_ON;
-
-				if (alarm_cnt >= MAX_ALARM_HISTORY - 1)
+			alarm_monitor_enable_flag[i] = 0;
+// 			if (sensor_sta[i] != pre_sensor_sta[i])
+// 			{
+//				pre_sensor_sta[i] = sensor_sta[i];
+	
+				if (sensor_sta[i] >= 4 && sensor_sta[i] <= 10)		//4-10:告警类型
 				{
-					alarm_cnt = MAX_ALARM_HISTORY - 1;
-					for (j = 0; j < alarm_cnt; j++)
+					ALARM_ON;
+					LED6_ON;
+	
+					if (alarm_cnt >= MAX_ALARM_HISTORY - 1)
 					{
-						alarm_history[j] = alarm_history[j + 1];
+						alarm_cnt = MAX_ALARM_HISTORY - 1;
+						for (j = 0; j < alarm_cnt; j++)
+						{
+							alarm_history[j] = alarm_history[j + 1];
+						}
 					}
-				}
-				alarm_history[alarm_cnt].alarm_type = sensor_sta[i] - 4;
-				alarm_history[alarm_cnt].alarm_device_num = i;
-
-				eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2 + 1),
-								  alarm_history[alarm_cnt].alarm_type);
-				eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2),
-								  alarm_history[alarm_cnt].alarm_device_num);
-				eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, ++alarm_cnt);
+					
+					alarm_history[alarm_cnt].alarm_type = sensor_sta[i] - 4;
+					alarm_history[alarm_cnt].alarm_device_num = i;
+	
+					eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2 + 1),
+									  alarm_history[alarm_cnt].alarm_type);
+					eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2),
+									  alarm_history[alarm_cnt].alarm_device_num);
+					eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, ++alarm_cnt);
+//				}
 			}
 		}
 
-		if (sensor_sta[i] <= 2)
+		if (sensor_sta[i] <= 3 || sensor_sta[i] == 15)			//如果没有告警（15代表没查温控卡，按要求不报警）	
 		{
-			alarm_sta_mask |= 1 << i;
+			alarm_sta_mask |= 1 << i;							//则把改通道对应的掩码位置1
 		}
 	}
 
 	/*如果无告警 则自动关闭报警器*/
-	if (alarm_sta_mask == 0x0FFF)
+	if (alarm_sta_mask == 0x0FFFFFF)
 	{
 		ALARM_OFF;
 		LED6_OFF;
@@ -1975,6 +2010,7 @@ void all_set_switch_sensor(uint8_t value)
 	{
 		switch_sensor[i] = value;
  		switch_sensor_buff[i] = value;
+		alarm_monitor_enable_flag[i] = value;
 // 		eeprom_write(SINGLE_SWSENSOR_EEADDR+i, switch_sensor[i]);
 	}
 	
@@ -2073,3 +2109,19 @@ void update_menu_tip_icon(uint8_t icon_num, uint8_t sta)
 	clear_menu_tip_icon();
 	send_variables(MENU_SET_TIP_ICON1+(icon_num-1)*2, sta);
 }
+
+// void enter_screen_protection(void)
+// {
+// 	
+// 	change_page(25);
+// }
+// 
+// void exit_screen_protection(void)
+// {
+// 
+// }
+
+
+
+
+

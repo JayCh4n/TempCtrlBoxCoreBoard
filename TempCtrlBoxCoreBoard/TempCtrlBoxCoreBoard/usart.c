@@ -102,6 +102,9 @@ int usart0_deal(void)
 		{
 		case KEY_ADDR:
 			key_action(variable);
+// 			screen_protection_time_cnt = 0;
+// 			screen_protection_over_time_mask = 0;
+// 			exit_screen_protection();
 			break; //如果变量地址为按键变量地址  执行按键动作
 		case MASTER_SWITCH:
 			pre_system_sta = variable;
@@ -132,27 +135,50 @@ int usart0_deal(void)
 			set_name_buff = get_name();
 			break;
 		case ALL_SET_TEMP:
-			if (temp_unit_buff)
+// 			if (temp_unit_buff)
+// 			{
+// 				variable = ((variable - 32) * 10 / 18);
+// 			}
+// 			all_temp_buff = variable;
+			if (temp_unit)
 			{
 				variable = ((variable - 32) * 10 / 18);
 			}
-			all_temp_buff = variable;
+			all_temp = variable;
+			all_set(TEMP, all_temp);
 			break;
 		case SET_PREHEAT_TIME:
-			preheat_time_buff = variable;
+//			preheat_time_buff = variable;
+			preheat_time = variable;
+			all_set(PREHEAT_TIME, preheat_time);
 			break;
 		case ALL_SET_SENSOR_TYPE:
-			all_sensor_type_buff = variable;
+// 			all_sensor_type_buff = variable;
+// 			send_variables(ALL_SENSOR_TYPE_ADDR,
+// 						   TYPE_J + (all_sensor_type_buff * TYPE_K));
+			all_sensor_type = variable;
 			send_variables(ALL_SENSOR_TYPE_ADDR,
-						   TYPE_J + (all_sensor_type_buff * TYPE_K));
+						   TYPE_J + (all_sensor_type * TYPE_K));
+			all_set(SENSOR_TYPE, all_sensor_type);
 			break;
 		case SET_TEMP_UNIT:
-			temp_unit_buff = variable;
+// 			temp_unit_buff = variable;
+// 			send_variables(TEMP_UINT_ADDR,
+// 						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
+// 			if(temp_unit_buff == 1)
+// 			{
+// 				send_variables(ALL_SET_TEMP, all_temp + temp_unit_buff * (all_temp * 8 / 10 + 32));
+// 			}
+// 			else
+// 			{
+// 				send_variables(ALL_SET_TEMP, all_temp);
+// 			}
+			temp_unit = variable;
 			send_variables(TEMP_UINT_ADDR,
-						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
-			if(temp_unit_buff == 1)
+			(CELSIUS + temp_unit * FAHRENHEIT));
+			if(temp_unit == 1)
 			{
-				send_variables(ALL_SET_TEMP, all_temp + temp_unit_buff * (all_temp * 8 / 10 + 32));
+				send_variables(ALL_SET_TEMP, all_temp + temp_unit * (all_temp * 8 / 10 + 32));
 			}
 			else
 			{
@@ -296,6 +322,10 @@ int usart0_deal(void)
 		case TEMPLATE_NAME5:
 			set_template_name(pre_first_tpnum+4, get_name());
 			break;
+		case TIME_CTRL_MODE_ADDR:
+			time_ctrl_mode = variable;
+			set_time_ctrl_mode(time_ctrl_mode);
+			eeprom_write_byte((uint8_t*)TIME_CTRL_MODE_EEADDR, time_ctrl_mode);
 		default:
 			break;
 		}
@@ -432,9 +462,9 @@ void usart0_init(uint16_t ubrr0) //屏幕通讯使用
 	UBRR0L = (uint8_t)ubrr0;
 
 	//	UBRR0H = 0;
-	//	UBRR0L = 103;									//波特率9600，晶振16M
-	UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);			   // Set frame format: 8data, 1stop bit 无校验,异步正常模式
-	UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0); //使能发送、接收；使能接收中断
+	//	UBRR0L = 103;										//波特率9600，晶振16M
+	UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);				// Set frame format: 8data, 1stop bit 无校验,异步正常模式
+	UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);	//使能发送、接收；使能接收中断
 }
 
 void usart1_init(uint16_t ubrr1) //设备通讯使用

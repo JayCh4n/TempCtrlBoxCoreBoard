@@ -44,6 +44,8 @@
 #define READ_SETTING_DATA 0x07
 #define SET_FOLLOW 0x08
 #define STANDBY	0x09
+#define APPLY_TEMP 0x0A
+#define APPLY_SENSOR_TYPE 0x0B
 
 #define ALL_SET_CMD 0x07	//菜单里全局设定OK键标志 用来轮询发送获取控制板卡数据
 
@@ -152,6 +154,8 @@
 #define TEMP_CTRL_ALL_STOP		0x0051
 #define STSTEM_STANDBY			0x0052
 
+
+#define TIME_CTRL_MODE	0x01F
 //曲线通道号
 #define CHANNEL0 0x01
 #define CHANNEL1 0x02
@@ -264,6 +268,7 @@
 
 #define TEMP_UINT_ADDR 0x023C		//温度单位显示地址
 #define ALL_SENSOR_TYPE_ADDR 0x0294 //全局传感器类型显示地址
+#define TIME_CTRL_MODE_ADDR 0x0340	//射胶控制模式文本显示  A，B
 
 #define CURVE_TIMELINE_ADDR 0x0052 //曲线时间轴显示地址 2byte 共十个 0x0052-0x0065
 
@@ -402,8 +407,8 @@
 #define ALARM_HISTORY_EEADDR 0x0003   //告警记录EEPROM地址 双字节 高：告警类型 低：告警设备号0～12 共70条记录 占140字节 0x0003~0x8E
 #define TIME_CTRL_VALUE_EEADDR 0x008F //射胶阀控制时间参数EEPROM地址 双字节 共256bytes  0x008F ~ 0x018E
 #define TEMPLATE_EEADDR	0x00190		  //模板存储在外部EEPROM中的地址 双字节 30个模板60bytes 0x0190 ~ 0x01CB   50个模板就是100bytes 0x00190 - 0x01F3 
-#define TEMPLATE_CNT_EEADDR	0x01FF
-
+#define TEMPLATE_CNT_EEADDR	0x01FF	  
+#define TIME_CTRL_MODE_EEADDR 0x0200
 
 typedef enum
 {
@@ -466,6 +471,7 @@ extern uint32_t set_name_buff;
 
 extern uint8_t module_num;
 extern uint16_t time_ctrl_value[4][8][4];
+extern uint8_t time_ctrl_mode;
 
 extern uint8_t alarm_cnt;
 extern alarm_struct_typedef alarm_history[MAX_ALARM_HISTORY];
@@ -475,6 +481,9 @@ extern uint8_t pre_first_tpnum;
 extern uint32_t tp_find_name;
 extern uint32_t tp_save_name;
 extern template_struct_typedef template_structure;
+
+// extern uint16_t screen_protection_time_cnt;
+// extern uint8_t screen_protection_over_time_mask;
 
 // void init_time_ctrl_value(void);
 void init_variable(void);
@@ -490,6 +499,7 @@ void start_time_ctrl(uint8_t slave_num);
 void start_time_ctrl_all(void);
 void stop_time_ctrl(uint8_t slave_num);
 void stop_temp_ctrl_all(void);
+void set_time_ctrl_mode(uint8_t mode);
 void time_ctrl_test(uint8_t slave_num, uint8_t command);
 void switch_language(void);
 void change_page(uint8_t page_num);
