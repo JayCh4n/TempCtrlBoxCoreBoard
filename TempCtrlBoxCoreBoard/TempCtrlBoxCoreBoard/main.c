@@ -36,6 +36,10 @@ int main(void)
 	send_variables(TEMP_UINT_ADDR, (CELSIUS + temp_unit * FAHRENHEIT));
 	send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
 	send_variables(TIME_CTRL_MODE_ADDR, time_ctrl_mode);
+	send_variables(ABOVE_TEMP_ADDR, above_temp);
+	send_variables(BELOW_TEMP_ADDR, below_temp);
+	send_variables(MAX_TEMP_LIMIT_ADDR, max_set_temp);
+	
 	set_time_ctrl_mode(time_ctrl_mode);
 	
 	init_complete = 1;

@@ -114,7 +114,15 @@ int usart0_deal(void)
 			// switch_all_sensor(variable);
 			break;
 		case SINGLE_SET_FOLLOW:
-			follow_sta_buff[set_num] = variable;
+			if(!switch_sensor[set_num])	//只有在关闭状态下才能设定跟随
+			{
+				follow_sta_buff[set_num] = variable;
+			}
+			else
+			{
+				send_variables(SINGLE_SET_FOLLOW, follow_sta_buff[set_num]);
+			}
+			
 			break;
 		case SINGLE_SET_SENSOR_TYPE:
 			sensor_type_buff[set_num] = variable;
@@ -129,7 +137,14 @@ int usart0_deal(void)
 			{
 				variable = ((variable - 32) * 10 / 18);
 			}
-			set_temp_buff[set_num] = variable;
+			if(variable <= max_set_temp)
+			{
+				set_temp_buff[set_num] = variable;
+			}
+			else
+			{
+				send_variables(SINGLE_SET_TEMP, set_temp_buff[set_num]);
+			}
 			break;
 		case SINGLE_SET_NAME:
 			set_name_buff = get_name();
@@ -144,8 +159,16 @@ int usart0_deal(void)
 			{
 				variable = ((variable - 32) * 10 / 18);
 			}
-			all_temp = variable;
-			all_set(TEMP, all_temp);
+			
+			if(variable <= max_set_temp)
+			{
+				all_temp = variable;
+				all_set(TEMP, all_temp);			
+			}
+			else
+			{
+				send_variables(ALL_SET_TEMP, all_temp);
+			}
 			break;
 		case SET_PREHEAT_TIME:
 //			preheat_time_buff = variable;
@@ -326,6 +349,42 @@ int usart0_deal(void)
 			time_ctrl_mode = variable;
 			set_time_ctrl_mode(time_ctrl_mode);
 			eeprom_write_byte((uint8_t*)TIME_CTRL_MODE_EEADDR, time_ctrl_mode);
+			break;
+		case TEMP_CALIVRETION_ADDR:
+			if (temp_unit)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			temp_calibration_buf = variable;
+			break;
+		case ABOVE_TEMP_ADDR:
+			if (temp_unit)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			above_temp = variable;
+			all_set(OVER_ABOVE_TEMP, above_temp);
+			break;
+		case BELOW_TEMP_ADDR:
+			if (temp_unit)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			below_temp = variable;
+			all_set(OVER_BELOW_TEMP, below_temp);
+		break;
+		case MAX_TEMP_LIMIT_ADDR:
+			if (temp_unit)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			if(variable >= 600)
+			{
+				variable = 600;
+				send_variables(MAX_TEMP_LIMIT_ADDR, 600);
+			}
+			max_set_temp = variable;
+			eeprom_write_word((uint16_t*)MAX_TEMP_LIMIT_EEADDR, max_set_temp);
 		default:
 			break;
 		}

@@ -46,6 +46,9 @@
 #define STANDBY	0x09
 #define APPLY_TEMP 0x0A
 #define APPLY_SENSOR_TYPE 0x0B
+#define OVER_ABOVE_TEMP	0x0C
+#define OVER_BELOW_TEMP	0x0D
+#define TEMP_CALIBRATION_CMD 0x0E
 
 #define ALL_SET_CMD 0x07	//菜单里全局设定OK键标志 用来轮询发送获取控制板卡数据
 
@@ -370,6 +373,11 @@
 #define TEMPLATE_FIND_NAME	0x01B6	//模板搜索名称输入 0x01B6 - 0x01B9*/
 #define TEMPLATE_SAVE_NAME	0x01BC  //模板保存名字	0x01BC-0x01BF
 
+#define TEMP_CALIVRETION_ADDR	0x01C0				//0X01C0 - 0X01C1
+#define ABOVE_TEMP_ADDR		0x01C2					//0X01C2 - 0X01C3
+#define BELOW_TEMP_ADDR		0x01C4					//0x01C4 - 0X01C5
+#define MAX_TEMP_LIMIT_ADDR	0x01C6					//0x01C6 - 0X01C7
+
 #define TEMP_VIEW_SENSOR_TYPE1	0x010C	//模板温度查看界面传感器类型图标 -0x010D
 #define TEMP_VIEW_SENSOR_TYPE2	0x010E
 #define TEMP_VIEW_SENSOR_TYPE3	0x0110
@@ -408,7 +416,8 @@
 #define TIME_CTRL_VALUE_EEADDR 0x008F //射胶阀控制时间参数EEPROM地址 双字节 共256bytes  0x008F ~ 0x018E
 #define TEMPLATE_EEADDR	0x00190		  //模板存储在外部EEPROM中的地址 双字节 30个模板60bytes 0x0190 ~ 0x01CB   50个模板就是100bytes 0x00190 - 0x01F3 
 #define TEMPLATE_CNT_EEADDR	0x01FF	  
-#define TIME_CTRL_MODE_EEADDR 0x0200
+#define TIME_CTRL_MODE_EEADDR	0x0200
+#define MAX_TEMP_LIMIT_EEADDR	0x0201		//-0x0201
 
 typedef enum
 {
@@ -481,6 +490,12 @@ extern uint8_t pre_first_tpnum;
 extern uint32_t tp_find_name;
 extern uint32_t tp_save_name;
 extern template_struct_typedef template_structure;
+extern uint8_t	temp_calibration[MAX_IQR_QUANTITY];
+extern uint8_t temp_calibration_buf;
+
+extern uint8_t above_temp;
+extern uint8_t below_temp; 
+extern uint16_t max_set_temp;
 
 // extern uint16_t screen_protection_time_cnt;
 // extern uint8_t screen_protection_over_time_mask;
@@ -538,6 +553,8 @@ void all_set_sensor_type(uint16_t type);
 void all_set_preheattime(uint8_t value);
 void all_set_switch_sensor(uint8_t value);
 void all_set_standby(uint8_t sta);
+void all_set_over_above_temp(uint8_t value);
+void all_set_over_below_temp(uint8_t value);
 void every_set(uint8_t command, uint16_t *value);
 void clear_menu_tip_icon(void);
 void update_menu_tip_icon(uint8_t icon_num, uint8_t sta);

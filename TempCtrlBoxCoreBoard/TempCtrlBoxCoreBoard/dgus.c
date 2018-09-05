@@ -65,6 +65,11 @@ template_struct_typedef template_structure;
 uint8_t standby_sta = 0;
 
 uint8_t alarm_monitor_enable_flag[MAX_IQR_QUANTITY] = {0};
+uint8_t	temp_calibration[MAX_IQR_QUANTITY] = {0};
+uint8_t temp_calibration_buf = 0;
+uint8_t above_temp = 20;
+uint8_t below_temp = 20;
+uint16_t max_set_temp = 600;
 
 // uint16_t screen_protection_time_cnt = 0;
 // uint8_t screen_protection_over_time_mask = 0;
@@ -171,10 +176,17 @@ void update_main_page(void)
 
 		/*更新传感状态图标 sensor_sta >= 4 时显示告警 0~3：关闭 开启 跟随 待机*/
 		/*更新告警类型图标 sensor_sta >= 4 时显示对应各种告警类型  0~3：显示运行正常*/
-		if (sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] >= 4 && sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] <= 10)		//连接温控卡有告警
+		if (sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] >= 4 && sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] <= 11)		//连接温控卡有告警
 		{
 			send_variables(MAIN_STA1_ADDR + (i * 4), 4);		//状态区域显示告警
-			send_variables(MAIN_ALARM1_ADDR + (i * 8), sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);	//告警区域显示相应告警类型
+			if (sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] == 11)
+			{
+				send_variables(MAIN_ALARM1_ADDR + (i * 8), 28);
+			}
+			else
+			{
+				send_variables(MAIN_ALARM1_ADDR + (i * 8), sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);	//告警区域显示相应告警类型
+			}
 		}
 		else if(sensor_sta[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] <= 3)			//连接温控卡无告警
 		{
@@ -676,8 +688,11 @@ void key_action(uint16_t key_code)
 			stop_temp_ctrl_all();
 			break;
 		case STSTEM_STANDBY:
-//			standby_sta ^= 0x01; 
-			all_set(STANDBY, standby_sta);
+//			standby_sta ^= 0x01;
+			if(pre_system_sta) 
+			{
+				all_set(STANDBY, standby_sta);
+			}
 			break;
 	default: break;
 	}
@@ -697,7 +712,7 @@ void single_set_ok(void)
 	if (switch_sensor_buff[set_num] != switch_sensor[set_num])
 	{
 		switch_sensor[set_num] = switch_sensor_buff[set_num];
-		alarm_monitor_enable_flag[set_num] = 1;
+		alarm_monitor_enable_flag[set_num] = switch_sensor[set_num];
 /*		ctrl_command[ctrl_index++] = SWITCH_SENSOR;*/
 		single_set(SWITCH_SENSOR, switch_sensor[set_num]);
 		//		eeprom_write(SINGLE_SWSENSOR_EEADDR+set_num, switch_sensor[set_num]);	//开启默认关闭 不用写eeprom
@@ -726,7 +741,15 @@ void single_set_ok(void)
 		// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 2, set_name[set_num] >> 16);
 		// 		eeprom_write(SET_NAME_EEADDR + (set_num * 4) + 3, set_name[set_num] >> 24);
 	}
-
+	
+	if(temp_calibration_buf != temp_calibration[set_num])
+	{
+		temp_calibration[set_num] = temp_calibration_buf;
+		single_set(TEMP_CALIBRATION_CMD, temp_calibration[set_num]);
+		
+//		eeprom_write_byte((uint8_t*)(TIME_CTRL_MODE_EEADDR + set_num + 1), temp_calibration[set_num]);
+	}
+	
 	update_main_page();
 	in_main_page = 1;
 	update_run_temp_flag = 0;
@@ -1073,6 +1096,8 @@ void all_set(uint8_t command, uint16_t value)
 		case PREHEAT_TIME: all_set_preheattime(value); break;
 		case SWITCH_SENSOR: all_set_switch_sensor(value); break;
 		case STANDBY: all_set_standby(value); break;
+		case OVER_ABOVE_TEMP: all_set_over_above_temp(value); break;
+		case OVER_BELOW_TEMP: all_set_over_below_temp(value); break;
 		default: break;
 	}
 }
@@ -1083,7 +1108,9 @@ void update_single_set_page(void)
 
 	update_run_temp_flag = 1;
 	run_temp_page = 1;
-
+	set_temp_buff[set_num] = set_temp[set_num];
+	follow_sta_buff[set_num] = follow_sta[set_num];
+	
 	send_variables(SINGLE_NUM_ADDR, set_num + 1);																//序号显示
 	send_variables(SINGLE_RUNTEMP_ADDR, run_temp[set_num] + temp_unit * (run_temp[set_num] * 8 / 10 + 32));		//运行温度显示
 	send_variables(SINGLE_SETTEMP_ADDR, set_temp[set_num] + temp_unit * (set_temp[set_num] * 8 / 10 + 32));		//设定温度显示
@@ -1091,12 +1118,14 @@ void update_single_set_page(void)
 	send_variables(SINGLE_SET_SWITCH, switch_sensor[set_num]);													//传感器开启/关闭状态
 	send_variables(SINGLE_SENSORTYPE_ADDR, TYPE_J + (sensor_type[set_num] * TYPE_K));							//DANDUPAGE传感器类型选择显示
 	send_variables(SINGLE_SET_FOLLOW, follow_sta[set_num]);
+	send_variables(TEMP_CALIVRETION_ADDR, temp_calibration[set_num]	+ temp_unit * (temp_calibration[set_num] * 8 / 10 + 32) );	//温度校准值
 	
 	send_name(SINGLE_NAME_ADDR, set_name[set_num]);
 
 	send_name(SINGLE_SET_NAME, set_name[set_num]);
 
 	set_name_buff = set_name[set_num];
+	temp_calibration_buf = temp_calibration[set_num];
 }
 
 void update_pid_page(uint8_t channel)
@@ -1664,7 +1693,10 @@ void get_setting_data(uint8_t addr)
 
 	d_value[iqr_num] = usart1_rx_buff[21];
 	d_value[iqr_num] = (d_value[iqr_num] << 8) | usart1_rx_buff[22];
-
+	
+	above_temp = usart1_rx_buff[23];
+	below_temp = usart1_rx_buff[24];
+	
 	//
 	// 	temp_unit = usart1_rx_buff[19];
 	// 	temp_unit_buff = temp_unit;
@@ -1711,17 +1743,24 @@ void get_data_all()
 	sensor_sta[0 + ((slave_num - 1) * 4)] = usart1_rx_buff[9];
 	sensor_sta[1 + ((slave_num - 1) * 4)] = usart1_rx_buff[10];
 	sensor_sta[2 + ((slave_num - 1) * 4)] = usart1_rx_buff[11];
-	sensor_sta[3 + ((slave_num - 1) * 4)] = usart1_rx_buff[12];
+	sensor_sta[3 + ((slave_num - 1) * 4)] = usart1_rx_buff[12];		//没用
 
 	run_temp[0 + ((slave_num - 1) * 4)] = usart1_rx_buff[13];
 	run_temp[0 + ((slave_num - 1) * 4)] = (run_temp[0 + ((slave_num - 1) * 4)] << 8) | usart1_rx_buff[14];
+//	run_temp[0 + ((slave_num - 1) * 4)] = run_temp[0 + ((slave_num - 1) * 4)] + temp_calibration[0 + ((slave_num - 1) * 4)];	//温度校准
+	
 	run_temp[1 + ((slave_num - 1) * 4)] = usart1_rx_buff[15];
 	run_temp[1 + ((slave_num - 1) * 4)] = (run_temp[1 + ((slave_num - 1) * 4)] << 8) | usart1_rx_buff[16];
+//	run_temp[1 + ((slave_num - 1) * 4)] = run_temp[1 + ((slave_num - 1) * 4)] + temp_calibration[1 + ((slave_num - 1) * 4)];
+	
 	run_temp[2 + ((slave_num - 1) * 4)] = usart1_rx_buff[17];
 	run_temp[2 + ((slave_num - 1) * 4)] = (run_temp[2 + ((slave_num - 1) * 4)] << 8) | usart1_rx_buff[18];
+//	run_temp[2 + ((slave_num - 1) * 4)] = run_temp[2 + ((slave_num - 1) * 4)] + temp_calibration[2 + ((slave_num - 1) * 4)];
+	
 	run_temp[3 + ((slave_num - 1) * 4)] = usart1_rx_buff[19];
 	run_temp[3 + ((slave_num - 1) * 4)] = (run_temp[3 + ((slave_num - 1) * 4)] << 8) | usart1_rx_buff[20];
-
+//	run_temp[3 + ((slave_num - 1) * 4)] = run_temp[3 + ((slave_num - 1) * 4)] + temp_calibration[3 + ((slave_num - 1) * 4)];
+	
 	sensor_sta[0 + ((slave_num - 1) * 4)] = usart1_rx_buff[21];
 	sensor_sta[1 + ((slave_num - 1) * 4)] = usart1_rx_buff[22];
 	sensor_sta[2 + ((slave_num - 1) * 4)] = usart1_rx_buff[23];
@@ -1801,12 +1840,12 @@ void alarm_monitor(void)
 	{
 		if (alarm_monitor_enable_flag[i] == 1)		//如果开启了该通道 再进行该通道的告警处理
 		{
-			alarm_monitor_enable_flag[i] = 0;
-// 			if (sensor_sta[i] != pre_sensor_sta[i])
-// 			{
-//				pre_sensor_sta[i] = sensor_sta[i];
+/*			alarm_monitor_enable_flag[i] = 0;*/
+ 			if (sensor_sta[i] != pre_sensor_sta[i])
+ 			{
+				pre_sensor_sta[i] = sensor_sta[i];
 	
-				if (sensor_sta[i] >= 4 && sensor_sta[i] <= 10)		//4-10:告警类型
+				if (sensor_sta[i] >= 4 && sensor_sta[i] <= 11)		//4-10:告警类型
 				{
 					ALARM_ON;
 					LED6_ON;
@@ -1828,7 +1867,7 @@ void alarm_monitor(void)
 					eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2),
 									  alarm_history[alarm_cnt].alarm_device_num);
 					eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, ++alarm_cnt);
-//				}
+				}
 			}
 		}
 
@@ -2060,6 +2099,57 @@ void all_set_standby(uint8_t sta)
 	usart1_tx_overtime_mask = 0;
 	usart1_tx_timecnt = 0;
 }
+
+void all_set_over_above_temp(uint8_t value)
+{
+	uint16_t crc;
+	
+	usart1_tx_buff[0] = 0xA5;
+	usart1_tx_buff[1] = 0x5A;
+	usart1_tx_buff[2] = 0x04;
+	usart1_tx_buff[3] = OVER_ABOVE_TEMP;
+	usart1_tx_buff[4] = 0x00;		//全局
+	usart1_tx_buff[5] = (value >> 8);
+	usart1_tx_buff[6] = value;
+	
+	crc = crc_check(usart1_tx_buff, 9);
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+	usart1_tx_buff[8] = crc >> 8;
+	
+	while (usart1_tx_overtime_mask != 1)
+	;
+	usart1_send_str(usart1_tx_buff, 9);
+	
+	usart1_tx_overtime_mask = 0;
+	usart1_tx_timecnt = 0;	
+}
+
+void all_set_over_below_temp(uint8_t value)
+{
+	uint16_t crc;
+	
+	usart1_tx_buff[0] = 0xA5;
+	usart1_tx_buff[1] = 0x5A;
+	usart1_tx_buff[2] = 0x04;
+	usart1_tx_buff[3] = OVER_BELOW_TEMP;
+	usart1_tx_buff[4] = 0x00;		//全局
+	usart1_tx_buff[5] = (value >> 8);
+	usart1_tx_buff[6] = value;
+	
+	crc = crc_check(usart1_tx_buff, 9);
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+	usart1_tx_buff[8] = crc >> 8;
+	
+	while (usart1_tx_overtime_mask != 1)
+	;
+	usart1_send_str(usart1_tx_buff, 9);
+	
+	usart1_tx_overtime_mask = 0;
+	usart1_tx_timecnt = 0;
+}
+
 
 /*所有通道的某一数据 例如温度、传感器类型  打包一起发过去 地址为 00*/
 void every_set(uint8_t command, uint16_t *value)

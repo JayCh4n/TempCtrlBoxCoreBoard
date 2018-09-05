@@ -22,6 +22,7 @@ void read_eeprom_data(void)
 		eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, 0);		//告警清单数量
 		eeprom_write_byte((uint8_t*)TEMPLATE_CNT_EEADDR, 0);	//模板数量
 		eeprom_write_byte((uint8_t*)TIME_CTRL_MODE_EEADDR, 'A');	//时间控制器模式
+		eeprom_write_word((uint16_t*)MAX_TEMP_LIMIT_EEADDR, 600);	//最大设定温度限制
 		
 		for(i=0;i<4;i++)
 		{
@@ -48,6 +49,7 @@ void read_eeprom_data(void)
 		alarm_cnt = eeprom_read_byte((uint8_t *)ALARM_CNT_EEADDR);
 		template_cnt = eeprom_read_byte((uint8_t*)TEMPLATE_CNT_EEADDR);
 		time_ctrl_mode = eeprom_read_byte((uint8_t*)TIME_CTRL_MODE_EEADDR);
+		max_set_temp = eeprom_read_word((uint16_t*)MAX_TEMP_LIMIT_EEADDR);
 		
 		for (i = 0; i < alarm_cnt; i++)
 		{
