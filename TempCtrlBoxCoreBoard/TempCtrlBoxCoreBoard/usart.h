@@ -13,7 +13,9 @@
 #include "dgus.h"
 #include "timer.h"
 #include "gpio.h"
-#include "delay.h"
+#include "at24c128c.h"
+/*#include "delay.h"*/
+#include <util/delay.h>
 
 #define MYUBRR(baud) ((F_CPU) / (baud * 16UL) - 1)
 
@@ -40,7 +42,7 @@
 #define SINGLE_SET_SWITCH 0x0144
 #define SINGLE_SET_TEMP 0x0146
 #define SINGLE_SET_NAME 0x0158 //~~!!!!!!!!!!!!!!z  0x0158 - 0x015F
-#define SINGLE_SET_FOLLOW	0x01A2	//¸úËæ
+#define SINGLE_SET_FOLLOW	0x01BA	//¸úËæ - 0x01B7
 #define ALL_SET_TEMP 0x0148
 #define SET_PREHEAT_TIME 0x014A
 #define ALL_SET_SENSOR_TYPE 0x014C
@@ -116,9 +118,9 @@ extern uint16_t preheat_time_buff;
 extern uint16_t all_sensor_type_buff;
 extern uint16_t temp_unit_buff;
 
-extern uint16_t set_temp_buff[12];
-extern uint16_t switch_sensor_buff[12];
-extern uint16_t sensor_type_buff[12];
+extern uint16_t set_temp_buff[24];
+extern uint16_t switch_sensor_buff[24];
+extern uint16_t sensor_type_buff[24];
 
 extern uint16_t p_value_buff;
 extern uint16_t i_value_buff;

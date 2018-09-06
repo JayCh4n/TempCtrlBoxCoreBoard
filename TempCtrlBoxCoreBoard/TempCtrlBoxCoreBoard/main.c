@@ -7,12 +7,13 @@
 
 #include <avr/io.h>
 #include <avr/eeprom.h>
-#include "delay.h"
+/*#include "delay.h"*/
 #include "usart.h"
 #include "timer.h"
 #include "dgus.h"
 #include "gpio.h"
-
+#include "at24c128c.h"
+#include <util/delay.h>
 
 extern void read_eeprom_data(void);
 void system_init(void);
@@ -25,7 +26,7 @@ int main(void)
 	EN_INTERRUPT;
 	read_eeprom_data();
 
-	_delay_ms(100);
+	_delay_ms(1000);
 	
 	read_setting_data_all(); //开机从主控板读取设定数据
 
@@ -34,11 +35,17 @@ int main(void)
 	send_variables(SET_PREHEAT_TIME, preheat_time);
 	send_variables(TEMP_UINT_ADDR, (CELSIUS + temp_unit * FAHRENHEIT));
 	send_variables(ALL_SENSOR_TYPE_ADDR, TYPE_J + (all_sensor_type * TYPE_K));
-
+	send_variables(TIME_CTRL_MODE_ADDR, time_ctrl_mode);
+	send_variables(ABOVE_TEMP_ADDR, above_temp);
+	send_variables(BELOW_TEMP_ADDR, below_temp);
+	send_variables(MAX_TEMP_LIMIT_ADDR, max_set_temp);
+	
+	set_time_ctrl_mode(time_ctrl_mode);
+	
 	init_complete = 1;
 	update_main_page();
 	switch_language();
-	
+
 	/* Replace with your application code */
 	while (1)
 	{
@@ -54,48 +61,46 @@ int main(void)
 			usart1_rx_end = 0;
 		}
 
-		// 		if (in_main_page) //
-		// 		{
-		// 			update_main_page();
-		// 		}
-		
-		/*500ms发送一次请求获取主控板卡运行数据*/
-		if (ctrl_command == READ_DATA_ALL)
+		if (usart1_tx_overtime_mask == 1)
 		{
-			if(usart1_tx_overtime_mask == 1)
+			send_request_all(slave_num);
+			if (++slave_num >= TEMP_CTRL_BOARD_QUANTITY + 1)
 			{
-				send_request_all(slave_num);
-				
-				if(++slave_num >=4)
-				{
-					slave_num = 1;
-				}
-				
-				usart1_tx_overtime_mask = 0;
-				usart1_tx_timecnt = 0;
+				slave_num = 1;
 			}
+			
+			usart1_tx_overtime_mask = 0;
+			usart1_tx_timecnt = 0;
 		}
-		
+
 		/*1.5秒监测一次告警状态*/
-		if(alarm_monitor_overtime_mask)
+		if (alarm_monitor_overtime_mask)
 		{
 			alarm_monitor();
 			alarm_monitor_overtime_mask = 0;
+			
+// 			if(screen_protection_over_time_mask)
+// 			{
+// 				enter_screen_protection();
+// 			}
 		}
 	}
-
+	
 	return 0;
 }
 
 void system_init()
 {
 	gpio_init();
-	usart0_init(MYUBRR(9600));
+	usart0_init(MYUBRR(38400));
 	usart1_init(MYUBRR(8928));
 	usart2_init(9600);
 
 	timer0_init();
 	timer2_init();
 	timer1_init();
-	init_time_ctrl_value();
+
+	twi_init(400);
+
+	init_variable();
 }

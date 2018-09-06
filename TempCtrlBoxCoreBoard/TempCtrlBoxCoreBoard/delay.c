@@ -9,31 +9,23 @@
 
 void _delay_ms(uint32_t nms)
 {
-	uint32_t us_ticks;
-	us_ticks = nms * 1000;
-
-	while (--us_ticks)
-	{
-		_delay_1us();
-	}
+	uint32_t ticks;
+	
+ 	ticks = 32 * nms - 17;
+	 
+ 	while (--ticks)
+ 	{
+ 		asm("nop");
+ 	}
+	
 }
 
 void _delay_us(uint32_t nus)
 {
-	while (--nus)
-	{
-		_delay_1us();
-	}
-}
-
-void _delay_1us()
-{
-	uint8_t ticks;
-
-	ticks = F_CPU / 1000000UL;
-
+	uint32_t ticks = nus - 5;
+	
 	while (--ticks)
 	{
-		_nop();
+		asm("nop");
 	}
 }

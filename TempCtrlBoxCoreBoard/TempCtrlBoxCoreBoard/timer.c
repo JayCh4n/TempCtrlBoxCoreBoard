@@ -7,8 +7,12 @@
 #include "timer.h"
 
 uint8_t timer2_ovf = 0;
-uint8_t ctrl_command = READ_DATA_ALL; //命令
-uint8_t global;						  //是否为全局设定
+// uint8_t ctrl_command = READ_DATA_ALL; //命令
+uint8_t ctrl_command[20];
+uint8_t ctrl_index = 0;
+uint8_t all_set_flag = 0;
+uint8_t all_set_cnt = 0;
+// uint8_t global;						  //是否为全局设定
 /*uint8_t all_senser_sta;*/
 uint8_t read_setting_data_mask = 0;
 uint8_t read_setting_data_cnt = 0;
@@ -130,6 +134,16 @@ ISR(TIMER0_OVF_vect)
 */
 ISR(TIMER1_COMPA_vect)
 {
+// 	EN_INTERRUPT;
+// 	
+// 	if(init_complete)
+// 	{
+// 		if(++screen_protection_time_cnt >= 30000)
+// 		{
+// 			screen_protection_over_time_mask = 1;
+// 		}
+// 	}
+// 	
 	/*
 	uint8_t i = 0;
 
@@ -243,12 +257,10 @@ ISR(TIMER2_OVF_vect)
 
 	// temp_differ = (run_temp[curve_page_num] - set_temp[curve_page_num]) + 100;
 
-	/*温度转换 计算不同单位下的温度数值  run_temp[] 存储的是摄氏度 
-	**set_temp[]存储的是设定温度数值，与温度单位无关 发送温度设定时需转换成相应单位的数值进行发送
-	*/
-	temp_differ = run_temp[curve_page_num]
-				+ temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32)
-				- set_temp[curve_page_num] + 100;
+	/*温度转换 计算不同单位下的温度数值  run_temp[] set_temp[] 存储的是摄氏度 */
+	temp_differ = (run_temp[curve_page_num]
+				+ temp_unit * (run_temp[curve_page_num] * 8 / 10 + 32))
+				- (set_temp[curve_page_num] + temp_unit * (set_temp[curve_page_num] * 8 / 10 + 32)) + 100;
 
 	time_cnt++;
 	if (time_cnt >= timer2_ovf)
@@ -258,6 +270,7 @@ ISR(TIMER2_OVF_vect)
 	}
 }
 
+/*IO口模拟usart发送*/
 ISR(TIMER3_COMPA_vect)
 {
 	static uint8_t cnt = 0;

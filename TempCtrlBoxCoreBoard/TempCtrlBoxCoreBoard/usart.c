@@ -30,9 +30,9 @@ uint16_t preheat_time_buff = 3;
 uint16_t all_sensor_type_buff = 0;
 uint16_t temp_unit_buff = 0;
 
-uint16_t set_temp_buff[12] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-uint16_t switch_sensor_buff[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //默认状态为关闭
-uint16_t sensor_type_buff[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+uint16_t set_temp_buff[MAX_IQR_QUANTITY];
+uint16_t switch_sensor_buff[MAX_IQR_QUANTITY] = {0}; //默认状态为关闭
+uint16_t sensor_type_buff[MAX_IQR_QUANTITY] = {0};
 
 uint16_t p_value_buff = 100;
 uint16_t i_value_buff = 100;
@@ -102,12 +102,27 @@ int usart0_deal(void)
 		{
 		case KEY_ADDR:
 			key_action(variable);
+// 			screen_protection_time_cnt = 0;
+// 			screen_protection_over_time_mask = 0;
+// 			exit_screen_protection();
 			break; //如果变量地址为按键变量地址  执行按键动作
 		case MASTER_SWITCH:
-			switch_all_sensor(variable);
+			pre_system_sta = variable;
+			all_set(SWITCH_SENSOR, variable);
+/*			all_set_flag = 1;*/
+/*			ctrl_command[ctrl_index++] = SWITCH_SENSOR;*/
+			// switch_all_sensor(variable);
 			break;
 		case SINGLE_SET_FOLLOW:
-			follow_sta_buff[set_num] = variable;
+			if(!switch_sensor[set_num])	//只有在关闭状态下才能设定跟随
+			{
+				follow_sta_buff[set_num] = variable;
+			}
+			else
+			{
+				send_variables(SINGLE_SET_FOLLOW, follow_sta_buff[set_num]);
+			}
+			
 			break;
 		case SINGLE_SET_SENSOR_TYPE:
 			sensor_type_buff[set_num] = variable;
@@ -118,30 +133,84 @@ int usart0_deal(void)
 			switch_sensor_buff[set_num] = variable;
 			break;
 		case SINGLE_SET_TEMP:
-			set_temp_buff[set_num] = variable;
+			if(temp_unit_buff)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			if(variable <= max_set_temp)
+			{
+				set_temp_buff[set_num] = variable;
+			}
+			else
+			{
+				send_variables(SINGLE_SET_TEMP, set_temp_buff[set_num]);
+			}
 			break;
 		case SINGLE_SET_NAME:
-			get_set_name();
+			set_name_buff = get_name();
 			break;
 		case ALL_SET_TEMP:
-			all_temp_buff = variable;
+// 			if (temp_unit_buff)
+// 			{
+// 				variable = ((variable - 32) * 10 / 18);
+// 			}
+// 			all_temp_buff = variable;
+			if (temp_unit)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			
+			if(variable <= max_set_temp)
+			{
+				all_temp = variable;
+				all_set(TEMP, all_temp);			
+			}
+			else
+			{
+				send_variables(ALL_SET_TEMP, all_temp);
+			}
 			break;
 		case SET_PREHEAT_TIME:
-			preheat_time_buff = variable;
+//			preheat_time_buff = variable;
+			preheat_time = variable;
+			all_set(PREHEAT_TIME, preheat_time);
 			break;
 		case ALL_SET_SENSOR_TYPE:
-			all_sensor_type_buff = variable;
+// 			all_sensor_type_buff = variable;
+// 			send_variables(ALL_SENSOR_TYPE_ADDR,
+// 						   TYPE_J + (all_sensor_type_buff * TYPE_K));
+			all_sensor_type = variable;
 			send_variables(ALL_SENSOR_TYPE_ADDR,
-						   TYPE_J + (all_sensor_type_buff * TYPE_K));
+						   TYPE_J + (all_sensor_type * TYPE_K));
+			all_set(SENSOR_TYPE, all_sensor_type);
 			break;
 		case SET_TEMP_UNIT:
-			temp_unit_buff = variable;
+// 			temp_unit_buff = variable;
+// 			send_variables(TEMP_UINT_ADDR,
+// 						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
+// 			if(temp_unit_buff == 1)
+// 			{
+// 				send_variables(ALL_SET_TEMP, all_temp + temp_unit_buff * (all_temp * 8 / 10 + 32));
+// 			}
+// 			else
+// 			{
+// 				send_variables(ALL_SET_TEMP, all_temp);
+// 			}
+			temp_unit = variable;
 			send_variables(TEMP_UINT_ADDR,
-						   (CELSIUS + temp_unit_buff * FAHRENHEIT));
+			(CELSIUS + temp_unit * FAHRENHEIT));
+			if(temp_unit == 1)
+			{
+				send_variables(ALL_SET_TEMP, all_temp + temp_unit * (all_temp * 8 / 10 + 32));
+			}
+			else
+			{
+				send_variables(ALL_SET_TEMP, all_temp);
+			}
 			break;
-		case PID_CHANNEL:
-			update_pid_page(variable);
-			break;
+			//		case PID_CHANNEL:
+			//			update_pid_page(variable);	//更改屏幕最大为24来改变最大通道数（最好改为按键返回）
+			//			break;
 		case PID_P:
 			p_value_buff = variable;
 			break;
@@ -255,6 +324,67 @@ int usart0_deal(void)
 		case IQR8_T4:
 			time_ctrl_value_buff[module_num - 1][7][3] = variable;
 			break;
+		case TEMPLATE_FIND_NAME:
+			tp_find_name = get_name();	
+			break;
+		case TEMPLATE_SAVE_NAME:
+			tp_save_name = get_name();
+			break;
+		case TEMPLATE_NAME1:
+			set_template_name(pre_first_tpnum, get_name());
+			break;
+		case TEMPLATE_NAME2:
+			set_template_name(pre_first_tpnum+1, get_name());
+			break;
+		case TEMPLATE_NAME3:
+			set_template_name(pre_first_tpnum+2, get_name());
+			break;
+		case TEMPLATE_NAME4:
+			set_template_name(pre_first_tpnum+3, get_name());
+			break;
+		case TEMPLATE_NAME5:
+			set_template_name(pre_first_tpnum+4, get_name());
+			break;
+		case TIME_CTRL_MODE_ADDR:
+			time_ctrl_mode = variable;
+			set_time_ctrl_mode(time_ctrl_mode);
+			eeprom_write_byte((uint8_t*)TIME_CTRL_MODE_EEADDR, time_ctrl_mode);
+			break;
+		case TEMP_CALIVRETION_ADDR:
+			if (temp_unit)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			temp_calibration_buf = variable;
+			break;
+		case ABOVE_TEMP_ADDR:
+			if (temp_unit)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			above_temp = variable;
+			all_set(OVER_ABOVE_TEMP, above_temp);
+			break;
+		case BELOW_TEMP_ADDR:
+			if (temp_unit)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			below_temp = variable;
+			all_set(OVER_BELOW_TEMP, below_temp);
+		break;
+		case MAX_TEMP_LIMIT_ADDR:
+			if (temp_unit)
+			{
+				variable = ((variable - 32) * 10 / 18);
+			}
+			if(variable >= 600)
+			{
+				variable = 600;
+				send_variables(MAX_TEMP_LIMIT_ADDR, 600);
+			}
+			max_set_temp = variable;
+			eeprom_write_word((uint16_t*)MAX_TEMP_LIMIT_EEADDR, max_set_temp);
 		default:
 			break;
 		}
@@ -282,11 +412,11 @@ int usart1_deal(void)
 		return 0;
 	}
 
-// 	if (crc_data != crc_check(usart1_rx_buff, usart1_rx_lenth))
-// 	{
-// 		usart1_rx_end = 0;
-// 		return 0;
-// 	}
+	// 	if (crc_data != crc_check(usart1_rx_buff, usart1_rx_lenth))
+	// 	{
+	// 		usart1_rx_end = 0;
+	// 		return 0;
+	// 	}
 
 	if (RX1_COMMAND == READ_DATA_ALL)
 	{
@@ -391,9 +521,9 @@ void usart0_init(uint16_t ubrr0) //屏幕通讯使用
 	UBRR0L = (uint8_t)ubrr0;
 
 	//	UBRR0H = 0;
-	//	UBRR0L = 103;									//波特率9600，晶振16M
-	UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);			   // Set frame format: 8data, 1stop bit 无校验,异步正常模式
-	UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0); //使能发送、接收；使能接收中断
+	//	UBRR0L = 103;										//波特率9600，晶振16M
+	UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);				// Set frame format: 8data, 1stop bit 无校验,异步正常模式
+	UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0);	//使能发送、接收；使能接收中断
 }
 
 void usart1_init(uint16_t ubrr1) //设备通讯使用
