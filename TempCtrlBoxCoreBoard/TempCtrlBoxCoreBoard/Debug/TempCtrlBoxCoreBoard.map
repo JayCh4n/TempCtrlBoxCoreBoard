@@ -1338,6 +1338,7 @@ END GROUP
  .debug_frame   0x00000b28       0xe0 twi.o
  .debug_frame   0x00000c08      0x230 usart.o
 
+<<<<<<< HEAD
 .debug_str      0x00000000     0x1165
  *(.debug_str)
  .debug_str     0x00000000      0x27e C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega64a/avr5/crtatmega64a.o
@@ -1357,6 +1358,27 @@ END GROUP
                                 0x1e8 (size before relaxing)
  .debug_str     0x00001065      0x100 usart.o
                                 0x50e (size before relaxing)
+=======
+.debug_str      0x00000000     0x11b5
+ *(.debug_str)
+ .debug_str     0x00000000      0x27e C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega64a/avr5/crtatmega64a.o
+ .debug_str     0x0000027e      0x39d at24c128c.o
+                                0x419 (size before relaxing)
+ .debug_str     0x0000061b      0x81f dgus.o
+                                0xb81 (size before relaxing)
+ .debug_str     0x00000e3a       0x1f eeprom.o
+                                0x2f9 (size before relaxing)
+ .debug_str     0x00000e59       0x79 gpio.o
+                                0x19b (size before relaxing)
+ .debug_str     0x00000ed2       0x55 main.o
+                                0x2bc (size before relaxing)
+ .debug_str     0x00000f27      0x13e timer.o
+                                0x3fc (size before relaxing)
+ .debug_str     0x00001065       0x50 twi.o
+                                0x1d5 (size before relaxing)
+ .debug_str     0x000010b5      0x100 usart.o
+                                0x4fb (size before relaxing)
+>>>>>>> master
 
 .debug_loc      0x00000000     0x1e11
  *(.debug_loc)

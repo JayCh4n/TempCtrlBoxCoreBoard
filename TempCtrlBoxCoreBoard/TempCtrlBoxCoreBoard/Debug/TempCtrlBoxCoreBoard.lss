@@ -23,11 +23,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   9 .debug_frame  00000e38  00000000  00000000  0001123c  2**2
                   CONTENTS, READONLY, DEBUGGING
+<<<<<<< HEAD
  10 .debug_str    00001165  00000000  00000000  00012074  2**0
                   CONTENTS, READONLY, DEBUGGING
  11 .debug_loc    00001e11  00000000  00000000  000131d9  2**0
                   CONTENTS, READONLY, DEBUGGING
  12 .debug_ranges 00000348  00000000  00000000  00014fea  2**0
+=======
+ 10 .debug_str    000011b5  00000000  00000000  00012074  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_loc    00001e11  00000000  00000000  00013229  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_ranges 00000348  00000000  00000000  0001503a  2**0
+>>>>>>> master
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -10722,6 +10730,7 @@ void alarm_monitor(void)
 	for (i = 0; i < MAX_IQR_QUANTITY; i++)
     4e70:	19 82       	std	Y+1, r1	; 0x01
     4e72:	f6 c0       	rjmp	.+492    	; 0x5060 <alarm_monitor+0x206>
+<<<<<<< HEAD
 	{
 		if (alarm_monitor_enable_flag[i] == 1)		//如果开启了该通道 再进行该通道的告警处理
     4e74:	89 81       	ldd	r24, Y+1	; 0x01
@@ -11019,6 +11028,1592 @@ void alarm_monitor(void)
 		}
 	}
 
+	/*如果无告警 则自动关闭报警器*/
+	if (alarm_sta_mask == 0x0FFFFFF)
+    5068:	8b 81       	ldd	r24, Y+3	; 0x03
+    506a:	9c 81       	ldd	r25, Y+4	; 0x04
+    506c:	ad 81       	ldd	r26, Y+5	; 0x05
+    506e:	be 81       	ldd	r27, Y+6	; 0x06
+    5070:	8f 3f       	cpi	r24, 0xFF	; 255
+    5072:	9f 4f       	sbci	r25, 0xFF	; 255
+    5074:	af 4f       	sbci	r26, 0xFF	; 255
+    5076:	b1 05       	cpc	r27, r1
+    5078:	91 f4       	brne	.+36     	; 0x509e <alarm_monitor+0x244>
+	{
+		ALARM_OFF;
+    507a:	82 e3       	ldi	r24, 0x32	; 50
+    507c:	90 e0       	ldi	r25, 0x00	; 0
+    507e:	22 e3       	ldi	r18, 0x32	; 50
+    5080:	30 e0       	ldi	r19, 0x00	; 0
+    5082:	f9 01       	movw	r30, r18
+    5084:	20 81       	ld	r18, Z
+    5086:	2f 7e       	andi	r18, 0xEF	; 239
+    5088:	fc 01       	movw	r30, r24
+    508a:	20 83       	st	Z, r18
+		LED6_OFF;
+    508c:	8b e3       	ldi	r24, 0x3B	; 59
+    508e:	90 e0       	ldi	r25, 0x00	; 0
+    5090:	2b e3       	ldi	r18, 0x3B	; 59
+    5092:	30 e0       	ldi	r19, 0x00	; 0
+    5094:	f9 01       	movw	r30, r18
+    5096:	20 81       	ld	r18, Z
+    5098:	22 60       	ori	r18, 0x02	; 2
+    509a:	fc 01       	movw	r30, r24
+    509c:	20 83       	st	Z, r18
+	}
+	alarm_sta_mask = 0;
+    509e:	1b 82       	std	Y+3, r1	; 0x03
+    50a0:	1c 82       	std	Y+4, r1	; 0x04
+    50a2:	1d 82       	std	Y+5, r1	; 0x05
+    50a4:	1e 82       	std	Y+6, r1	; 0x06
+}
+    50a6:	00 00       	nop
+    50a8:	26 96       	adiw	r28, 0x06	; 6
+    50aa:	0f b6       	in	r0, 0x3f	; 63
+    50ac:	f8 94       	cli
+    50ae:	de bf       	out	0x3e, r29	; 62
+    50b0:	0f be       	out	0x3f, r0	; 63
+    50b2:	cd bf       	out	0x3d, r28	; 61
+    50b4:	df 91       	pop	r29
+    50b6:	cf 91       	pop	r28
+    50b8:	08 95       	ret
+
+000050ba <update_template_page>:
+
+void update_template_page(uint8_t first_tpnum)
+{
+    50ba:	cf 93       	push	r28
+    50bc:	df 93       	push	r29
+    50be:	cd b7       	in	r28, 0x3d	; 61
+    50c0:	de b7       	in	r29, 0x3e	; 62
+    50c2:	27 97       	sbiw	r28, 0x07	; 7
+    50c4:	0f b6       	in	r0, 0x3f	; 63
+    50c6:	f8 94       	cli
+    50c8:	de bf       	out	0x3e, r29	; 62
+    50ca:	0f be       	out	0x3f, r0	; 63
+    50cc:	cd bf       	out	0x3d, r28	; 61
+    50ce:	8f 83       	std	Y+7, r24	; 0x07
+	uint8_t i;
+ 	uint8_t sta;
+ 	uint32_t name;
+	
+	send_name(TEMPLATE_SAVE_NAME, tp_save_name);
+    50d0:	80 91 37 03 	lds	r24, 0x0337	; 0x800337 <tp_save_name>
+    50d4:	90 91 38 03 	lds	r25, 0x0338	; 0x800338 <tp_save_name+0x1>
+    50d8:	a0 91 39 03 	lds	r26, 0x0339	; 0x800339 <tp_save_name+0x2>
+    50dc:	b0 91 3a 03 	lds	r27, 0x033A	; 0x80033a <tp_save_name+0x3>
+    50e0:	ac 01       	movw	r20, r24
+    50e2:	bd 01       	movw	r22, r26
+    50e4:	8c eb       	ldi	r24, 0xBC	; 188
+    50e6:	91 e0       	ldi	r25, 0x01	; 1
+    50e8:	18 d8       	rcall	.-4048   	; 0x411a <send_name>
+	send_name(TEMPLATE_FIND_NAME, tp_find_name);		//发送搜索框名称
+    50ea:	80 91 33 03 	lds	r24, 0x0333	; 0x800333 <tp_find_name>
+    50ee:	90 91 34 03 	lds	r25, 0x0334	; 0x800334 <tp_find_name+0x1>
+    50f2:	a0 91 35 03 	lds	r26, 0x0335	; 0x800335 <tp_find_name+0x2>
+    50f6:	b0 91 36 03 	lds	r27, 0x0336	; 0x800336 <tp_find_name+0x3>
+    50fa:	ac 01       	movw	r20, r24
+    50fc:	bd 01       	movw	r22, r26
+    50fe:	86 eb       	ldi	r24, 0xB6	; 182
+    5100:	91 e0       	ldi	r25, 0x01	; 1
+    5102:	0b d8       	rcall	.-4074   	; 0x411a <send_name>
+	send_variables(TEMPLATE_TIP_MAG, template_tip_msg);
+    5104:	80 91 32 03 	lds	r24, 0x0332	; 0x800332 <template_tip_msg>
+    5108:	88 2f       	mov	r24, r24
+    510a:	90 e0       	ldi	r25, 0x00	; 0
+    510c:	bc 01       	movw	r22, r24
+    510e:	8e e8       	ldi	r24, 0x8E	; 142
+    5110:	90 e0       	ldi	r25, 0x00	; 0
+    5112:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+	
+	for (i = 0; i < 5; i++)
+    5116:	19 82       	std	Y+1, r1	; 0x01
+    5118:	6f c0       	rjmp	.+222    	; 0x51f8 <update_template_page+0x13e>
+	{
+		send_variables(TEMPLATE_NUM1 + i * 2, first_tpnum + i);
+    511a:	8f 81       	ldd	r24, Y+7	; 0x07
+    511c:	28 2f       	mov	r18, r24
+    511e:	30 e0       	ldi	r19, 0x00	; 0
+    5120:	89 81       	ldd	r24, Y+1	; 0x01
+    5122:	88 2f       	mov	r24, r24
+    5124:	90 e0       	ldi	r25, 0x00	; 0
+    5126:	82 0f       	add	r24, r18
+    5128:	93 1f       	adc	r25, r19
+    512a:	9c 01       	movw	r18, r24
+    512c:	89 81       	ldd	r24, Y+1	; 0x01
+    512e:	88 2f       	mov	r24, r24
+    5130:	90 e0       	ldi	r25, 0x00	; 0
+    5132:	cc 96       	adiw	r24, 0x3c	; 60
+    5134:	88 0f       	add	r24, r24
+    5136:	99 1f       	adc	r25, r25
+    5138:	b9 01       	movw	r22, r18
+    513a:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+			
+		if(first_tpnum + i > template_cnt)
+    513e:	8f 81       	ldd	r24, Y+7	; 0x07
+    5140:	28 2f       	mov	r18, r24
+    5142:	30 e0       	ldi	r19, 0x00	; 0
+    5144:	89 81       	ldd	r24, Y+1	; 0x01
+    5146:	88 2f       	mov	r24, r24
+    5148:	90 e0       	ldi	r25, 0x00	; 0
+    514a:	28 0f       	add	r18, r24
+    514c:	39 1f       	adc	r19, r25
+    514e:	80 91 31 03 	lds	r24, 0x0331	; 0x800331 <template_cnt>
+    5152:	88 2f       	mov	r24, r24
+    5154:	90 e0       	ldi	r25, 0x00	; 0
+    5156:	82 17       	cp	r24, r18
+    5158:	93 07       	cpc	r25, r19
+    515a:	d4 f4       	brge	.+52     	; 0x5190 <update_template_page+0xd6>
+		{
+			send_name(TEMPLATE_NAME1 + i * 4, 0);			//清除名称
+    515c:	89 81       	ldd	r24, Y+1	; 0x01
+    515e:	88 2f       	mov	r24, r24
+    5160:	90 e0       	ldi	r25, 0x00	; 0
+    5162:	88 0f       	add	r24, r24
+    5164:	99 1f       	adc	r25, r25
+    5166:	88 0f       	add	r24, r24
+    5168:	99 1f       	adc	r25, r25
+    516a:	8e 55       	subi	r24, 0x5E	; 94
+    516c:	9e 4f       	sbci	r25, 0xFE	; 254
+    516e:	40 e0       	ldi	r20, 0x00	; 0
+    5170:	50 e0       	ldi	r21, 0x00	; 0
+    5172:	ba 01       	movw	r22, r20
+    5174:	0e 94 8d 20 	call	0x411a	; 0x411a <send_name>
+			send_variables(TEMPLATE_STATUS1 + i * 2, 4);	//清除图标
+    5178:	89 81       	ldd	r24, Y+1	; 0x01
+    517a:	88 2f       	mov	r24, r24
+    517c:	90 e0       	ldi	r25, 0x00	; 0
+    517e:	8e 5b       	subi	r24, 0xBE	; 190
+    5180:	9f 4f       	sbci	r25, 0xFF	; 255
+    5182:	88 0f       	add	r24, r24
+    5184:	99 1f       	adc	r25, r25
+    5186:	64 e0       	ldi	r22, 0x04	; 4
+    5188:	70 e0       	ldi	r23, 0x00	; 0
+    518a:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+    518e:	31 c0       	rjmp	.+98     	; 0x51f2 <update_template_page+0x138>
+		}
+		else
+		{
+			sta = read_sta_from_eeprom(first_tpnum + i);
+    5190:	9f 81       	ldd	r25, Y+7	; 0x07
+    5192:	89 81       	ldd	r24, Y+1	; 0x01
+    5194:	89 0f       	add	r24, r25
+    5196:	0e 94 02 06 	call	0xc04	; 0xc04 <read_sta_from_eeprom>
+    519a:	8a 83       	std	Y+2, r24	; 0x02
+			send_variables(TEMPLATE_STATUS1 + i * 2, sta);
+    519c:	8a 81       	ldd	r24, Y+2	; 0x02
+    519e:	28 2f       	mov	r18, r24
+    51a0:	30 e0       	ldi	r19, 0x00	; 0
+    51a2:	89 81       	ldd	r24, Y+1	; 0x01
+    51a4:	88 2f       	mov	r24, r24
+    51a6:	90 e0       	ldi	r25, 0x00	; 0
+    51a8:	8e 5b       	subi	r24, 0xBE	; 190
+    51aa:	9f 4f       	sbci	r25, 0xFF	; 255
+    51ac:	88 0f       	add	r24, r24
+    51ae:	99 1f       	adc	r25, r25
+    51b0:	b9 01       	movw	r22, r18
+    51b2:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+						
+			name = read_name_from_eeprom(first_tpnum + i);
+    51b6:	9f 81       	ldd	r25, Y+7	; 0x07
+    51b8:	89 81       	ldd	r24, Y+1	; 0x01
+    51ba:	89 0f       	add	r24, r25
+    51bc:	0e 94 77 06 	call	0xcee	; 0xcee <read_name_from_eeprom>
+    51c0:	dc 01       	movw	r26, r24
+    51c2:	cb 01       	movw	r24, r22
+    51c4:	8b 83       	std	Y+3, r24	; 0x03
+    51c6:	9c 83       	std	Y+4, r25	; 0x04
+    51c8:	ad 83       	std	Y+5, r26	; 0x05
+    51ca:	be 83       	std	Y+6, r27	; 0x06
+			send_name(TEMPLATE_NAME1 + i * 4, name);
+    51cc:	89 81       	ldd	r24, Y+1	; 0x01
+    51ce:	88 2f       	mov	r24, r24
+    51d0:	90 e0       	ldi	r25, 0x00	; 0
+    51d2:	88 0f       	add	r24, r24
+    51d4:	99 1f       	adc	r25, r25
+    51d6:	88 0f       	add	r24, r24
+    51d8:	99 1f       	adc	r25, r25
+    51da:	8e 55       	subi	r24, 0x5E	; 94
+    51dc:	9e 4f       	sbci	r25, 0xFE	; 254
+    51de:	9c 01       	movw	r18, r24
+    51e0:	8b 81       	ldd	r24, Y+3	; 0x03
+    51e2:	9c 81       	ldd	r25, Y+4	; 0x04
+    51e4:	ad 81       	ldd	r26, Y+5	; 0x05
+    51e6:	be 81       	ldd	r27, Y+6	; 0x06
+    51e8:	ac 01       	movw	r20, r24
+    51ea:	bd 01       	movw	r22, r26
+    51ec:	c9 01       	movw	r24, r18
+    51ee:	0e 94 8d 20 	call	0x411a	; 0x411a <send_name>
+	
+	send_name(TEMPLATE_SAVE_NAME, tp_save_name);
+	send_name(TEMPLATE_FIND_NAME, tp_find_name);		//发送搜索框名称
+	send_variables(TEMPLATE_TIP_MAG, template_tip_msg);
+	
+	for (i = 0; i < 5; i++)
+    51f2:	89 81       	ldd	r24, Y+1	; 0x01
+    51f4:	8f 5f       	subi	r24, 0xFF	; 255
+    51f6:	89 83       	std	Y+1, r24	; 0x01
+    51f8:	89 81       	ldd	r24, Y+1	; 0x01
+    51fa:	85 30       	cpi	r24, 0x05	; 5
+    51fc:	08 f4       	brcc	.+2      	; 0x5200 <update_template_page+0x146>
+    51fe:	8d cf       	rjmp	.-230    	; 0x511a <update_template_page+0x60>
+			name = read_name_from_eeprom(first_tpnum + i);
+			send_name(TEMPLATE_NAME1 + i * 4, name);
+=======
+	{
+		if (alarm_monitor_enable_flag[i] == 1)		//如果开启了该通道 再进行该通道的告警处理
+    4e74:	89 81       	ldd	r24, Y+1	; 0x01
+    4e76:	88 2f       	mov	r24, r24
+    4e78:	90 e0       	ldi	r25, 0x00	; 0
+    4e7a:	84 5c       	subi	r24, 0xC4	; 196
+    4e7c:	9c 4f       	sbci	r25, 0xFC	; 252
+    4e7e:	fc 01       	movw	r30, r24
+    4e80:	80 81       	ld	r24, Z
+    4e82:	81 30       	cpi	r24, 0x01	; 1
+    4e84:	09 f0       	breq	.+2      	; 0x4e88 <alarm_monitor+0x2e>
+    4e86:	bd c0       	rjmp	.+378    	; 0x5002 <alarm_monitor+0x1a8>
+		{
+/*			alarm_monitor_enable_flag[i] = 0;*/
+ 			if (sensor_sta[i] != pre_sensor_sta[i])
+    4e88:	89 81       	ldd	r24, Y+1	; 0x01
+    4e8a:	88 2f       	mov	r24, r24
+    4e8c:	90 e0       	ldi	r25, 0x00	; 0
+    4e8e:	8f 5c       	subi	r24, 0xCF	; 207
+    4e90:	9d 4f       	sbci	r25, 0xFD	; 253
+    4e92:	fc 01       	movw	r30, r24
+    4e94:	20 81       	ld	r18, Z
+    4e96:	89 81       	ldd	r24, Y+1	; 0x01
+    4e98:	88 2f       	mov	r24, r24
+    4e9a:	90 e0       	ldi	r25, 0x00	; 0
+    4e9c:	87 5b       	subi	r24, 0xB7	; 183
+    4e9e:	9d 4f       	sbci	r25, 0xFD	; 253
+    4ea0:	fc 01       	movw	r30, r24
+    4ea2:	80 81       	ld	r24, Z
+    4ea4:	28 17       	cp	r18, r24
+    4ea6:	09 f4       	brne	.+2      	; 0x4eaa <alarm_monitor+0x50>
+    4ea8:	ac c0       	rjmp	.+344    	; 0x5002 <alarm_monitor+0x1a8>
+ 			{
+				pre_sensor_sta[i] = sensor_sta[i];
+    4eaa:	89 81       	ldd	r24, Y+1	; 0x01
+    4eac:	88 2f       	mov	r24, r24
+    4eae:	90 e0       	ldi	r25, 0x00	; 0
+    4eb0:	29 81       	ldd	r18, Y+1	; 0x01
+    4eb2:	22 2f       	mov	r18, r18
+    4eb4:	30 e0       	ldi	r19, 0x00	; 0
+    4eb6:	2f 5c       	subi	r18, 0xCF	; 207
+    4eb8:	3d 4f       	sbci	r19, 0xFD	; 253
+    4eba:	f9 01       	movw	r30, r18
+    4ebc:	20 81       	ld	r18, Z
+    4ebe:	87 5b       	subi	r24, 0xB7	; 183
+    4ec0:	9d 4f       	sbci	r25, 0xFD	; 253
+    4ec2:	fc 01       	movw	r30, r24
+    4ec4:	20 83       	st	Z, r18
+	
+				if (sensor_sta[i] >= 4 && sensor_sta[i] <= 11)		//4-10:告警类型
+    4ec6:	89 81       	ldd	r24, Y+1	; 0x01
+    4ec8:	88 2f       	mov	r24, r24
+    4eca:	90 e0       	ldi	r25, 0x00	; 0
+    4ecc:	8f 5c       	subi	r24, 0xCF	; 207
+    4ece:	9d 4f       	sbci	r25, 0xFD	; 253
+    4ed0:	fc 01       	movw	r30, r24
+    4ed2:	80 81       	ld	r24, Z
+    4ed4:	84 30       	cpi	r24, 0x04	; 4
+    4ed6:	08 f4       	brcc	.+2      	; 0x4eda <alarm_monitor+0x80>
+    4ed8:	94 c0       	rjmp	.+296    	; 0x5002 <alarm_monitor+0x1a8>
+    4eda:	89 81       	ldd	r24, Y+1	; 0x01
+    4edc:	88 2f       	mov	r24, r24
+    4ede:	90 e0       	ldi	r25, 0x00	; 0
+    4ee0:	8f 5c       	subi	r24, 0xCF	; 207
+    4ee2:	9d 4f       	sbci	r25, 0xFD	; 253
+    4ee4:	fc 01       	movw	r30, r24
+    4ee6:	80 81       	ld	r24, Z
+    4ee8:	8c 30       	cpi	r24, 0x0C	; 12
+    4eea:	08 f0       	brcs	.+2      	; 0x4eee <alarm_monitor+0x94>
+    4eec:	8a c0       	rjmp	.+276    	; 0x5002 <alarm_monitor+0x1a8>
+				{
+					ALARM_ON;
+    4eee:	82 e3       	ldi	r24, 0x32	; 50
+    4ef0:	90 e0       	ldi	r25, 0x00	; 0
+    4ef2:	22 e3       	ldi	r18, 0x32	; 50
+    4ef4:	30 e0       	ldi	r19, 0x00	; 0
+    4ef6:	f9 01       	movw	r30, r18
+    4ef8:	20 81       	ld	r18, Z
+    4efa:	20 61       	ori	r18, 0x10	; 16
+    4efc:	fc 01       	movw	r30, r24
+    4efe:	20 83       	st	Z, r18
+					LED6_ON;
+    4f00:	8b e3       	ldi	r24, 0x3B	; 59
+    4f02:	90 e0       	ldi	r25, 0x00	; 0
+    4f04:	2b e3       	ldi	r18, 0x3B	; 59
+    4f06:	30 e0       	ldi	r19, 0x00	; 0
+    4f08:	f9 01       	movw	r30, r18
+    4f0a:	20 81       	ld	r18, Z
+    4f0c:	2d 7f       	andi	r18, 0xFD	; 253
+    4f0e:	fc 01       	movw	r30, r24
+    4f10:	20 83       	st	Z, r18
+	
+					if (alarm_cnt >= MAX_ALARM_HISTORY - 1)
+    4f12:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4f16:	85 34       	cpi	r24, 0x45	; 69
+    4f18:	18 f1       	brcs	.+70     	; 0x4f60 <alarm_monitor+0x106>
+					{
+						alarm_cnt = MAX_ALARM_HISTORY - 1;
+    4f1a:	85 e4       	ldi	r24, 0x45	; 69
+    4f1c:	80 93 2d 03 	sts	0x032D, r24	; 0x80032d <alarm_cnt>
+						for (j = 0; j < alarm_cnt; j++)
+    4f20:	1a 82       	std	Y+2, r1	; 0x02
+    4f22:	19 c0       	rjmp	.+50     	; 0x4f56 <alarm_monitor+0xfc>
+						{
+							alarm_history[j] = alarm_history[j + 1];
+    4f24:	8a 81       	ldd	r24, Y+2	; 0x02
+    4f26:	88 2f       	mov	r24, r24
+    4f28:	90 e0       	ldi	r25, 0x00	; 0
+    4f2a:	2a 81       	ldd	r18, Y+2	; 0x02
+    4f2c:	22 2f       	mov	r18, r18
+    4f2e:	30 e0       	ldi	r19, 0x00	; 0
+    4f30:	2f 5f       	subi	r18, 0xFF	; 255
+    4f32:	3f 4f       	sbci	r19, 0xFF	; 255
+    4f34:	88 0f       	add	r24, r24
+    4f36:	99 1f       	adc	r25, r25
+    4f38:	81 5e       	subi	r24, 0xE1	; 225
+    4f3a:	94 4f       	sbci	r25, 0xF4	; 244
+    4f3c:	22 0f       	add	r18, r18
+    4f3e:	33 1f       	adc	r19, r19
+    4f40:	21 5e       	subi	r18, 0xE1	; 225
+    4f42:	34 4f       	sbci	r19, 0xF4	; 244
+    4f44:	f9 01       	movw	r30, r18
+    4f46:	20 81       	ld	r18, Z
+    4f48:	31 81       	ldd	r19, Z+1	; 0x01
+    4f4a:	fc 01       	movw	r30, r24
+    4f4c:	31 83       	std	Z+1, r19	; 0x01
+    4f4e:	20 83       	st	Z, r18
+					LED6_ON;
+	
+					if (alarm_cnt >= MAX_ALARM_HISTORY - 1)
+					{
+						alarm_cnt = MAX_ALARM_HISTORY - 1;
+						for (j = 0; j < alarm_cnt; j++)
+    4f50:	8a 81       	ldd	r24, Y+2	; 0x02
+    4f52:	8f 5f       	subi	r24, 0xFF	; 255
+    4f54:	8a 83       	std	Y+2, r24	; 0x02
+    4f56:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4f5a:	9a 81       	ldd	r25, Y+2	; 0x02
+    4f5c:	98 17       	cp	r25, r24
+    4f5e:	10 f3       	brcs	.-60     	; 0x4f24 <alarm_monitor+0xca>
+						{
+							alarm_history[j] = alarm_history[j + 1];
+						}
+					}
+					
+					alarm_history[alarm_cnt].alarm_type = sensor_sta[i] - 4;
+    4f60:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4f64:	88 2f       	mov	r24, r24
+    4f66:	90 e0       	ldi	r25, 0x00	; 0
+    4f68:	29 81       	ldd	r18, Y+1	; 0x01
+    4f6a:	22 2f       	mov	r18, r18
+    4f6c:	30 e0       	ldi	r19, 0x00	; 0
+    4f6e:	2f 5c       	subi	r18, 0xCF	; 207
+    4f70:	3d 4f       	sbci	r19, 0xFD	; 253
+    4f72:	f9 01       	movw	r30, r18
+    4f74:	20 81       	ld	r18, Z
+    4f76:	24 50       	subi	r18, 0x04	; 4
+    4f78:	88 0f       	add	r24, r24
+    4f7a:	99 1f       	adc	r25, r25
+    4f7c:	81 5e       	subi	r24, 0xE1	; 225
+    4f7e:	94 4f       	sbci	r25, 0xF4	; 244
+    4f80:	fc 01       	movw	r30, r24
+    4f82:	20 83       	st	Z, r18
+					alarm_history[alarm_cnt].alarm_device_num = i;
+    4f84:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4f88:	88 2f       	mov	r24, r24
+    4f8a:	90 e0       	ldi	r25, 0x00	; 0
+    4f8c:	88 0f       	add	r24, r24
+    4f8e:	99 1f       	adc	r25, r25
+    4f90:	80 5e       	subi	r24, 0xE0	; 224
+    4f92:	94 4f       	sbci	r25, 0xF4	; 244
+    4f94:	29 81       	ldd	r18, Y+1	; 0x01
+    4f96:	fc 01       	movw	r30, r24
+    4f98:	20 83       	st	Z, r18
+	
+					eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2 + 1),
+    4f9a:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4f9e:	88 2f       	mov	r24, r24
+    4fa0:	90 e0       	ldi	r25, 0x00	; 0
+									  alarm_history[alarm_cnt].alarm_type);
+    4fa2:	88 0f       	add	r24, r24
+    4fa4:	99 1f       	adc	r25, r25
+    4fa6:	81 5e       	subi	r24, 0xE1	; 225
+    4fa8:	94 4f       	sbci	r25, 0xF4	; 244
+    4faa:	fc 01       	movw	r30, r24
+    4fac:	20 81       	ld	r18, Z
+					}
+					
+					alarm_history[alarm_cnt].alarm_type = sensor_sta[i] - 4;
+					alarm_history[alarm_cnt].alarm_device_num = i;
+	
+					eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2 + 1),
+    4fae:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4fb2:	88 2f       	mov	r24, r24
+    4fb4:	90 e0       	ldi	r25, 0x00	; 0
+    4fb6:	02 96       	adiw	r24, 0x02	; 2
+    4fb8:	88 0f       	add	r24, r24
+    4fba:	99 1f       	adc	r25, r25
+    4fbc:	62 2f       	mov	r22, r18
+    4fbe:	0e 94 9a 3f 	call	0x7f34	; 0x7f34 <eeprom_write_byte>
+									  alarm_history[alarm_cnt].alarm_type);
+					eeprom_write_byte((uint8_t *)(ALARM_HISTORY_EEADDR + alarm_cnt * 2),
+    4fc2:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4fc6:	88 2f       	mov	r24, r24
+    4fc8:	90 e0       	ldi	r25, 0x00	; 0
+    4fca:	88 0f       	add	r24, r24
+    4fcc:	99 1f       	adc	r25, r25
+    4fce:	80 5e       	subi	r24, 0xE0	; 224
+    4fd0:	94 4f       	sbci	r25, 0xF4	; 244
+    4fd2:	fc 01       	movw	r30, r24
+    4fd4:	20 81       	ld	r18, Z
+    4fd6:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4fda:	88 2f       	mov	r24, r24
+    4fdc:	90 e0       	ldi	r25, 0x00	; 0
+    4fde:	88 0f       	add	r24, r24
+    4fe0:	99 1f       	adc	r25, r25
+    4fe2:	03 96       	adiw	r24, 0x03	; 3
+    4fe4:	62 2f       	mov	r22, r18
+    4fe6:	0e 94 9a 3f 	call	0x7f34	; 0x7f34 <eeprom_write_byte>
+									  alarm_history[alarm_cnt].alarm_device_num);
+					eeprom_write_byte((uint8_t *)ALARM_CNT_EEADDR, ++alarm_cnt);
+    4fea:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4fee:	8f 5f       	subi	r24, 0xFF	; 255
+    4ff0:	80 93 2d 03 	sts	0x032D, r24	; 0x80032d <alarm_cnt>
+    4ff4:	80 91 2d 03 	lds	r24, 0x032D	; 0x80032d <alarm_cnt>
+    4ff8:	68 2f       	mov	r22, r24
+    4ffa:	82 e0       	ldi	r24, 0x02	; 2
+    4ffc:	90 e0       	ldi	r25, 0x00	; 0
+    4ffe:	0e 94 9a 3f 	call	0x7f34	; 0x7f34 <eeprom_write_byte>
+				}
+			}
+		}
+
+		if (sensor_sta[i] <= 3 || sensor_sta[i] == 15)			//如果没有告警（15代表没查温控卡，按要求不报警）	
+    5002:	89 81       	ldd	r24, Y+1	; 0x01
+    5004:	88 2f       	mov	r24, r24
+    5006:	90 e0       	ldi	r25, 0x00	; 0
+    5008:	8f 5c       	subi	r24, 0xCF	; 207
+    500a:	9d 4f       	sbci	r25, 0xFD	; 253
+    500c:	fc 01       	movw	r30, r24
+    500e:	80 81       	ld	r24, Z
+    5010:	84 30       	cpi	r24, 0x04	; 4
+    5012:	48 f0       	brcs	.+18     	; 0x5026 <alarm_monitor+0x1cc>
+    5014:	89 81       	ldd	r24, Y+1	; 0x01
+    5016:	88 2f       	mov	r24, r24
+    5018:	90 e0       	ldi	r25, 0x00	; 0
+    501a:	8f 5c       	subi	r24, 0xCF	; 207
+    501c:	9d 4f       	sbci	r25, 0xFD	; 253
+    501e:	fc 01       	movw	r30, r24
+    5020:	80 81       	ld	r24, Z
+    5022:	8f 30       	cpi	r24, 0x0F	; 15
+    5024:	d1 f4       	brne	.+52     	; 0x505a <alarm_monitor+0x200>
+		{
+			alarm_sta_mask |= 1 << i;							//则把改通道对应的掩码位置1
+    5026:	89 81       	ldd	r24, Y+1	; 0x01
+    5028:	28 2f       	mov	r18, r24
+    502a:	30 e0       	ldi	r19, 0x00	; 0
+    502c:	81 e0       	ldi	r24, 0x01	; 1
+    502e:	90 e0       	ldi	r25, 0x00	; 0
+    5030:	02 c0       	rjmp	.+4      	; 0x5036 <alarm_monitor+0x1dc>
+    5032:	88 0f       	add	r24, r24
+    5034:	99 1f       	adc	r25, r25
+    5036:	2a 95       	dec	r18
+    5038:	e2 f7       	brpl	.-8      	; 0x5032 <alarm_monitor+0x1d8>
+    503a:	09 2e       	mov	r0, r25
+    503c:	00 0c       	add	r0, r0
+    503e:	aa 0b       	sbc	r26, r26
+    5040:	bb 0b       	sbc	r27, r27
+    5042:	2b 81       	ldd	r18, Y+3	; 0x03
+    5044:	3c 81       	ldd	r19, Y+4	; 0x04
+    5046:	4d 81       	ldd	r20, Y+5	; 0x05
+    5048:	5e 81       	ldd	r21, Y+6	; 0x06
+    504a:	82 2b       	or	r24, r18
+    504c:	93 2b       	or	r25, r19
+    504e:	a4 2b       	or	r26, r20
+    5050:	b5 2b       	or	r27, r21
+    5052:	8b 83       	std	Y+3, r24	; 0x03
+    5054:	9c 83       	std	Y+4, r25	; 0x04
+    5056:	ad 83       	std	Y+5, r26	; 0x05
+    5058:	be 83       	std	Y+6, r27	; 0x06
+void alarm_monitor(void)
+{
+	uint8_t i, j;
+	uint32_t alarm_sta_mask = 0;		//告警掩码   0-0x00FFFFFF 24位 每一位代表一个通道的状态  0：有告警 1：无告警	 
+
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
+    505a:	89 81       	ldd	r24, Y+1	; 0x01
+    505c:	8f 5f       	subi	r24, 0xFF	; 255
+    505e:	89 83       	std	Y+1, r24	; 0x01
+    5060:	89 81       	ldd	r24, Y+1	; 0x01
+    5062:	88 31       	cpi	r24, 0x18	; 24
+    5064:	08 f4       	brcc	.+2      	; 0x5068 <alarm_monitor+0x20e>
+    5066:	06 cf       	rjmp	.-500    	; 0x4e74 <alarm_monitor+0x1a>
+			alarm_sta_mask |= 1 << i;							//则把改通道对应的掩码位置1
+>>>>>>> master
+		}
+	}
+	
+	template_tip_msg = ICON_NONE;
+    5200:	10 92 32 03 	sts	0x0332, r1	; 0x800332 <template_tip_msg>
+}
+    5204:	00 00       	nop
+    5206:	27 96       	adiw	r28, 0x07	; 7
+    5208:	0f b6       	in	r0, 0x3f	; 63
+    520a:	f8 94       	cli
+    520c:	de bf       	out	0x3e, r29	; 62
+    520e:	0f be       	out	0x3f, r0	; 63
+    5210:	cd bf       	out	0x3d, r28	; 61
+    5212:	df 91       	pop	r29
+    5214:	cf 91       	pop	r28
+    5216:	08 95       	ret
+
+00005218 <update_tp_temp>:
+
+void update_tp_temp(uint8_t page_num)
+{
+    5218:	cf 93       	push	r28
+    521a:	df 93       	push	r29
+    521c:	00 d0       	rcall	.+0      	; 0x521e <update_tp_temp+0x6>
+    521e:	1f 92       	push	r1
+    5220:	cd b7       	in	r28, 0x3d	; 61
+    5222:	de b7       	in	r29, 0x3e	; 62
+    5224:	8b 83       	std	Y+3, r24	; 0x03
+	uint8_t i,iqr_num;
+	
+	send_variables(TEMP_VIEW_UNIT, temp_unit);
+    5226:	80 91 27 03 	lds	r24, 0x0327	; 0x800327 <temp_unit>
+    522a:	90 91 28 03 	lds	r25, 0x0328	; 0x800328 <temp_unit+0x1>
+    522e:	bc 01       	movw	r22, r24
+    5230:	80 e9       	ldi	r24, 0x90	; 144
+    5232:	90 e0       	ldi	r25, 0x00	; 0
+    5234:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+	
+	for(i=0;i<12;i++)
+    5238:	19 82       	std	Y+1, r1	; 0x01
+    523a:	76 c0       	rjmp	.+236    	; 0x5328 <update_tp_temp+0x110>
+	{	
+		iqr_num = (page_num - 1) * 12 + i + 1;
+    523c:	8b 81       	ldd	r24, Y+3	; 0x03
+    523e:	88 2f       	mov	r24, r24
+    5240:	90 e0       	ldi	r25, 0x00	; 0
+    5242:	01 97       	sbiw	r24, 0x01	; 1
+    5244:	98 2f       	mov	r25, r24
+    5246:	89 2f       	mov	r24, r25
+    5248:	88 0f       	add	r24, r24
+    524a:	89 0f       	add	r24, r25
+    524c:	88 0f       	add	r24, r24
+    524e:	88 0f       	add	r24, r24
+    5250:	98 2f       	mov	r25, r24
+    5252:	89 81       	ldd	r24, Y+1	; 0x01
+    5254:	89 0f       	add	r24, r25
+    5256:	8f 5f       	subi	r24, 0xFF	; 255
+    5258:	8a 83       	std	Y+2, r24	; 0x02
+		send_variables(TEMP_VIEW_NUM1+(i*2), iqr_num);
+    525a:	8a 81       	ldd	r24, Y+2	; 0x02
+    525c:	28 2f       	mov	r18, r24
+    525e:	30 e0       	ldi	r19, 0x00	; 0
+    5260:	89 81       	ldd	r24, Y+1	; 0x01
+    5262:	88 2f       	mov	r24, r24
+    5264:	90 e0       	ldi	r25, 0x00	; 0
+    5266:	87 5b       	subi	r24, 0xB7	; 183
+    5268:	9f 4f       	sbci	r25, 0xFF	; 255
+    526a:	88 0f       	add	r24, r24
+    526c:	99 1f       	adc	r25, r25
+    526e:	b9 01       	movw	r22, r18
+    5270:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+		send_variables(TEMP_VIEW_SETTEMP1+(i*2), template_structure.set_temp[iqr_num-1] + 
+    5274:	8a 81       	ldd	r24, Y+2	; 0x02
+    5276:	88 2f       	mov	r24, r24
+    5278:	90 e0       	ldi	r25, 0x00	; 0
+    527a:	01 97       	sbiw	r24, 0x01	; 1
+    527c:	88 0f       	add	r24, r24
+    527e:	99 1f       	adc	r25, r25
+    5280:	81 54       	subi	r24, 0x41	; 65
+    5282:	96 4f       	sbci	r25, 0xF6	; 246
+    5284:	fc 01       	movw	r30, r24
+    5286:	40 81       	ld	r20, Z
+    5288:	51 81       	ldd	r21, Z+1	; 0x01
+						temp_unit*(template_structure.set_temp[iqr_num-1]*8/10+32));
+    528a:	8a 81       	ldd	r24, Y+2	; 0x02
+    528c:	88 2f       	mov	r24, r24
+    528e:	90 e0       	ldi	r25, 0x00	; 0
+    5290:	01 97       	sbiw	r24, 0x01	; 1
+    5292:	88 0f       	add	r24, r24
+    5294:	99 1f       	adc	r25, r25
+    5296:	81 54       	subi	r24, 0x41	; 65
+    5298:	96 4f       	sbci	r25, 0xF6	; 246
+    529a:	fc 01       	movw	r30, r24
+    529c:	80 81       	ld	r24, Z
+    529e:	91 81       	ldd	r25, Z+1	; 0x01
+    52a0:	88 0f       	add	r24, r24
+    52a2:	99 1f       	adc	r25, r25
+    52a4:	88 0f       	add	r24, r24
+    52a6:	99 1f       	adc	r25, r25
+    52a8:	88 0f       	add	r24, r24
+    52aa:	99 1f       	adc	r25, r25
+    52ac:	9c 01       	movw	r18, r24
+    52ae:	ad ec       	ldi	r26, 0xCD	; 205
+    52b0:	bc ec       	ldi	r27, 0xCC	; 204
+    52b2:	0e 94 6a 3f 	call	0x7ed4	; 0x7ed4 <__umulhisi3>
+    52b6:	96 95       	lsr	r25
+    52b8:	87 95       	ror	r24
+    52ba:	96 95       	lsr	r25
+    52bc:	87 95       	ror	r24
+    52be:	96 95       	lsr	r25
+    52c0:	87 95       	ror	r24
+    52c2:	bc 01       	movw	r22, r24
+    52c4:	60 5e       	subi	r22, 0xE0	; 224
+    52c6:	7f 4f       	sbci	r23, 0xFF	; 255
+    52c8:	20 91 27 03 	lds	r18, 0x0327	; 0x800327 <temp_unit>
+    52cc:	30 91 28 03 	lds	r19, 0x0328	; 0x800328 <temp_unit+0x1>
+    52d0:	62 9f       	mul	r22, r18
+    52d2:	c0 01       	movw	r24, r0
+    52d4:	63 9f       	mul	r22, r19
+    52d6:	90 0d       	add	r25, r0
+    52d8:	72 9f       	mul	r23, r18
+    52da:	90 0d       	add	r25, r0
+    52dc:	11 24       	eor	r1, r1
+	
+	for(i=0;i<12;i++)
+	{	
+		iqr_num = (page_num - 1) * 12 + i + 1;
+		send_variables(TEMP_VIEW_NUM1+(i*2), iqr_num);
+		send_variables(TEMP_VIEW_SETTEMP1+(i*2), template_structure.set_temp[iqr_num-1] + 
+    52de:	9a 01       	movw	r18, r20
+    52e0:	28 0f       	add	r18, r24
+    52e2:	39 1f       	adc	r19, r25
+    52e4:	89 81       	ldd	r24, Y+1	; 0x01
+    52e6:	88 2f       	mov	r24, r24
+    52e8:	90 e0       	ldi	r25, 0x00	; 0
+    52ea:	8b 5a       	subi	r24, 0xAB	; 171
+    52ec:	9f 4f       	sbci	r25, 0xFF	; 255
+    52ee:	88 0f       	add	r24, r24
+    52f0:	99 1f       	adc	r25, r25
+    52f2:	b9 01       	movw	r22, r18
+    52f4:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+						temp_unit*(template_structure.set_temp[iqr_num-1]*8/10+32));
+		send_variables(TEMP_VIEW_SENSOR_TYPE1+(i*2), template_structure.sensor_type[iqr_num-1]);
+    52f8:	8a 81       	ldd	r24, Y+2	; 0x02
+    52fa:	88 2f       	mov	r24, r24
+    52fc:	90 e0       	ldi	r25, 0x00	; 0
+    52fe:	01 97       	sbiw	r24, 0x01	; 1
+    5300:	88 0f       	add	r24, r24
+    5302:	99 1f       	adc	r25, r25
+    5304:	81 51       	subi	r24, 0x11	; 17
+    5306:	96 4f       	sbci	r25, 0xF6	; 246
+    5308:	fc 01       	movw	r30, r24
+    530a:	20 81       	ld	r18, Z
+    530c:	31 81       	ldd	r19, Z+1	; 0x01
+    530e:	89 81       	ldd	r24, Y+1	; 0x01
+    5310:	88 2f       	mov	r24, r24
+    5312:	90 e0       	ldi	r25, 0x00	; 0
+    5314:	8a 57       	subi	r24, 0x7A	; 122
+    5316:	9f 4f       	sbci	r25, 0xFF	; 255
+    5318:	88 0f       	add	r24, r24
+    531a:	99 1f       	adc	r25, r25
+    531c:	b9 01       	movw	r22, r18
+    531e:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+{
+	uint8_t i,iqr_num;
+	
+	send_variables(TEMP_VIEW_UNIT, temp_unit);
+	
+	for(i=0;i<12;i++)
+    5322:	89 81       	ldd	r24, Y+1	; 0x01
+    5324:	8f 5f       	subi	r24, 0xFF	; 255
+    5326:	89 83       	std	Y+1, r24	; 0x01
+    5328:	89 81       	ldd	r24, Y+1	; 0x01
+    532a:	8c 30       	cpi	r24, 0x0C	; 12
+    532c:	08 f4       	brcc	.+2      	; 0x5330 <update_tp_temp+0x118>
+    532e:	86 cf       	rjmp	.-244    	; 0x523c <update_tp_temp+0x24>
+		send_variables(TEMP_VIEW_NUM1+(i*2), iqr_num);
+		send_variables(TEMP_VIEW_SETTEMP1+(i*2), template_structure.set_temp[iqr_num-1] + 
+						temp_unit*(template_structure.set_temp[iqr_num-1]*8/10+32));
+		send_variables(TEMP_VIEW_SENSOR_TYPE1+(i*2), template_structure.sensor_type[iqr_num-1]);
+	}
+}
+    5330:	00 00       	nop
+    5332:	0f 90       	pop	r0
+    5334:	0f 90       	pop	r0
+    5336:	0f 90       	pop	r0
+    5338:	df 91       	pop	r29
+    533a:	cf 91       	pop	r28
+    533c:	08 95       	ret
+
+0000533e <update_tp_time>:
+
+<<<<<<< HEAD
+void update_tp_time(uint8_t page_num)
+{
+    533e:	cf 93       	push	r28
+    5340:	df 93       	push	r29
+    5342:	00 d0       	rcall	.+0      	; 0x5344 <update_tp_time+0x6>
+    5344:	00 d0       	rcall	.+0      	; 0x5346 <update_tp_time+0x8>
+    5346:	cd b7       	in	r28, 0x3d	; 61
+    5348:	de b7       	in	r29, 0x3e	; 62
+    534a:	8c 83       	std	Y+4, r24	; 0x04
+	uint8_t j, k;
+	uint8_t addr_offset = 0x00;
+    534c:	1b 82       	std	Y+3, r1	; 0x03
+	
+	send_variables(TIME_VIEW_MOUDEL_NUM, page_num);
+    534e:	8c 81       	ldd	r24, Y+4	; 0x04
+    5350:	88 2f       	mov	r24, r24
+    5352:	90 e0       	ldi	r25, 0x00	; 0
+    5354:	bc 01       	movw	r22, r24
+    5356:	82 e0       	ldi	r24, 0x02	; 2
+    5358:	91 e0       	ldi	r25, 0x01	; 1
+    535a:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+
+	for (j = 0; j < 8; j++)
+    535e:	19 82       	std	Y+1, r1	; 0x01
+    5360:	37 c0       	rjmp	.+110    	; 0x53d0 <update_tp_time+0x92>
+	{
+		for (k = 0; k < 4; k++)
+    5362:	1a 82       	std	Y+2, r1	; 0x02
+    5364:	2f c0       	rjmp	.+94     	; 0x53c4 <update_tp_time+0x86>
+		{
+			send_variables(TIME_VIEW_IQR1_T1 + addr_offset, template_structure.ctrl_time[page_num - 1][j][k]);
+    5366:	8c 81       	ldd	r24, Y+4	; 0x04
+    5368:	88 2f       	mov	r24, r24
+    536a:	90 e0       	ldi	r25, 0x00	; 0
+    536c:	ac 01       	movw	r20, r24
+    536e:	41 50       	subi	r20, 0x01	; 1
+    5370:	51 09       	sbc	r21, r1
+    5372:	89 81       	ldd	r24, Y+1	; 0x01
+    5374:	28 2f       	mov	r18, r24
+    5376:	30 e0       	ldi	r19, 0x00	; 0
+    5378:	8a 81       	ldd	r24, Y+2	; 0x02
+    537a:	88 2f       	mov	r24, r24
+    537c:	90 e0       	ldi	r25, 0x00	; 0
+    537e:	44 0f       	add	r20, r20
+    5380:	55 1f       	adc	r21, r21
+    5382:	44 0f       	add	r20, r20
+    5384:	55 1f       	adc	r21, r21
+    5386:	44 0f       	add	r20, r20
+    5388:	55 1f       	adc	r21, r21
+    538a:	24 0f       	add	r18, r20
+    538c:	35 1f       	adc	r19, r21
+    538e:	22 0f       	add	r18, r18
+    5390:	33 1f       	adc	r19, r19
+    5392:	22 0f       	add	r18, r18
+    5394:	33 1f       	adc	r19, r19
+    5396:	82 0f       	add	r24, r18
+    5398:	93 1f       	adc	r25, r19
+    539a:	88 0f       	add	r24, r24
+    539c:	99 1f       	adc	r25, r25
+    539e:	81 5e       	subi	r24, 0xE1	; 225
+    53a0:	95 4f       	sbci	r25, 0xF5	; 245
+    53a2:	fc 01       	movw	r30, r24
+    53a4:	20 81       	ld	r18, Z
+    53a6:	31 81       	ldd	r19, Z+1	; 0x01
+    53a8:	8b 81       	ldd	r24, Y+3	; 0x03
+    53aa:	88 2f       	mov	r24, r24
+    53ac:	90 e0       	ldi	r25, 0x00	; 0
+    53ae:	8e 53       	subi	r24, 0x3E	; 62
+    53b0:	9f 4f       	sbci	r25, 0xFF	; 255
+    53b2:	b9 01       	movw	r22, r18
+    53b4:	0e 94 43 20 	call	0x4086	; 0x4086 <send_variables>
+			addr_offset += 0x02;
+    53b8:	8b 81       	ldd	r24, Y+3	; 0x03
+    53ba:	8e 5f       	subi	r24, 0xFE	; 254
+    53bc:	8b 83       	std	Y+3, r24	; 0x03
+	
+	send_variables(TIME_VIEW_MOUDEL_NUM, page_num);
+
+	for (j = 0; j < 8; j++)
+	{
+		for (k = 0; k < 4; k++)
+    53be:	8a 81       	ldd	r24, Y+2	; 0x02
+    53c0:	8f 5f       	subi	r24, 0xFF	; 255
+    53c2:	8a 83       	std	Y+2, r24	; 0x02
+    53c4:	8a 81       	ldd	r24, Y+2	; 0x02
+    53c6:	84 30       	cpi	r24, 0x04	; 4
+    53c8:	70 f2       	brcs	.-100    	; 0x5366 <update_tp_time+0x28>
+	uint8_t j, k;
+	uint8_t addr_offset = 0x00;
+	
+	send_variables(TIME_VIEW_MOUDEL_NUM, page_num);
+
+	for (j = 0; j < 8; j++)
+    53ca:	89 81       	ldd	r24, Y+1	; 0x01
+    53cc:	8f 5f       	subi	r24, 0xFF	; 255
+    53ce:	89 83       	std	Y+1, r24	; 0x01
+    53d0:	89 81       	ldd	r24, Y+1	; 0x01
+    53d2:	88 30       	cpi	r24, 0x08	; 8
+    53d4:	30 f2       	brcs	.-116    	; 0x5362 <update_tp_time+0x24>
+		{
+			send_variables(TIME_VIEW_IQR1_T1 + addr_offset, template_structure.ctrl_time[page_num - 1][j][k]);
+			addr_offset += 0x02;
+		}
+	}
+}
+    53d6:	00 00       	nop
+    53d8:	0f 90       	pop	r0
+    53da:	0f 90       	pop	r0
+    53dc:	0f 90       	pop	r0
+    53de:	0f 90       	pop	r0
+    53e0:	df 91       	pop	r29
+    53e2:	cf 91       	pop	r28
+    53e4:	08 95       	ret
+
+000053e6 <all_set_temp>:
+
+void all_set_temp(uint16_t temp)
+{
+    53e6:	cf 93       	push	r28
+    53e8:	df 93       	push	r29
+    53ea:	00 d0       	rcall	.+0      	; 0x53ec <all_set_temp+0x6>
+    53ec:	00 d0       	rcall	.+0      	; 0x53ee <all_set_temp+0x8>
+    53ee:	1f 92       	push	r1
+    53f0:	cd b7       	in	r28, 0x3d	; 61
+    53f2:	de b7       	in	r29, 0x3e	; 62
+    53f4:	9d 83       	std	Y+5, r25	; 0x05
+    53f6:	8c 83       	std	Y+4, r24	; 0x04
+	uint8_t i;
+	uint16_t crc;
+	
+	for (i=0; i<MAX_IQR_QUANTITY; i++)
+    53f8:	19 82       	std	Y+1, r1	; 0x01
+    53fa:	0f c0       	rjmp	.+30     	; 0x541a <all_set_temp+0x34>
+	{
+		set_temp[i] = temp; 
+    53fc:	89 81       	ldd	r24, Y+1	; 0x01
+    53fe:	88 2f       	mov	r24, r24
+    5400:	90 e0       	ldi	r25, 0x00	; 0
+    5402:	88 0f       	add	r24, r24
+    5404:	99 1f       	adc	r25, r25
+    5406:	85 5f       	subi	r24, 0xF5	; 245
+    5408:	93 4f       	sbci	r25, 0xF3	; 243
+    540a:	2c 81       	ldd	r18, Y+4	; 0x04
+    540c:	3d 81       	ldd	r19, Y+5	; 0x05
+    540e:	fc 01       	movw	r30, r24
+    5410:	31 83       	std	Z+1, r19	; 0x01
+    5412:	20 83       	st	Z, r18
+void all_set_temp(uint16_t temp)
+{
+	uint8_t i;
+	uint16_t crc;
+	
+	for (i=0; i<MAX_IQR_QUANTITY; i++)
+    5414:	89 81       	ldd	r24, Y+1	; 0x01
+    5416:	8f 5f       	subi	r24, 0xFF	; 255
+    5418:	89 83       	std	Y+1, r24	; 0x01
+    541a:	89 81       	ldd	r24, Y+1	; 0x01
+    541c:	88 31       	cpi	r24, 0x18	; 24
+    541e:	70 f3       	brcs	.-36     	; 0x53fc <all_set_temp+0x16>
+	{
+		set_temp[i] = temp; 
+	}
+	
+	usart1_tx_buff[0] = 0xA5;
+    5420:	85 ea       	ldi	r24, 0xA5	; 165
+    5422:	80 93 da 05 	sts	0x05DA, r24	; 0x8005da <usart1_tx_buff>
+	usart1_tx_buff[1] = 0x5A;
+    5426:	8a e5       	ldi	r24, 0x5A	; 90
+    5428:	80 93 db 05 	sts	0x05DB, r24	; 0x8005db <usart1_tx_buff+0x1>
+	usart1_tx_buff[2] = 0x04;
+    542c:	84 e0       	ldi	r24, 0x04	; 4
+    542e:	80 93 dc 05 	sts	0x05DC, r24	; 0x8005dc <usart1_tx_buff+0x2>
+	usart1_tx_buff[3] = TEMP;
+    5432:	83 e0       	ldi	r24, 0x03	; 3
+    5434:	80 93 dd 05 	sts	0x05DD, r24	; 0x8005dd <usart1_tx_buff+0x3>
+	usart1_tx_buff[4] = 0x00;		//全局
+    5438:	10 92 de 05 	sts	0x05DE, r1	; 0x8005de <usart1_tx_buff+0x4>
+	usart1_tx_buff[5] = (temp >> 8);
+    543c:	8c 81       	ldd	r24, Y+4	; 0x04
+    543e:	9d 81       	ldd	r25, Y+5	; 0x05
+    5440:	89 2f       	mov	r24, r25
+    5442:	99 27       	eor	r25, r25
+    5444:	80 93 df 05 	sts	0x05DF, r24	; 0x8005df <usart1_tx_buff+0x5>
+	usart1_tx_buff[6] = temp;
+    5448:	8c 81       	ldd	r24, Y+4	; 0x04
+    544a:	80 93 e0 05 	sts	0x05E0, r24	; 0x8005e0 <usart1_tx_buff+0x6>
+	
+	crc = crc_check(usart1_tx_buff, 9);
+    544e:	69 e0       	ldi	r22, 0x09	; 9
+    5450:	8a ed       	ldi	r24, 0xDA	; 218
+    5452:	95 e0       	ldi	r25, 0x05	; 5
+    5454:	0e 94 eb 3c 	call	0x79d6	; 0x79d6 <crc_check>
+    5458:	9b 83       	std	Y+3, r25	; 0x03
+    545a:	8a 83       	std	Y+2, r24	; 0x02
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+    545c:	8a 81       	ldd	r24, Y+2	; 0x02
+    545e:	80 93 e1 05 	sts	0x05E1, r24	; 0x8005e1 <usart1_tx_buff+0x7>
+	usart1_tx_buff[8] = crc >> 8;
+    5462:	8a 81       	ldd	r24, Y+2	; 0x02
+    5464:	9b 81       	ldd	r25, Y+3	; 0x03
+    5466:	89 2f       	mov	r24, r25
+    5468:	99 27       	eor	r25, r25
+    546a:	80 93 e2 05 	sts	0x05E2, r24	; 0x8005e2 <usart1_tx_buff+0x8>
+	
+	while (usart1_tx_overtime_mask != 1)
+    546e:	00 00       	nop
+    5470:	80 91 71 03 	lds	r24, 0x0371	; 0x800371 <usart1_tx_overtime_mask>
+    5474:	81 30       	cpi	r24, 0x01	; 1
+    5476:	e1 f7       	brne	.-8      	; 0x5470 <all_set_temp+0x8a>
+	;
+	
+	usart1_send_str(usart1_tx_buff, 9);
+    5478:	69 e0       	ldi	r22, 0x09	; 9
+    547a:	8a ed       	ldi	r24, 0xDA	; 218
+    547c:	95 e0       	ldi	r25, 0x05	; 5
+    547e:	0e 94 75 3c 	call	0x78ea	; 0x78ea <usart1_send_str>
+	
+	usart1_tx_overtime_mask = 0;
+    5482:	10 92 71 03 	sts	0x0371, r1	; 0x800371 <usart1_tx_overtime_mask>
+	usart1_tx_timecnt = 0;
+    5486:	10 92 70 03 	sts	0x0370, r1	; 0x800370 <usart1_tx_timecnt>
+}
+    548a:	00 00       	nop
+    548c:	0f 90       	pop	r0
+    548e:	0f 90       	pop	r0
+    5490:	0f 90       	pop	r0
+    5492:	0f 90       	pop	r0
+    5494:	0f 90       	pop	r0
+    5496:	df 91       	pop	r29
+    5498:	cf 91       	pop	r28
+    549a:	08 95       	ret
+
+0000549c <all_set_sensor_type>:
+
+void all_set_sensor_type(uint16_t type)
+{
+    549c:	cf 93       	push	r28
+    549e:	df 93       	push	r29
+    54a0:	00 d0       	rcall	.+0      	; 0x54a2 <all_set_sensor_type+0x6>
+    54a2:	00 d0       	rcall	.+0      	; 0x54a4 <all_set_sensor_type+0x8>
+    54a4:	1f 92       	push	r1
+    54a6:	cd b7       	in	r28, 0x3d	; 61
+    54a8:	de b7       	in	r29, 0x3e	; 62
+    54aa:	9d 83       	std	Y+5, r25	; 0x05
+    54ac:	8c 83       	std	Y+4, r24	; 0x04
+	uint8_t i;
+	uint16_t crc;
+	
+	for (i=0; i<MAX_IQR_QUANTITY; i++)
+    54ae:	19 82       	std	Y+1, r1	; 0x01
+    54b0:	0f c0       	rjmp	.+30     	; 0x54d0 <all_set_sensor_type+0x34>
+	{
+		sensor_type[i] = type;
+    54b2:	89 81       	ldd	r24, Y+1	; 0x01
+    54b4:	88 2f       	mov	r24, r24
+    54b6:	90 e0       	ldi	r25, 0x00	; 0
+    54b8:	88 0f       	add	r24, r24
+    54ba:	99 1f       	adc	r25, r25
+    54bc:	8f 53       	subi	r24, 0x3F	; 63
+    54be:	9d 4f       	sbci	r25, 0xFD	; 253
+    54c0:	2c 81       	ldd	r18, Y+4	; 0x04
+    54c2:	3d 81       	ldd	r19, Y+5	; 0x05
+    54c4:	fc 01       	movw	r30, r24
+    54c6:	31 83       	std	Z+1, r19	; 0x01
+    54c8:	20 83       	st	Z, r18
+void all_set_sensor_type(uint16_t type)
+{
+	uint8_t i;
+	uint16_t crc;
+	
+	for (i=0; i<MAX_IQR_QUANTITY; i++)
+    54ca:	89 81       	ldd	r24, Y+1	; 0x01
+    54cc:	8f 5f       	subi	r24, 0xFF	; 255
+    54ce:	89 83       	std	Y+1, r24	; 0x01
+    54d0:	89 81       	ldd	r24, Y+1	; 0x01
+    54d2:	88 31       	cpi	r24, 0x18	; 24
+    54d4:	70 f3       	brcs	.-36     	; 0x54b2 <all_set_sensor_type+0x16>
+	{
+		sensor_type[i] = type;
+	}
+	
+	usart1_tx_buff[0] = 0xA5;
+    54d6:	85 ea       	ldi	r24, 0xA5	; 165
+    54d8:	80 93 da 05 	sts	0x05DA, r24	; 0x8005da <usart1_tx_buff>
+	usart1_tx_buff[1] = 0x5A;
+    54dc:	8a e5       	ldi	r24, 0x5A	; 90
+    54de:	80 93 db 05 	sts	0x05DB, r24	; 0x8005db <usart1_tx_buff+0x1>
+	usart1_tx_buff[2] = 0x04;
+    54e2:	84 e0       	ldi	r24, 0x04	; 4
+    54e4:	80 93 dc 05 	sts	0x05DC, r24	; 0x8005dc <usart1_tx_buff+0x2>
+	usart1_tx_buff[3] = SENSOR_TYPE;
+    54e8:	85 e0       	ldi	r24, 0x05	; 5
+    54ea:	80 93 dd 05 	sts	0x05DD, r24	; 0x8005dd <usart1_tx_buff+0x3>
+	usart1_tx_buff[4] = 0x00;		//全局
+    54ee:	10 92 de 05 	sts	0x05DE, r1	; 0x8005de <usart1_tx_buff+0x4>
+	usart1_tx_buff[5] = (type >> 8);
+    54f2:	8c 81       	ldd	r24, Y+4	; 0x04
+    54f4:	9d 81       	ldd	r25, Y+5	; 0x05
+    54f6:	89 2f       	mov	r24, r25
+    54f8:	99 27       	eor	r25, r25
+    54fa:	80 93 df 05 	sts	0x05DF, r24	; 0x8005df <usart1_tx_buff+0x5>
+	usart1_tx_buff[6] = type;
+    54fe:	8c 81       	ldd	r24, Y+4	; 0x04
+    5500:	80 93 e0 05 	sts	0x05E0, r24	; 0x8005e0 <usart1_tx_buff+0x6>
+	
+	crc = crc_check(usart1_tx_buff, 9);
+    5504:	69 e0       	ldi	r22, 0x09	; 9
+    5506:	8a ed       	ldi	r24, 0xDA	; 218
+    5508:	95 e0       	ldi	r25, 0x05	; 5
+    550a:	0e 94 eb 3c 	call	0x79d6	; 0x79d6 <crc_check>
+    550e:	9b 83       	std	Y+3, r25	; 0x03
+    5510:	8a 83       	std	Y+2, r24	; 0x02
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+    5512:	8a 81       	ldd	r24, Y+2	; 0x02
+    5514:	80 93 e1 05 	sts	0x05E1, r24	; 0x8005e1 <usart1_tx_buff+0x7>
+	usart1_tx_buff[8] = crc >> 8;
+    5518:	8a 81       	ldd	r24, Y+2	; 0x02
+    551a:	9b 81       	ldd	r25, Y+3	; 0x03
+    551c:	89 2f       	mov	r24, r25
+    551e:	99 27       	eor	r25, r25
+    5520:	80 93 e2 05 	sts	0x05E2, r24	; 0x8005e2 <usart1_tx_buff+0x8>
+	
+	while (usart1_tx_overtime_mask != 1)
+    5524:	00 00       	nop
+    5526:	80 91 71 03 	lds	r24, 0x0371	; 0x800371 <usart1_tx_overtime_mask>
+    552a:	81 30       	cpi	r24, 0x01	; 1
+    552c:	e1 f7       	brne	.-8      	; 0x5526 <all_set_sensor_type+0x8a>
+	;
+	
+	usart1_send_str(usart1_tx_buff, 9);
+    552e:	69 e0       	ldi	r22, 0x09	; 9
+    5530:	8a ed       	ldi	r24, 0xDA	; 218
+    5532:	95 e0       	ldi	r25, 0x05	; 5
+    5534:	0e 94 75 3c 	call	0x78ea	; 0x78ea <usart1_send_str>
+	
+	usart1_tx_overtime_mask = 0;
+    5538:	10 92 71 03 	sts	0x0371, r1	; 0x800371 <usart1_tx_overtime_mask>
+	usart1_tx_timecnt = 0;
+    553c:	10 92 70 03 	sts	0x0370, r1	; 0x800370 <usart1_tx_timecnt>
+}
+    5540:	00 00       	nop
+    5542:	0f 90       	pop	r0
+    5544:	0f 90       	pop	r0
+    5546:	0f 90       	pop	r0
+    5548:	0f 90       	pop	r0
+    554a:	0f 90       	pop	r0
+    554c:	df 91       	pop	r29
+    554e:	cf 91       	pop	r28
+    5550:	08 95       	ret
+
+00005552 <all_set_preheattime>:
+void all_set_preheattime(uint8_t value)
+{
+    5552:	cf 93       	push	r28
+    5554:	df 93       	push	r29
+    5556:	00 d0       	rcall	.+0      	; 0x5558 <all_set_preheattime+0x6>
+    5558:	1f 92       	push	r1
+    555a:	cd b7       	in	r28, 0x3d	; 61
+    555c:	de b7       	in	r29, 0x3e	; 62
+    555e:	8b 83       	std	Y+3, r24	; 0x03
+	uint16_t crc;
+	
+	usart1_tx_buff[0] = 0xA5;
+    5560:	85 ea       	ldi	r24, 0xA5	; 165
+    5562:	80 93 da 05 	sts	0x05DA, r24	; 0x8005da <usart1_tx_buff>
+	usart1_tx_buff[1] = 0x5A;
+    5566:	8a e5       	ldi	r24, 0x5A	; 90
+    5568:	80 93 db 05 	sts	0x05DB, r24	; 0x8005db <usart1_tx_buff+0x1>
+	usart1_tx_buff[2] = 0x04;
+    556c:	84 e0       	ldi	r24, 0x04	; 4
+    556e:	80 93 dc 05 	sts	0x05DC, r24	; 0x8005dc <usart1_tx_buff+0x2>
+	usart1_tx_buff[3] = PREHEAT_TIME;
+    5572:	84 e0       	ldi	r24, 0x04	; 4
+    5574:	80 93 dd 05 	sts	0x05DD, r24	; 0x8005dd <usart1_tx_buff+0x3>
+	usart1_tx_buff[4] = 0x00;		//全局
+    5578:	10 92 de 05 	sts	0x05DE, r1	; 0x8005de <usart1_tx_buff+0x4>
+	usart1_tx_buff[5] = (value >> 8);
+    557c:	8b 81       	ldd	r24, Y+3	; 0x03
+    557e:	88 2f       	mov	r24, r24
+    5580:	90 e0       	ldi	r25, 0x00	; 0
+    5582:	89 2f       	mov	r24, r25
+    5584:	99 0f       	add	r25, r25
+    5586:	99 0b       	sbc	r25, r25
+    5588:	80 93 df 05 	sts	0x05DF, r24	; 0x8005df <usart1_tx_buff+0x5>
+	usart1_tx_buff[6] = value;
+    558c:	8b 81       	ldd	r24, Y+3	; 0x03
+    558e:	80 93 e0 05 	sts	0x05E0, r24	; 0x8005e0 <usart1_tx_buff+0x6>
+	
+	crc = crc_check(usart1_tx_buff, 9);
+    5592:	69 e0       	ldi	r22, 0x09	; 9
+    5594:	8a ed       	ldi	r24, 0xDA	; 218
+    5596:	95 e0       	ldi	r25, 0x05	; 5
+    5598:	0e 94 eb 3c 	call	0x79d6	; 0x79d6 <crc_check>
+    559c:	9a 83       	std	Y+2, r25	; 0x02
+    559e:	89 83       	std	Y+1, r24	; 0x01
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+    55a0:	89 81       	ldd	r24, Y+1	; 0x01
+    55a2:	80 93 e1 05 	sts	0x05E1, r24	; 0x8005e1 <usart1_tx_buff+0x7>
+	usart1_tx_buff[8] = crc >> 8;
+    55a6:	89 81       	ldd	r24, Y+1	; 0x01
+    55a8:	9a 81       	ldd	r25, Y+2	; 0x02
+    55aa:	89 2f       	mov	r24, r25
+    55ac:	99 27       	eor	r25, r25
+    55ae:	80 93 e2 05 	sts	0x05E2, r24	; 0x8005e2 <usart1_tx_buff+0x8>
+	
+	while (usart1_tx_overtime_mask != 1)
+    55b2:	00 00       	nop
+    55b4:	80 91 71 03 	lds	r24, 0x0371	; 0x800371 <usart1_tx_overtime_mask>
+    55b8:	81 30       	cpi	r24, 0x01	; 1
+    55ba:	e1 f7       	brne	.-8      	; 0x55b4 <all_set_preheattime+0x62>
+	;
+	
+	usart1_send_str(usart1_tx_buff, 9);
+    55bc:	69 e0       	ldi	r22, 0x09	; 9
+    55be:	8a ed       	ldi	r24, 0xDA	; 218
+    55c0:	95 e0       	ldi	r25, 0x05	; 5
+    55c2:	0e 94 75 3c 	call	0x78ea	; 0x78ea <usart1_send_str>
+	
+	usart1_tx_overtime_mask = 0;
+    55c6:	10 92 71 03 	sts	0x0371, r1	; 0x800371 <usart1_tx_overtime_mask>
+	usart1_tx_timecnt = 0;
+    55ca:	10 92 70 03 	sts	0x0370, r1	; 0x800370 <usart1_tx_timecnt>
+}
+    55ce:	00 00       	nop
+    55d0:	0f 90       	pop	r0
+    55d2:	0f 90       	pop	r0
+    55d4:	0f 90       	pop	r0
+    55d6:	df 91       	pop	r29
+    55d8:	cf 91       	pop	r28
+    55da:	08 95       	ret
+
+000055dc <all_set_switch_sensor>:
+
+void all_set_switch_sensor(uint8_t value)
+{
+    55dc:	cf 93       	push	r28
+    55de:	df 93       	push	r29
+    55e0:	00 d0       	rcall	.+0      	; 0x55e2 <all_set_switch_sensor+0x6>
+    55e2:	00 d0       	rcall	.+0      	; 0x55e4 <all_set_switch_sensor+0x8>
+    55e4:	cd b7       	in	r28, 0x3d	; 61
+    55e6:	de b7       	in	r29, 0x3e	; 62
+    55e8:	8c 83       	std	Y+4, r24	; 0x04
+	uint8_t i;
+	uint16_t crc;
+	
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
+    55ea:	19 82       	std	Y+1, r1	; 0x01
+    55ec:	25 c0       	rjmp	.+74     	; 0x5638 <all_set_switch_sensor+0x5c>
+	{
+		switch_sensor[i] = value;
+    55ee:	89 81       	ldd	r24, Y+1	; 0x01
+    55f0:	88 2f       	mov	r24, r24
+    55f2:	90 e0       	ldi	r25, 0x00	; 0
+    55f4:	2c 81       	ldd	r18, Y+4	; 0x04
+    55f6:	22 2f       	mov	r18, r18
+    55f8:	30 e0       	ldi	r19, 0x00	; 0
+    55fa:	88 0f       	add	r24, r24
+    55fc:	99 1f       	adc	r25, r25
+    55fe:	8f 56       	subi	r24, 0x6F	; 111
+    5600:	9d 4f       	sbci	r25, 0xFD	; 253
+    5602:	fc 01       	movw	r30, r24
+    5604:	31 83       	std	Z+1, r19	; 0x01
+    5606:	20 83       	st	Z, r18
+ 		switch_sensor_buff[i] = value;
+    5608:	89 81       	ldd	r24, Y+1	; 0x01
+    560a:	88 2f       	mov	r24, r24
+    560c:	90 e0       	ldi	r25, 0x00	; 0
+    560e:	2c 81       	ldd	r18, Y+4	; 0x04
+    5610:	22 2f       	mov	r18, r18
+    5612:	30 e0       	ldi	r19, 0x00	; 0
+    5614:	88 0f       	add	r24, r24
+    5616:	99 1f       	adc	r25, r25
+    5618:	8e 58       	subi	r24, 0x8E	; 142
+    561a:	98 4f       	sbci	r25, 0xF8	; 248
+    561c:	fc 01       	movw	r30, r24
+    561e:	31 83       	std	Z+1, r19	; 0x01
+    5620:	20 83       	st	Z, r18
+		alarm_monitor_enable_flag[i] = value;
+    5622:	89 81       	ldd	r24, Y+1	; 0x01
+    5624:	88 2f       	mov	r24, r24
+    5626:	90 e0       	ldi	r25, 0x00	; 0
+    5628:	84 5c       	subi	r24, 0xC4	; 196
+    562a:	9c 4f       	sbci	r25, 0xFC	; 252
+    562c:	2c 81       	ldd	r18, Y+4	; 0x04
+    562e:	fc 01       	movw	r30, r24
+    5630:	20 83       	st	Z, r18
+void all_set_switch_sensor(uint8_t value)
+{
+	uint8_t i;
+	uint16_t crc;
+	
+	for (i = 0; i < MAX_IQR_QUANTITY; i++)
+    5632:	89 81       	ldd	r24, Y+1	; 0x01
+    5634:	8f 5f       	subi	r24, 0xFF	; 255
+    5636:	89 83       	std	Y+1, r24	; 0x01
+    5638:	89 81       	ldd	r24, Y+1	; 0x01
+    563a:	88 31       	cpi	r24, 0x18	; 24
+    563c:	c0 f2       	brcs	.-80     	; 0x55ee <all_set_switch_sensor+0x12>
+ 		switch_sensor_buff[i] = value;
+		alarm_monitor_enable_flag[i] = value;
+// 		eeprom_write(SINGLE_SWSENSOR_EEADDR+i, switch_sensor[i]);
+	}
+	
+	usart1_tx_buff[0] = 0xA5;
+    563e:	85 ea       	ldi	r24, 0xA5	; 165
+    5640:	80 93 da 05 	sts	0x05DA, r24	; 0x8005da <usart1_tx_buff>
+	usart1_tx_buff[1] = 0x5A;
+    5644:	8a e5       	ldi	r24, 0x5A	; 90
+    5646:	80 93 db 05 	sts	0x05DB, r24	; 0x8005db <usart1_tx_buff+0x1>
+	usart1_tx_buff[2] = 0x04;
+    564a:	84 e0       	ldi	r24, 0x04	; 4
+    564c:	80 93 dc 05 	sts	0x05DC, r24	; 0x8005dc <usart1_tx_buff+0x2>
+	usart1_tx_buff[3] = SWITCH_SENSOR;
+    5650:	86 e0       	ldi	r24, 0x06	; 6
+    5652:	80 93 dd 05 	sts	0x05DD, r24	; 0x8005dd <usart1_tx_buff+0x3>
+	usart1_tx_buff[4] = 0x00;		//全局
+    5656:	10 92 de 05 	sts	0x05DE, r1	; 0x8005de <usart1_tx_buff+0x4>
+	usart1_tx_buff[5] = (value >> 8);
+    565a:	8c 81       	ldd	r24, Y+4	; 0x04
+    565c:	88 2f       	mov	r24, r24
+    565e:	90 e0       	ldi	r25, 0x00	; 0
+    5660:	89 2f       	mov	r24, r25
+    5662:	99 0f       	add	r25, r25
+    5664:	99 0b       	sbc	r25, r25
+    5666:	80 93 df 05 	sts	0x05DF, r24	; 0x8005df <usart1_tx_buff+0x5>
+	usart1_tx_buff[6] = value;
+    566a:	8c 81       	ldd	r24, Y+4	; 0x04
+    566c:	80 93 e0 05 	sts	0x05E0, r24	; 0x8005e0 <usart1_tx_buff+0x6>
+	
+	crc = crc_check(usart1_tx_buff, 9);
+    5670:	69 e0       	ldi	r22, 0x09	; 9
+    5672:	8a ed       	ldi	r24, 0xDA	; 218
+    5674:	95 e0       	ldi	r25, 0x05	; 5
+    5676:	0e 94 eb 3c 	call	0x79d6	; 0x79d6 <crc_check>
+    567a:	9b 83       	std	Y+3, r25	; 0x03
+    567c:	8a 83       	std	Y+2, r24	; 0x02
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+    567e:	8a 81       	ldd	r24, Y+2	; 0x02
+    5680:	80 93 e1 05 	sts	0x05E1, r24	; 0x8005e1 <usart1_tx_buff+0x7>
+	usart1_tx_buff[8] = crc >> 8;
+    5684:	8a 81       	ldd	r24, Y+2	; 0x02
+    5686:	9b 81       	ldd	r25, Y+3	; 0x03
+    5688:	89 2f       	mov	r24, r25
+    568a:	99 27       	eor	r25, r25
+    568c:	80 93 e2 05 	sts	0x05E2, r24	; 0x8005e2 <usart1_tx_buff+0x8>
+	
+	while (usart1_tx_overtime_mask != 1)
+    5690:	00 00       	nop
+    5692:	80 91 71 03 	lds	r24, 0x0371	; 0x800371 <usart1_tx_overtime_mask>
+    5696:	81 30       	cpi	r24, 0x01	; 1
+    5698:	e1 f7       	brne	.-8      	; 0x5692 <all_set_switch_sensor+0xb6>
+	;
+	
+	usart1_send_str(usart1_tx_buff, 9);
+    569a:	69 e0       	ldi	r22, 0x09	; 9
+    569c:	8a ed       	ldi	r24, 0xDA	; 218
+    569e:	95 e0       	ldi	r25, 0x05	; 5
+    56a0:	0e 94 75 3c 	call	0x78ea	; 0x78ea <usart1_send_str>
+	
+	usart1_tx_overtime_mask = 0;
+    56a4:	10 92 71 03 	sts	0x0371, r1	; 0x800371 <usart1_tx_overtime_mask>
+	usart1_tx_timecnt = 0;
+    56a8:	10 92 70 03 	sts	0x0370, r1	; 0x800370 <usart1_tx_timecnt>
+}
+    56ac:	00 00       	nop
+    56ae:	0f 90       	pop	r0
+    56b0:	0f 90       	pop	r0
+    56b2:	0f 90       	pop	r0
+    56b4:	0f 90       	pop	r0
+    56b6:	df 91       	pop	r29
+    56b8:	cf 91       	pop	r28
+    56ba:	08 95       	ret
+
+000056bc <all_set_standby>:
+
+void all_set_standby(uint8_t sta)
+{
+    56bc:	cf 93       	push	r28
+    56be:	df 93       	push	r29
+    56c0:	00 d0       	rcall	.+0      	; 0x56c2 <all_set_standby+0x6>
+    56c2:	1f 92       	push	r1
+    56c4:	cd b7       	in	r28, 0x3d	; 61
+    56c6:	de b7       	in	r29, 0x3e	; 62
+    56c8:	8b 83       	std	Y+3, r24	; 0x03
+	uint16_t crc;
+	
+	usart1_tx_buff[0] = 0xA5;
+    56ca:	85 ea       	ldi	r24, 0xA5	; 165
+    56cc:	80 93 da 05 	sts	0x05DA, r24	; 0x8005da <usart1_tx_buff>
+	usart1_tx_buff[1] = 0x5A;
+    56d0:	8a e5       	ldi	r24, 0x5A	; 90
+    56d2:	80 93 db 05 	sts	0x05DB, r24	; 0x8005db <usart1_tx_buff+0x1>
+	usart1_tx_buff[2] = 0x04;
+    56d6:	84 e0       	ldi	r24, 0x04	; 4
+    56d8:	80 93 dc 05 	sts	0x05DC, r24	; 0x8005dc <usart1_tx_buff+0x2>
+	usart1_tx_buff[3] = STANDBY;
+    56dc:	89 e0       	ldi	r24, 0x09	; 9
+    56de:	80 93 dd 05 	sts	0x05DD, r24	; 0x8005dd <usart1_tx_buff+0x3>
+	usart1_tx_buff[4] = 0x00;		//全局
+    56e2:	10 92 de 05 	sts	0x05DE, r1	; 0x8005de <usart1_tx_buff+0x4>
+	usart1_tx_buff[5] = (sta >> 8);
+    56e6:	8b 81       	ldd	r24, Y+3	; 0x03
+    56e8:	88 2f       	mov	r24, r24
+    56ea:	90 e0       	ldi	r25, 0x00	; 0
+    56ec:	89 2f       	mov	r24, r25
+    56ee:	99 0f       	add	r25, r25
+    56f0:	99 0b       	sbc	r25, r25
+    56f2:	80 93 df 05 	sts	0x05DF, r24	; 0x8005df <usart1_tx_buff+0x5>
+	usart1_tx_buff[6] = sta;
+    56f6:	8b 81       	ldd	r24, Y+3	; 0x03
+    56f8:	80 93 e0 05 	sts	0x05E0, r24	; 0x8005e0 <usart1_tx_buff+0x6>
+	
+	crc = crc_check(usart1_tx_buff, 9);
+    56fc:	69 e0       	ldi	r22, 0x09	; 9
+    56fe:	8a ed       	ldi	r24, 0xDA	; 218
+    5700:	95 e0       	ldi	r25, 0x05	; 5
+    5702:	0e 94 eb 3c 	call	0x79d6	; 0x79d6 <crc_check>
+    5706:	9a 83       	std	Y+2, r25	; 0x02
+    5708:	89 83       	std	Y+1, r24	; 0x01
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+    570a:	89 81       	ldd	r24, Y+1	; 0x01
+    570c:	80 93 e1 05 	sts	0x05E1, r24	; 0x8005e1 <usart1_tx_buff+0x7>
+	usart1_tx_buff[8] = crc >> 8;
+    5710:	89 81       	ldd	r24, Y+1	; 0x01
+    5712:	9a 81       	ldd	r25, Y+2	; 0x02
+    5714:	89 2f       	mov	r24, r25
+    5716:	99 27       	eor	r25, r25
+    5718:	80 93 e2 05 	sts	0x05E2, r24	; 0x8005e2 <usart1_tx_buff+0x8>
+	
+	while (usart1_tx_overtime_mask != 1)
+    571c:	00 00       	nop
+    571e:	80 91 71 03 	lds	r24, 0x0371	; 0x800371 <usart1_tx_overtime_mask>
+    5722:	81 30       	cpi	r24, 0x01	; 1
+    5724:	e1 f7       	brne	.-8      	; 0x571e <all_set_standby+0x62>
+		;
+	usart1_send_str(usart1_tx_buff, 9);
+    5726:	69 e0       	ldi	r22, 0x09	; 9
+    5728:	8a ed       	ldi	r24, 0xDA	; 218
+    572a:	95 e0       	ldi	r25, 0x05	; 5
+    572c:	0e 94 75 3c 	call	0x78ea	; 0x78ea <usart1_send_str>
+	
+	usart1_tx_overtime_mask = 0;
+    5730:	10 92 71 03 	sts	0x0371, r1	; 0x800371 <usart1_tx_overtime_mask>
+	usart1_tx_timecnt = 0;
+    5734:	10 92 70 03 	sts	0x0370, r1	; 0x800370 <usart1_tx_timecnt>
+}
+    5738:	00 00       	nop
+    573a:	0f 90       	pop	r0
+    573c:	0f 90       	pop	r0
+    573e:	0f 90       	pop	r0
+    5740:	df 91       	pop	r29
+    5742:	cf 91       	pop	r28
+    5744:	08 95       	ret
+
+00005746 <all_set_over_above_temp>:
+
+void all_set_over_above_temp(uint8_t value)
+{
+    5746:	cf 93       	push	r28
+    5748:	df 93       	push	r29
+    574a:	00 d0       	rcall	.+0      	; 0x574c <all_set_over_above_temp+0x6>
+    574c:	1f 92       	push	r1
+    574e:	cd b7       	in	r28, 0x3d	; 61
+    5750:	de b7       	in	r29, 0x3e	; 62
+    5752:	8b 83       	std	Y+3, r24	; 0x03
+	uint16_t crc;
+	
+	usart1_tx_buff[0] = 0xA5;
+    5754:	85 ea       	ldi	r24, 0xA5	; 165
+    5756:	80 93 da 05 	sts	0x05DA, r24	; 0x8005da <usart1_tx_buff>
+	usart1_tx_buff[1] = 0x5A;
+    575a:	8a e5       	ldi	r24, 0x5A	; 90
+    575c:	80 93 db 05 	sts	0x05DB, r24	; 0x8005db <usart1_tx_buff+0x1>
+	usart1_tx_buff[2] = 0x04;
+    5760:	84 e0       	ldi	r24, 0x04	; 4
+    5762:	80 93 dc 05 	sts	0x05DC, r24	; 0x8005dc <usart1_tx_buff+0x2>
+	usart1_tx_buff[3] = OVER_ABOVE_TEMP;
+    5766:	8c e0       	ldi	r24, 0x0C	; 12
+    5768:	80 93 dd 05 	sts	0x05DD, r24	; 0x8005dd <usart1_tx_buff+0x3>
+	usart1_tx_buff[4] = 0x00;		//全局
+    576c:	10 92 de 05 	sts	0x05DE, r1	; 0x8005de <usart1_tx_buff+0x4>
+	usart1_tx_buff[5] = (value >> 8);
+    5770:	8b 81       	ldd	r24, Y+3	; 0x03
+    5772:	88 2f       	mov	r24, r24
+    5774:	90 e0       	ldi	r25, 0x00	; 0
+    5776:	89 2f       	mov	r24, r25
+    5778:	99 0f       	add	r25, r25
+    577a:	99 0b       	sbc	r25, r25
+    577c:	80 93 df 05 	sts	0x05DF, r24	; 0x8005df <usart1_tx_buff+0x5>
+	usart1_tx_buff[6] = value;
+    5780:	8b 81       	ldd	r24, Y+3	; 0x03
+    5782:	80 93 e0 05 	sts	0x05E0, r24	; 0x8005e0 <usart1_tx_buff+0x6>
+	
+	crc = crc_check(usart1_tx_buff, 9);
+    5786:	69 e0       	ldi	r22, 0x09	; 9
+    5788:	8a ed       	ldi	r24, 0xDA	; 218
+    578a:	95 e0       	ldi	r25, 0x05	; 5
+    578c:	0e 94 eb 3c 	call	0x79d6	; 0x79d6 <crc_check>
+    5790:	9a 83       	std	Y+2, r25	; 0x02
+    5792:	89 83       	std	Y+1, r24	; 0x01
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+    5794:	89 81       	ldd	r24, Y+1	; 0x01
+    5796:	80 93 e1 05 	sts	0x05E1, r24	; 0x8005e1 <usart1_tx_buff+0x7>
+	usart1_tx_buff[8] = crc >> 8;
+    579a:	89 81       	ldd	r24, Y+1	; 0x01
+    579c:	9a 81       	ldd	r25, Y+2	; 0x02
+    579e:	89 2f       	mov	r24, r25
+    57a0:	99 27       	eor	r25, r25
+    57a2:	80 93 e2 05 	sts	0x05E2, r24	; 0x8005e2 <usart1_tx_buff+0x8>
+	
+	while (usart1_tx_overtime_mask != 1)
+    57a6:	00 00       	nop
+    57a8:	80 91 71 03 	lds	r24, 0x0371	; 0x800371 <usart1_tx_overtime_mask>
+    57ac:	81 30       	cpi	r24, 0x01	; 1
+    57ae:	e1 f7       	brne	.-8      	; 0x57a8 <all_set_over_above_temp+0x62>
+	;
+	usart1_send_str(usart1_tx_buff, 9);
+    57b0:	69 e0       	ldi	r22, 0x09	; 9
+    57b2:	8a ed       	ldi	r24, 0xDA	; 218
+    57b4:	95 e0       	ldi	r25, 0x05	; 5
+    57b6:	0e 94 75 3c 	call	0x78ea	; 0x78ea <usart1_send_str>
+	
+	usart1_tx_overtime_mask = 0;
+    57ba:	10 92 71 03 	sts	0x0371, r1	; 0x800371 <usart1_tx_overtime_mask>
+	usart1_tx_timecnt = 0;	
+    57be:	10 92 70 03 	sts	0x0370, r1	; 0x800370 <usart1_tx_timecnt>
+}
+    57c2:	00 00       	nop
+    57c4:	0f 90       	pop	r0
+    57c6:	0f 90       	pop	r0
+    57c8:	0f 90       	pop	r0
+    57ca:	df 91       	pop	r29
+    57cc:	cf 91       	pop	r28
+    57ce:	08 95       	ret
+
+000057d0 <all_set_over_below_temp>:
+
+void all_set_over_below_temp(uint8_t value)
+{
+    57d0:	cf 93       	push	r28
+    57d2:	df 93       	push	r29
+    57d4:	00 d0       	rcall	.+0      	; 0x57d6 <all_set_over_below_temp+0x6>
+    57d6:	1f 92       	push	r1
+    57d8:	cd b7       	in	r28, 0x3d	; 61
+    57da:	de b7       	in	r29, 0x3e	; 62
+    57dc:	8b 83       	std	Y+3, r24	; 0x03
+	uint16_t crc;
+	
+	usart1_tx_buff[0] = 0xA5;
+    57de:	85 ea       	ldi	r24, 0xA5	; 165
+    57e0:	80 93 da 05 	sts	0x05DA, r24	; 0x8005da <usart1_tx_buff>
+	usart1_tx_buff[1] = 0x5A;
+    57e4:	8a e5       	ldi	r24, 0x5A	; 90
+    57e6:	80 93 db 05 	sts	0x05DB, r24	; 0x8005db <usart1_tx_buff+0x1>
+	usart1_tx_buff[2] = 0x04;
+    57ea:	84 e0       	ldi	r24, 0x04	; 4
+    57ec:	80 93 dc 05 	sts	0x05DC, r24	; 0x8005dc <usart1_tx_buff+0x2>
+	usart1_tx_buff[3] = OVER_BELOW_TEMP;
+    57f0:	8d e0       	ldi	r24, 0x0D	; 13
+    57f2:	80 93 dd 05 	sts	0x05DD, r24	; 0x8005dd <usart1_tx_buff+0x3>
+	usart1_tx_buff[4] = 0x00;		//全局
+    57f6:	10 92 de 05 	sts	0x05DE, r1	; 0x8005de <usart1_tx_buff+0x4>
+	usart1_tx_buff[5] = (value >> 8);
+    57fa:	8b 81       	ldd	r24, Y+3	; 0x03
+    57fc:	88 2f       	mov	r24, r24
+    57fe:	90 e0       	ldi	r25, 0x00	; 0
+    5800:	89 2f       	mov	r24, r25
+    5802:	99 0f       	add	r25, r25
+    5804:	99 0b       	sbc	r25, r25
+    5806:	80 93 df 05 	sts	0x05DF, r24	; 0x8005df <usart1_tx_buff+0x5>
+	usart1_tx_buff[6] = value;
+    580a:	8b 81       	ldd	r24, Y+3	; 0x03
+    580c:	80 93 e0 05 	sts	0x05E0, r24	; 0x8005e0 <usart1_tx_buff+0x6>
+	
+	crc = crc_check(usart1_tx_buff, 9);
+    5810:	69 e0       	ldi	r22, 0x09	; 9
+    5812:	8a ed       	ldi	r24, 0xDA	; 218
+    5814:	95 e0       	ldi	r25, 0x05	; 5
+    5816:	0e 94 eb 3c 	call	0x79d6	; 0x79d6 <crc_check>
+    581a:	9a 83       	std	Y+2, r25	; 0x02
+    581c:	89 83       	std	Y+1, r24	; 0x01
+
+	usart1_tx_buff[7] = crc & 0x00FF;
+    581e:	89 81       	ldd	r24, Y+1	; 0x01
+    5820:	80 93 e1 05 	sts	0x05E1, r24	; 0x8005e1 <usart1_tx_buff+0x7>
+	usart1_tx_buff[8] = crc >> 8;
+    5824:	89 81       	ldd	r24, Y+1	; 0x01
+    5826:	9a 81       	ldd	r25, Y+2	; 0x02
+    5828:	89 2f       	mov	r24, r25
+    582a:	99 27       	eor	r25, r25
+    582c:	80 93 e2 05 	sts	0x05E2, r24	; 0x8005e2 <usart1_tx_buff+0x8>
+	
+	while (usart1_tx_overtime_mask != 1)
+    5830:	00 00       	nop
+    5832:	80 91 71 03 	lds	r24, 0x0371	; 0x800371 <usart1_tx_overtime_mask>
+    5836:	81 30       	cpi	r24, 0x01	; 1
+    5838:	e1 f7       	brne	.-8      	; 0x5832 <all_set_over_below_temp+0x62>
+	;
+	usart1_send_str(usart1_tx_buff, 9);
+    583a:	69 e0       	ldi	r22, 0x09	; 9
+    583c:	8a ed       	ldi	r24, 0xDA	; 218
+    583e:	95 e0       	ldi	r25, 0x05	; 5
+    5840:	0e 94 75 3c 	call	0x78ea	; 0x78ea <usart1_send_str>
+	
+	usart1_tx_overtime_mask = 0;
+    5844:	10 92 71 03 	sts	0x0371, r1	; 0x800371 <usart1_tx_overtime_mask>
+	usart1_tx_timecnt = 0;
+    5848:	10 92 70 03 	sts	0x0370, r1	; 0x800370 <usart1_tx_timecnt>
+}
+    584c:	00 00       	nop
+    584e:	0f 90       	pop	r0
+    5850:	0f 90       	pop	r0
+    5852:	0f 90       	pop	r0
+    5854:	df 91       	pop	r29
+    5856:	cf 91       	pop	r28
+    5858:	08 95       	ret
+
+0000585a <every_set>:
+
+
+/*所有通道的某一数据 例如温度、传感器类型  打包一起发过去 地址为 00*/
+void every_set(uint8_t command, uint16_t *value)
+{
+    585a:	cf 93       	push	r28
+    585c:	df 93       	push	r29
+    585e:	cd b7       	in	r28, 0x3d	; 61
+    5860:	de b7       	in	r29, 0x3e	; 62
+    5862:	27 97       	sbiw	r28, 0x07	; 7
+    5864:	0f b6       	in	r0, 0x3f	; 63
+    5866:	f8 94       	cli
+    5868:	de bf       	out	0x3e, r29	; 62
+    586a:	0f be       	out	0x3f, r0	; 63
+    586c:	cd bf       	out	0x3d, r28	; 61
+    586e:	8d 83       	std	Y+5, r24	; 0x05
+    5870:	7f 83       	std	Y+7, r23	; 0x07
+    5872:	6e 83       	std	Y+6, r22	; 0x06
+	uint8_t i, lenth;
+	uint16_t crc;
+	
+	lenth = MAX_IQR_QUANTITY*2 + 7;
+    5874:	87 e3       	ldi	r24, 0x37	; 55
+    5876:	8a 83       	std	Y+2, r24	; 0x02
+	
+	usart1_tx_buff[0] = 0xA5;
+    5878:	85 ea       	ldi	r24, 0xA5	; 165
+    587a:	80 93 da 05 	sts	0x05DA, r24	; 0x8005da <usart1_tx_buff>
+	usart1_tx_buff[1] = 0x5A;
+    587e:	8a e5       	ldi	r24, 0x5A	; 90
+    5880:	80 93 db 05 	sts	0x05DB, r24	; 0x8005db <usart1_tx_buff+0x1>
+	usart1_tx_buff[2] = lenth - 5;		//长度不包括 数据头 长度 和校验位
+    5884:	8a 81       	ldd	r24, Y+2	; 0x02
+    5886:	85 50       	subi	r24, 0x05	; 5
+    5888:	80 93 dc 05 	sts	0x05DC, r24	; 0x8005dc <usart1_tx_buff+0x2>
+	usart1_tx_buff[3] = command;
+    588c:	8d 81       	ldd	r24, Y+5	; 0x05
+    588e:	80 93 dd 05 	sts	0x05DD, r24	; 0x8005dd <usart1_tx_buff+0x3>
+	usart1_tx_buff[4] = 0x00;			//address
+    5892:	10 92 de 05 	sts	0x05DE, r1	; 0x8005de <usart1_tx_buff+0x4>
+	
+=======
 	/*如果无告警 则自动关闭报警器*/
 	if (alarm_sta_mask == 0x0FFFFFF)
     5068:	8b 81       	ldd	r24, Y+3	; 0x03
@@ -12307,6 +13902,7 @@ void every_set(uint8_t command, uint16_t *value)
 	usart1_tx_buff[4] = 0x00;			//address
     5892:	10 92 de 05 	sts	0x05DE, r1	; 0x8005de <usart1_tx_buff+0x4>
 	
+>>>>>>> master
 	for (i=0; i<MAX_IQR_QUANTITY; i++)
     5896:	19 82       	std	Y+1, r1	; 0x01
     5898:	31 c0       	rjmp	.+98     	; 0x58fc <every_set+0xa2>
@@ -13015,18 +14611,24 @@ void read_eeprom_data(void)
     5d04:	08 95       	ret
 
 00005d06 <gpio_init>:
+<<<<<<< HEAD
 
 /*
 *初始化gpio
 */
 void gpio_init()
 {
+=======
+>>>>>>> master
     5d06:	cf 93       	push	r28
     5d08:	df 93       	push	r29
     5d0a:	cd b7       	in	r28, 0x3d	; 61
     5d0c:	de b7       	in	r29, 0x3e	; 62
+<<<<<<< HEAD
 	/* LED相关IO口初始化 */
 	LED1_PIN_OUTPUT;
+=======
+>>>>>>> master
     5d0e:	8a e3       	ldi	r24, 0x3A	; 58
     5d10:	90 e0       	ldi	r25, 0x00	; 0
     5d12:	2a e3       	ldi	r18, 0x3A	; 58
@@ -13036,7 +14638,10 @@ void gpio_init()
     5d1a:	20 64       	ori	r18, 0x40	; 64
     5d1c:	fc 01       	movw	r30, r24
     5d1e:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED2_PIN_OUTPUT;
+=======
+>>>>>>> master
     5d20:	8a e3       	ldi	r24, 0x3A	; 58
     5d22:	90 e0       	ldi	r25, 0x00	; 0
     5d24:	2a e3       	ldi	r18, 0x3A	; 58
@@ -13046,7 +14651,10 @@ void gpio_init()
     5d2c:	20 62       	ori	r18, 0x20	; 32
     5d2e:	fc 01       	movw	r30, r24
     5d30:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED3_PIN_OUTPUT;
+=======
+>>>>>>> master
     5d32:	8a e3       	ldi	r24, 0x3A	; 58
     5d34:	90 e0       	ldi	r25, 0x00	; 0
     5d36:	2a e3       	ldi	r18, 0x3A	; 58
@@ -13056,7 +14664,10 @@ void gpio_init()
     5d3e:	20 61       	ori	r18, 0x10	; 16
     5d40:	fc 01       	movw	r30, r24
     5d42:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED4_PIN_OUTPUT;
+=======
+>>>>>>> master
     5d44:	8a e3       	ldi	r24, 0x3A	; 58
     5d46:	90 e0       	ldi	r25, 0x00	; 0
     5d48:	2a e3       	ldi	r18, 0x3A	; 58
@@ -13066,7 +14677,10 @@ void gpio_init()
     5d50:	28 60       	ori	r18, 0x08	; 8
     5d52:	fc 01       	movw	r30, r24
     5d54:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED5_PIN_OUTPUT;
+=======
+>>>>>>> master
     5d56:	8a e3       	ldi	r24, 0x3A	; 58
     5d58:	90 e0       	ldi	r25, 0x00	; 0
     5d5a:	2a e3       	ldi	r18, 0x3A	; 58
@@ -13076,7 +14690,10 @@ void gpio_init()
     5d62:	24 60       	ori	r18, 0x04	; 4
     5d64:	fc 01       	movw	r30, r24
     5d66:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED6_PIN_OUTPUT;
+=======
+>>>>>>> master
     5d68:	8a e3       	ldi	r24, 0x3A	; 58
     5d6a:	90 e0       	ldi	r25, 0x00	; 0
     5d6c:	2a e3       	ldi	r18, 0x3A	; 58
@@ -13086,7 +14703,10 @@ void gpio_init()
     5d74:	22 60       	ori	r18, 0x02	; 2
     5d76:	fc 01       	movw	r30, r24
     5d78:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED7_PIN_OUTPUT;
+=======
+>>>>>>> master
     5d7a:	8a e3       	ldi	r24, 0x3A	; 58
     5d7c:	90 e0       	ldi	r25, 0x00	; 0
     5d7e:	2a e3       	ldi	r18, 0x3A	; 58
@@ -13096,8 +14716,11 @@ void gpio_init()
     5d86:	21 60       	ori	r18, 0x01	; 1
     5d88:	fc 01       	movw	r30, r24
     5d8a:	20 83       	st	Z, r18
+<<<<<<< HEAD
 
 	LED1_OFF;
+=======
+>>>>>>> master
     5d8c:	8b e3       	ldi	r24, 0x3B	; 59
     5d8e:	90 e0       	ldi	r25, 0x00	; 0
     5d90:	2b e3       	ldi	r18, 0x3B	; 59
@@ -13107,7 +14730,10 @@ void gpio_init()
     5d98:	20 64       	ori	r18, 0x40	; 64
     5d9a:	fc 01       	movw	r30, r24
     5d9c:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED2_OFF;
+=======
+>>>>>>> master
     5d9e:	8b e3       	ldi	r24, 0x3B	; 59
     5da0:	90 e0       	ldi	r25, 0x00	; 0
     5da2:	2b e3       	ldi	r18, 0x3B	; 59
@@ -13117,7 +14743,10 @@ void gpio_init()
     5daa:	20 62       	ori	r18, 0x20	; 32
     5dac:	fc 01       	movw	r30, r24
     5dae:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED3_OFF;
+=======
+>>>>>>> master
     5db0:	8b e3       	ldi	r24, 0x3B	; 59
     5db2:	90 e0       	ldi	r25, 0x00	; 0
     5db4:	2b e3       	ldi	r18, 0x3B	; 59
@@ -13127,7 +14756,10 @@ void gpio_init()
     5dbc:	20 61       	ori	r18, 0x10	; 16
     5dbe:	fc 01       	movw	r30, r24
     5dc0:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED4_OFF;
+=======
+>>>>>>> master
     5dc2:	8b e3       	ldi	r24, 0x3B	; 59
     5dc4:	90 e0       	ldi	r25, 0x00	; 0
     5dc6:	2b e3       	ldi	r18, 0x3B	; 59
@@ -13137,7 +14769,10 @@ void gpio_init()
     5dce:	28 60       	ori	r18, 0x08	; 8
     5dd0:	fc 01       	movw	r30, r24
     5dd2:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED5_ON;
+=======
+>>>>>>> master
     5dd4:	8b e3       	ldi	r24, 0x3B	; 59
     5dd6:	90 e0       	ldi	r25, 0x00	; 0
     5dd8:	2b e3       	ldi	r18, 0x3B	; 59
@@ -13147,7 +14782,10 @@ void gpio_init()
     5de0:	2b 7f       	andi	r18, 0xFB	; 251
     5de2:	fc 01       	movw	r30, r24
     5de4:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED6_OFF;
+=======
+>>>>>>> master
     5de6:	8b e3       	ldi	r24, 0x3B	; 59
     5de8:	90 e0       	ldi	r25, 0x00	; 0
     5dea:	2b e3       	ldi	r18, 0x3B	; 59
@@ -13157,7 +14795,10 @@ void gpio_init()
     5df2:	22 60       	ori	r18, 0x02	; 2
     5df4:	fc 01       	movw	r30, r24
     5df6:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	LED7_ON;
+=======
+>>>>>>> master
     5df8:	8b e3       	ldi	r24, 0x3B	; 59
     5dfa:	90 e0       	ldi	r25, 0x00	; 0
     5dfc:	2b e3       	ldi	r18, 0x3B	; 59
@@ -13167,12 +14808,15 @@ void gpio_init()
     5e04:	2e 7f       	andi	r18, 0xFE	; 254
     5e06:	fc 01       	movw	r30, r24
     5e08:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	IQR6_CLOSE;
 	IQR7_CLOSE;
 	*/
 
 	/* 继电器相关IO口初始化 */
 	ALARM_PIN_OUTPUT;
+=======
+>>>>>>> master
     5e0a:	81 e3       	ldi	r24, 0x31	; 49
     5e0c:	90 e0       	ldi	r25, 0x00	; 0
     5e0e:	21 e3       	ldi	r18, 0x31	; 49
@@ -13182,7 +14826,10 @@ void gpio_init()
     5e16:	20 61       	ori	r18, 0x10	; 16
     5e18:	fc 01       	movw	r30, r24
     5e1a:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	ACCON_PIN_OUTPUT;
+=======
+>>>>>>> master
     5e1c:	81 e3       	ldi	r24, 0x31	; 49
     5e1e:	90 e0       	ldi	r25, 0x00	; 0
     5e20:	21 e3       	ldi	r18, 0x31	; 49
@@ -13192,8 +14839,11 @@ void gpio_init()
     5e28:	20 62       	ori	r18, 0x20	; 32
     5e2a:	fc 01       	movw	r30, r24
     5e2c:	20 83       	st	Z, r18
+<<<<<<< HEAD
 
 	ALARM_OFF;
+=======
+>>>>>>> master
     5e2e:	82 e3       	ldi	r24, 0x32	; 50
     5e30:	90 e0       	ldi	r25, 0x00	; 0
     5e32:	22 e3       	ldi	r18, 0x32	; 50
@@ -13203,7 +14853,10 @@ void gpio_init()
     5e3a:	2f 7e       	andi	r18, 0xEF	; 239
     5e3c:	fc 01       	movw	r30, r24
     5e3e:	20 83       	st	Z, r18
+<<<<<<< HEAD
 	ACCON_ON;
+=======
+>>>>>>> master
     5e40:	82 e3       	ldi	r24, 0x32	; 50
     5e42:	90 e0       	ldi	r25, 0x00	; 0
     5e44:	22 e3       	ldi	r18, 0x32	; 50
