@@ -40,7 +40,9 @@ void read_eeprom_data(void)
 			template_eeaddr[i] = i * TEMPLATE_SIZE;
 			eeprom_write_word((uint16_t *)(TEMPLATE_EEADDR + i * 2), template_eeaddr[i]);
 		}
-
+		
+		eeprom_write_word((uint16_t *)ALL_SET_TEMP_EEADDR, all_temp);
+		
 		eeprom_write_byte((uint8_t *)FIRST_START_ADDR, 'y');
 	}
 	else
@@ -50,6 +52,7 @@ void read_eeprom_data(void)
 		template_cnt = eeprom_read_byte((uint8_t*)TEMPLATE_CNT_EEADDR);
 		time_ctrl_mode = eeprom_read_byte((uint8_t*)TIME_CTRL_MODE_EEADDR);
 		max_set_temp = eeprom_read_word((uint16_t*)MAX_TEMP_LIMIT_EEADDR);
+		all_temp = eeprom_read_word((uint16_t*)ALL_SET_TEMP_EEADDR);
 		
 		for (i = 0; i < alarm_cnt; i++)
 		{

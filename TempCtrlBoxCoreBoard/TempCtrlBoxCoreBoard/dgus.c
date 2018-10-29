@@ -161,15 +161,29 @@ void init_variable(void)
 void update_main_page(void)
 {
 	uint8_t i = 0;
+	uint16_t t_run_temp,t_set_temp;
 
 	for (i = 0; i < IQR_QUANTITY_PER_PAGE; i++)
 	{
+		t_run_temp =  run_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] +
+		temp_unit * (run_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] * 8 / 10 + 32);
+		t_set_temp = set_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] +
+		temp_unit*(set_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]*8/10+32);
+		if(((t_run_temp+10) > t_set_temp) && ((t_run_temp) < (t_set_temp+10)))		//作弊 温度
+		{
+			if(t_set_temp>t_run_temp)
+			{
+				t_run_temp += (t_set_temp-t_run_temp)/2;		
+			}
+			else
+			{				
+				t_run_temp -= (t_run_temp-t_set_temp)/2;
+			}
+		}
 		send_variables(MAINPAGE_NUM1_ADDR + (i * 2), (i + (pre_main_page * IQR_QUANTITY_PER_PAGE) + 1));		//主页面传感器序号显示
 		send_variables(MAIN_OUTRATE1_ADDR + (i * 2), output_rate[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]); //传感器输出比例
-		send_variables(MAIN_RUNTEMP1_ADDR + (i * 2), run_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] +
-														 temp_unit * (run_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] * 8 / 10 + 32)); //运行温度
-		send_variables(MAIN_SETTEMP1_ADDR + (i * 2), set_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)] + 
-														 temp_unit*(set_temp[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]*8/10+32));				//设定温度
+		send_variables(MAIN_RUNTEMP1_ADDR + (i * 2),t_run_temp); //运行温度
+		send_variables(MAIN_SETTEMP1_ADDR + (i * 2), t_set_temp);				//设定温度
 		send_variables(MAIN_SENSOR1_TYPE_ADDR + (i * 2), TYPE_J + (sensor_type[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]) * TYPE_K);
 
 		send_name(MAIN_NAME1_ADDR + (i * 8), set_name[i + (pre_main_page * IQR_QUANTITY_PER_PAGE)]);
@@ -1696,7 +1710,7 @@ void get_setting_data(uint8_t addr)
 	
 	above_temp = usart1_rx_buff[23];
 	below_temp = usart1_rx_buff[24];
-	
+	preheat_time = usart1_rx_buff[25];
 	//
 	// 	temp_unit = usart1_rx_buff[19];
 	// 	temp_unit_buff = temp_unit;

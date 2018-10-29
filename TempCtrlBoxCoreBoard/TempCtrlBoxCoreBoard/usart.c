@@ -163,7 +163,8 @@ int usart0_deal(void)
 			if(variable <= max_set_temp)
 			{
 				all_temp = variable;
-				all_set(TEMP, all_temp);			
+				all_set(TEMP, all_temp);
+				eeprom_write_word((uint16_t *)ALL_SET_TEMP_EEADDR, all_temp);			
 			}
 			else
 			{

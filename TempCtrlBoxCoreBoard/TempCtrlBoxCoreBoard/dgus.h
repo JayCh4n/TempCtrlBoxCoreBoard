@@ -417,8 +417,8 @@
 #define TEMPLATE_EEADDR	0x00190		  //模板存储在外部EEPROM中的地址 双字节 30个模板60bytes 0x0190 ~ 0x01CB   50个模板就是100bytes 0x00190 - 0x01F3 
 #define TEMPLATE_CNT_EEADDR	0x01FF	  
 #define TIME_CTRL_MODE_EEADDR	0x0200
-#define MAX_TEMP_LIMIT_EEADDR	0x0201		//-0x0201
-
+#define MAX_TEMP_LIMIT_EEADDR	0x0201		//-0x0202
+#define ALL_SET_TEMP_EEADDR		0x0203		//-0x0204
 typedef enum
 {
 	thermocouple_disconnected,
